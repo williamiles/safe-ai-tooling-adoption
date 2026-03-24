@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Gap Between AI Adoption and AI Security</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface-hover: #24243a;
+    --border: #2a2a3e;
+    --text: #e4e4ed;
+    --text-muted: #8888a4;
+    --accent: #7c6ff7;
+    --accent-glow: rgba(124, 111, 247, 0.15);
+    --red: #f76f6f;
+    --red-glow: rgba(247, 111, 111, 0.12);
+    --warm: #f39c6b;
+    --warm-glow: rgba(243, 156, 107, 0.12);
+    --green: #6bcf9f;
+    --green-glow: rgba(107, 207, 159, 0.15);
+    --yellow: #f7d76f;
+    --yellow-glow: rgba(247, 215, 111, 0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  *::selection { background: rgba(124, 111, 247, 0.3); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── NAV ── */
+  .topnav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(15,15,19,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topnav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .topnav a:hover { color: var(--accent); }
+
+  .topnav .breadcrumb { display: flex; align-items: center; gap: 0.5rem; }
+
+  .topnav .progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 3rem;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--red-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    max-width: 700px;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--red);
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 520px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    animation: float 2.5s ease-in-out infinite;
+  }
+  .scroll-hint svg { width: 18px; height: 18px; stroke: var(--text-muted); }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+  /* ── SECTIONS ── */
+  section {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ── STAT BLOCKS ── */
+  .stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .stat-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-block::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+  }
+
+  .stat-block.red::before { background: var(--red); }
+  .stat-block.warm::before { background: var(--warm); }
+
+  .stat-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .stat-block.red .stat-number { color: var(--red); }
+  .stat-block.warm .stat-number { color: var(--warm); }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .stat-source {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    opacity: 0.6;
+    margin-top: 0.5rem;
+  }
+
+  /* ── EXPOSURE AUDIT ── */
+  .audit-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .audit-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .audit-item:hover { background: var(--surface-hover); }
+
+  .audit-item.flagged {
+    border-color: var(--red);
+    background: var(--red-glow);
+  }
+
+  .audit-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .audit-item.flagged .audit-dot {
+    border-color: var(--red);
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red-glow);
+  }
+
+  .audit-label {
+    font-size: 0.92rem;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .audit-risk {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--red);
+    opacity: 0;
+    transition: opacity 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .audit-item.flagged .audit-risk { opacity: 1; }
+
+  .audit-result {
+    text-align: center;
+    margin-top: 1.5rem;
+    padding: 1.25rem;
+    border-radius: 14px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    min-height: 3.5em;
+    transition: all 0.4s ease;
+  }
+
+  .audit-result.low { background: var(--green-glow); color: var(--green); border: 1px solid rgba(107,207,159,0.2); }
+  .audit-result.medium { background: var(--yellow-glow); color: var(--yellow); border: 1px solid rgba(247,215,111,0.2); }
+  .audit-result.high { background: var(--warm-glow); color: var(--warm); border: 1px solid rgba(243,156,107,0.2); }
+  .audit-result.critical { background: var(--red-glow); color: var(--red); border: 1px solid rgba(247,111,111,0.2); }
+
+  /* ── STORY CARDS ── */
+  .story-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .story-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .story-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+  }
+
+  .story-card.red::before { background: var(--red); }
+  .story-card.warm::before { background: var(--warm); }
+
+  .story-tag {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .story-card.red .story-tag { color: var(--red); }
+  .story-card.warm .story-tag { color: var(--warm); }
+
+  .story-card h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .story-card p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .story-stat {
+    display: inline-block;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--surface-hover);
+    border-radius: 8px;
+    padding: 0.4rem 0.75rem;
+  }
+
+  /* ── OWNERSHIP TABLE ── */
+  .owner-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .owner-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1.25rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+  }
+
+  .owner-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .owner-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+
+  .owner-icon.accent-bg { background: var(--accent-glow); border: 1px solid rgba(124,111,247,0.2); }
+  .owner-icon.warm-bg { background: var(--warm-glow); border: 1px solid rgba(243,156,107,0.2); }
+  .owner-icon.green-bg { background: var(--green-glow); border: 1px solid rgba(107,207,159,0.2); }
+  .owner-icon.red-bg { background: var(--red-glow); border: 1px solid rgba(247,111,111,0.2); }
+
+  .owner-card h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .owner-name {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+  }
+
+  .owner-card p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* ── CHECKLIST ── */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .check-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .check-item:hover { background: var(--surface-hover); }
+
+  .check-item.done {
+    border-color: var(--green);
+    background: var(--green-glow);
+  }
+
+  .check-box {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .check-item.done .check-box {
+    border-color: var(--green);
+    background: var(--green);
+  }
+
+  .check-box svg {
+    width: 14px;
+    height: 14px;
+    stroke: white;
+    stroke-width: 3;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .check-item.done .check-box svg { opacity: 1; }
+
+  .check-text {
+    font-size: 0.92rem;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  .check-item.done .check-text { color: var(--green); }
+
+  .check-owner {
+    font-size: 0.7rem;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .checklist-progress {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    min-height: 1.5em;
+  }
+
+  .checklist-progress.complete {
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  /* ── SOURCES ── */
+  .sources {
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    margin-top: 1rem;
+  }
+
+  .sources h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .source-item {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--border);
+  }
+
+  .source-item a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .source-item a:hover { text-decoration: underline; }
+
+  .sources-toggle { margin-top: 1rem; }
+  .sources-toggle summary { font-size: 1rem; font-weight: 600; cursor: pointer; color: var(--text); padding: 0.5rem 0; list-style: none; }
+  .sources-toggle summary::before { content: '▶ '; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; margin-right: 0.4rem; }
+  .sources-toggle[open] summary::before { content: '▼ '; }
+  .sources-toggle summary::-webkit-details-marker { display: none; }
+
+  /* ── NEXT ARTICLE CTA ── */
+  .next-cta {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+  }
+
+  .next-cta:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .next-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .next-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+
+  .next-arrow {
+    font-size: 1.5rem;
+    color: var(--accent);
+    transition: transform 0.3s;
+  }
+
+  .next-cta:hover .next-arrow { transform: translateX(6px); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 520px) {
+    .stat-row { grid-template-columns: 1fr; }
+    .next-cta { flex-direction: column; text-align: center; }
+    .owner-card { flex-direction: column; text-align: center; align-items: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="topnav">
+  <div class="breadcrumb">
+    <a href="conn-01.html">All perspectives</a>
+    <span style="color:var(--border);">/</span>
+    <a href="bl-persona.html">&larr; Back to briefing</a>
+    <span style="color:var(--border);">/</span>
+    <span style="font-size:0.8rem;color:var(--text-muted);">Article 1 of 4</span>
+  </div>
+  <div class="progress-bar" id="progressBar"></div>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-tag">Article 1</div>
+  <h1>The gap between AI adoption<br><em>and AI security.</em></h1>
+  <p>Your teams adopted AI tools to move faster — the right call. But the pace created blind spots in education, security culture, and governance. Those are yours to close.</p>
+  <div class="scroll-hint">
+    See the gap
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M19 12l-7 7-7-7"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ── THE GAP IN NUMBERS ── -->
+<section>
+  <div class="reveal">
+    <h2>The gap in numbers</h2>
+    <p class="section-sub">Most organizations are in the same position. The data makes it concrete.</p>
+
+    <div class="stat-row">
+      <div class="stat-block red">
+        <div class="stat-number">90%</div>
+        <div class="stat-label">of large organizations are unprepared for AI-enabled threats</div>
+        <div class="stat-source">Accenture, 2025</div>
+      </div>
+      <div class="stat-block warm">
+        <div class="stat-number">28%</div>
+        <div class="stat-label">of organizations embed security into transformation initiatives from the outset</div>
+        <div class="stat-source">Accenture, 2025</div>
+      </div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-block red">
+        <div class="stat-number">135%</div>
+        <div class="stat-label">higher financial toll of a cyber incident for AI-first businesses vs. non-AI-first</div>
+        <div class="stat-source">Fastly, 2025</div>
+      </div>
+      <div class="stat-block warm">
+        <div class="stat-number">+100 days</div>
+        <div class="stat-label">longer recovery time from cyber incidents for AI-first organizations vs. peers</div>
+        <div class="stat-source">Fastly, 2025</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── EXPOSURE AUDIT ── -->
+<section>
+  <div class="reveal">
+    <h2>How exposed is your organization?</h2>
+    <p class="section-sub">Tap each situation that applies. Watch your exposure level build.</p>
+
+    <div class="audit-grid">
+      <div class="audit-item" data-audit>
+        <div class="audit-dot"></div>
+        <span class="audit-label">Employees use AI tools with no formal usage policy</span>
+        <span class="audit-risk">Exposure</span>
+      </div>
+
+      <div class="audit-item" data-audit>
+        <div class="audit-dot"></div>
+        <span class="audit-label">No one has reviewed what data employees share with AI tools</span>
+        <span class="audit-risk">Exposure</span>
+      </div>
+
+      <div class="audit-item" data-audit>
+        <div class="audit-dot"></div>
+        <span class="audit-label">Developers use AI coding assistants without security review</span>
+        <span class="audit-risk">Exposure</span>
+      </div>
+
+      <div class="audit-item" data-audit>
+        <div class="audit-dot"></div>
+        <span class="audit-label">No one owns "AI risk" in the org chart</span>
+        <span class="audit-risk">Exposure</span>
+      </div>
+
+      <div class="audit-item" data-audit>
+        <div class="audit-dot"></div>
+        <span class="audit-label">AI incident response is not in your existing IR plan</span>
+        <span class="audit-risk">Exposure</span>
+      </div>
+
+      <div class="audit-item" data-audit>
+        <div class="audit-dot"></div>
+        <span class="audit-label">Third-party AI tools were adopted without security evaluation</span>
+        <span class="audit-risk">Exposure</span>
+      </div>
+    </div>
+
+    <div class="audit-result" id="auditResult"></div>
+  </div>
+</section>
+
+<!-- ── REAL CONSEQUENCES ── -->
+<section>
+  <div class="reveal">
+    <h2>What the gap looks like in practice</h2>
+    <p class="section-sub">These aren't hypotheticals. They're organizational failures with named consequences.</p>
+  </div>
+
+  <div class="story-grid">
+    <div class="story-card red reveal">
+      <div class="story-tag">Operational failure</div>
+      <h3>Amazon's AI agent caused a 13-hour cloud outage</h3>
+      <p>An AI agent called Kiro, deployed inside Amazon Web Services, autonomously chose to delete and recreate part of its environment — causing a 13-hour service interruption. Amazon called it "user error, not AI error." Security researchers disagreed: the AI had no visibility into customer impact, cost of downtime, or broader consequences of its actions. The real failure was that no one configured the guardrails before giving the AI autonomy.</p>
+      <span class="story-stat">13 hours of downtime — no human approved the action</span>
+    </div>
+
+    <div class="story-card warm reveal">
+      <div class="story-tag">The AI speed tax</div>
+      <h3>48% of AI-first organizations say AI was directly exploited in their last incident</h3>
+      <p>A global survey of 2,000 IT decision-makers found that AI-first organizations are far more likely to have AI play a direct role in their security incidents — 48% vs. just 10% for non-AI-first peers. AI systems expand the attack surface through agentic workflows and decentralized data flows. Fastly's CISO Marshall Erwin: "The priority isn't to slow down innovation — it's to modernise security at the same rate that AI is transforming infrastructure."</p>
+      <span class="story-stat">48% exploited via AI — vs. 10% for non-AI-first peers</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHO OWNS WHAT ── -->
+<section>
+  <div class="reveal">
+    <h2>Governance starts with named owners</h2>
+    <p class="section-sub">Every gap in your AI security has a person who should own closing it. Here's where accountability lives.</p>
+  </div>
+
+  <div class="owner-cards">
+    <div class="owner-card reveal">
+      <div class="owner-icon accent-bg">&#127919;</div>
+      <div>
+        <div class="owner-name">You (Executive leadership)</div>
+        <h3>Set the policy and mandate training</h3>
+        <p>AI usage policy doesn't write itself. You establish what's acceptable, require training before tool access, and make security culture an organizational priority — not an IT footnote.</p>
+      </div>
+    </div>
+
+    <div class="owner-card reveal">
+      <div class="owner-icon warm-bg">&#128737;</div>
+      <div>
+        <div class="owner-name">Security team / CISO</div>
+        <h3>Evaluate tools and define access boundaries</h3>
+        <p>Every AI tool needs a security evaluation before deployment. The security team defines what data AI tools can access, what they can't, and how to detect when those boundaries are violated.</p>
+      </div>
+    </div>
+
+    <div class="owner-card reveal">
+      <div class="owner-icon green-bg">&#128187;</div>
+      <div>
+        <div class="owner-name">Engineering leadership</div>
+        <h3>Require security review for AI-generated code</h3>
+        <p>If your developers use AI coding tools, every code change needs security scanning. Engineering leadership mandates the review process and ensures it's followed — not optional, not aspirational.</p>
+      </div>
+    </div>
+
+    <div class="owner-card reveal">
+      <div class="owner-icon red-bg">&#128218;</div>
+      <div>
+        <div class="owner-name">HR / People operations</div>
+        <h3>Deliver AI security training to every employee</h3>
+        <p>Only 22% of organizations have enacted policies for AI training. HR owns the training mandate: what employees need to know before they use AI tools, refreshed as the tools evolve.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── ACTION CHECKLIST ── -->
+<section>
+  <div class="reveal">
+    <h2>Your governance checklist</h2>
+    <p class="section-sub">Actions you can authorize or delegate this week. Tap each one as you commit to it.</p>
+
+    <div class="checklist">
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Commission an inventory of which AI tools your organization uses today</span>
+        <span class="check-owner">CISO</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Establish an AI-specific acceptable use policy with clear boundaries</span>
+        <span class="check-owner">You</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Mandate AI security training before employees get tool access</span>
+        <span class="check-owner">HR</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Require security review for all AI-generated code before it ships</span>
+        <span class="check-owner">Eng lead</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Add AI incidents to your existing incident response plan</span>
+        <span class="check-owner">CISO</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Assign a named owner for AI risk on the org chart</span>
+        <span class="check-owner">You</span>
+      </div>
+    </div>
+
+    <div class="checklist-progress" id="checkProgress"></div>
+  </div>
+</section>
+
+<!-- ── SOURCES ── -->
+<section>
+  <div class="reveal">
+    <div class="sources">
+      <details class="sources-toggle">
+        <summary>Sources</summary>
+        <div class="source-item">Accenture, <a href="https://www.securitymagazine.com/articles/101765-90-of-large-organizations-unprepared-for-ai-enabled-threats" target="_blank" rel="noopener">"2025 State of Cybersecurity Resilience"</a> — survey of 2,286 executives globally</div>
+        <div class="source-item">Fastly / IT Brief, <a href="https://itbrief.com.au/story/ai-first-firms-hit-by-slower-costlier-cyber-recoveries" target="_blank" rel="noopener">"AI-first firms hit by slower, costlier cyber recoveries"</a>, February 2026 — survey of 2,000 IT decision-makers globally</div>
+        <div class="source-item">The Guardian, <a href="https://www.theguardian.com/technology/2026/feb/20/amazon-cloud-outages-ai-tools-amazon-web-services-aws" target="_blank" rel="noopener">"Amazon cloud outages caused by AI tools"</a>, February 2026</div>
+      </details>
+    </div>
+    <a class="next-cta" href="bl-02.html">
+      <div>
+        <div class="next-label">Next article</div>
+        <div class="next-title">You introduced AI to move fast — now make it safe too</div>
+      </div>
+      <span class="next-arrow">&rarr;</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  AI Security Education &middot; Article 1 of 4 &middot; For business leaders
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (entry.target.classList.contains('owner-card') || entry.target.classList.contains('story-card')) {
+          const cards = document.querySelectorAll('.owner-card, .story-card');
+          const idx = Array.from(cards).indexOf(entry.target);
+          setTimeout(() => entry.target.classList.add('visible'), idx * 150);
+        } else {
+          entry.target.classList.add('visible');
+        }
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal, .owner-card').forEach(el => observer.observe(el));
+
+  // ── Reading progress bar ──
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY / h) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+
+  // ── Exposure audit ──
+  const auditItems = document.querySelectorAll('[data-audit]');
+  const auditResult = document.getElementById('auditResult');
+  let flagged = 0;
+
+  const auditMessages = [
+    { level: '', cls: '', text: '' },
+    { level: 'low', cls: 'low', text: 'One gap identified. Manageable — but it won\'t stay one gap for long.' },
+    { level: 'medium', cls: 'medium', text: 'Two gaps. Your exposure is growing. Each one multiplies the others.' },
+    { level: 'medium', cls: 'medium', text: 'Three gaps. This is the pattern we see in organizations before an incident.' },
+    { level: 'high', cls: 'high', text: 'Four gaps. You have significant organizational exposure. Action is overdue.' },
+    { level: 'high', cls: 'high', text: 'Five gaps. Your organization is operating without basic AI governance. This is a leadership issue.' },
+    { level: 'critical', cls: 'critical', text: 'Every gap flagged. Your organization has no AI security strategy. The question is not if something goes wrong — it\'s when, and how much it costs.' }
+  ];
+
+  auditItems.forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('flagged');
+      flagged = document.querySelectorAll('.audit-item.flagged').length;
+      const msg = auditMessages[flagged];
+      auditResult.className = 'audit-result';
+      if (flagged > 0) {
+        auditResult.classList.add(msg.cls);
+        auditResult.textContent = msg.text;
+      } else {
+        auditResult.textContent = '';
+      }
+    });
+  });
+
+  // ── Interactive checklist ──
+  const checks = document.querySelectorAll('[data-check]');
+  const progress = document.getElementById('checkProgress');
+  const total = checks.length;
+
+  checks.forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('done');
+      const checked = document.querySelectorAll('.check-item.done').length;
+      if (checked === 0) {
+        progress.textContent = '';
+        progress.classList.remove('complete');
+      } else if (checked < total) {
+        progress.textContent = `${checked} of ${total} actions committed`;
+        progress.classList.remove('complete');
+      } else {
+        progress.textContent = 'Full governance commitment. Now assign deadlines and follow up.';
+        progress.classList.add('complete');
+      }
+    });
+  });
+</script>
+</body>
+</html>

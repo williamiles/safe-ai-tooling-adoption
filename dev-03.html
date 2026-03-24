@@ -1,0 +1,1935 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      Your AI Dev Environment Is a Security Surface — Configure It Like One
+    </title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a24;
+        --surface-hover: #24243a;
+        --border: #2a2a3e;
+        --text: #e4e4ed;
+        --text-muted: #8888a4;
+        --accent: #7c6ff7;
+        --accent-glow: rgba(124, 111, 247, 0.15);
+        --red: #f76f6f;
+        --red-glow: rgba(247, 111, 111, 0.12);
+        --warm: #f39c6b;
+        --warm-glow: rgba(243, 156, 107, 0.12);
+        --green: #6bcf9f;
+        --green-glow: rgba(107, 207, 159, 0.15);
+        --yellow: #f7d76f;
+        --yellow-glow: rgba(247, 215, 111, 0.12);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      *::selection {
+        background: rgba(124, 111, 247, 0.3);
+      }
+      a,
+      button,
+      [role="button"],
+      .spoke,
+      .tile,
+      [data-tile],
+      [data-spoke] {
+        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+      }
+
+      code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88em;
+        background: var(--accent-glow);
+        color: var(--accent);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── NAV ── */
+      .topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(15, 15, 19, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .topnav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .topnav a:hover {
+        color: var(--accent);
+      }
+      .topnav .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .topnav .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.1s linear;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6rem 2rem 3rem;
+        position: relative;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          var(--accent-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .hero-tag {
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+      }
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        max-width: 750px;
+        margin-bottom: 1.25rem;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .hero p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 560px;
+      }
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        animation: float 2.5s ease-in-out infinite;
+      }
+      .scroll-hint svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--text-muted);
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(8px);
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+      }
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+      .section-sub {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      /* ── MINDSET BOX ── */
+      .mindset-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 2rem;
+      }
+
+      .mindset-box p {
+        font-size: 0.92rem;
+        color: var(--text-muted);
+        line-height: 1.75;
+        margin-bottom: 1rem;
+      }
+
+      .mindset-box p:last-child {
+        margin-bottom: 0;
+      }
+      .mindset-box strong {
+        color: var(--text);
+      }
+
+      .mindset-highlight {
+        padding: 1.25rem 1.5rem;
+        border-radius: 12px;
+        background: var(--green-glow);
+        border: 1px solid rgba(107, 207, 159, 0.15);
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: var(--green);
+        text-align: center;
+        margin-top: 1.25rem;
+        line-height: 1.6;
+      }
+
+      /* ── AUTONOMY LEVELS ── */
+      .level-track {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+
+      .level-row {
+        display: flex;
+        align-items: stretch;
+        gap: 1rem;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: all 0.3s;
+      }
+
+      .level-indicator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 40px;
+        flex-shrink: 0;
+      }
+
+      .level-dot {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        flex-shrink: 0;
+        transition: all 0.3s;
+        z-index: 1;
+        background: var(--bg);
+      }
+
+      .level-line {
+        width: 2px;
+        flex: 1;
+        background: var(--border);
+        transition: background 0.3s;
+      }
+
+      .level-row:last-child .level-line {
+        display: none;
+      }
+
+      .level-body {
+        flex: 1;
+        padding: 0.75rem 0 1.5rem;
+      }
+
+      .level-badge {
+        font-size: 0.68rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text-muted);
+        margin-bottom: 0.2rem;
+        transition: color 0.3s;
+      }
+
+      .level-name {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+
+      .level-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .level-controls {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+      }
+
+      .level-controls-inner {
+        padding-top: 0.75rem;
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+
+      .level-controls-inner strong {
+        color: var(--text);
+      }
+
+      .control-tag {
+        display: inline-block;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        font-weight: 600;
+        padding: 0.15rem 0.45rem;
+        border-radius: 4px;
+        margin-right: 0.3rem;
+        margin-bottom: 0.3rem;
+      }
+
+      .control-tag.green {
+        background: var(--green-glow);
+        color: var(--green);
+      }
+      .control-tag.yellow {
+        background: var(--yellow-glow);
+        color: var(--yellow);
+      }
+      .control-tag.red {
+        background: var(--red-glow);
+        color: var(--red);
+      }
+
+      .level-row.active .level-dot {
+        border-color: var(--accent);
+        background: var(--accent);
+        color: white;
+      }
+      .level-row.active .level-line {
+        background: var(--accent);
+      }
+      .level-row.active .level-badge {
+        color: var(--accent);
+      }
+      .level-row.active .level-controls {
+        max-height: 300px;
+      }
+
+      .level-row.l1.active .level-dot {
+        border-color: var(--green);
+        background: var(--green);
+      }
+      .level-row.l1.active .level-line {
+        background: var(--green);
+      }
+      .level-row.l1.active .level-badge {
+        color: var(--green);
+      }
+      .level-row.l2.active .level-dot {
+        border-color: var(--yellow);
+        background: var(--yellow);
+      }
+      .level-row.l2.active .level-line {
+        background: var(--yellow);
+      }
+      .level-row.l2.active .level-badge {
+        color: var(--yellow);
+      }
+      .level-row.l3.active .level-dot {
+        border-color: var(--warm);
+        background: var(--warm);
+      }
+      .level-row.l3.active .level-line {
+        background: var(--warm);
+      }
+      .level-row.l3.active .level-badge {
+        color: var(--warm);
+      }
+      .level-row.l4.active .level-dot {
+        border-color: var(--red);
+        background: var(--red);
+      }
+      .level-row.l4.active .level-badge {
+        color: var(--red);
+      }
+
+      /* ── SANDBOX SECTIONS ── */
+      .sandbox-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+        margin-bottom: 1rem;
+      }
+
+      .sandbox-header {
+        padding: 1.75rem 2rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .sandbox-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+      }
+
+      .sandbox-badge.green {
+        background: var(--green-glow);
+        color: var(--green);
+      }
+      .sandbox-badge.accent {
+        background: var(--accent-glow);
+        color: var(--accent);
+      }
+      .sandbox-badge.yellow {
+        background: var(--yellow-glow);
+        color: var(--yellow);
+      }
+
+      .sandbox-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .sandbox-body {
+        padding: 1.25rem 2rem 1.75rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      .sandbox-body strong {
+        color: var(--text);
+      }
+
+      .sandbox-stat-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+
+      .sandbox-stat {
+        text-align: center;
+        padding: 1rem;
+        border-radius: 12px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+      }
+
+      .sandbox-stat-num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--green);
+        line-height: 1;
+        margin-bottom: 0.35rem;
+      }
+
+      .sandbox-stat-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+      }
+
+      /* ── CONFIG BLOCK ── */
+      .config-block {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-top: 1.25rem;
+        overflow: hidden;
+      }
+
+      .config-header {
+        padding: 0.6rem 1rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        background: var(--surface-hover);
+        border-bottom: 1px solid var(--border);
+      }
+
+      .config-body {
+        padding: 1rem;
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.8rem;
+        line-height: 1.7;
+        color: var(--text-muted);
+        overflow-x: auto;
+      }
+
+      .config-body .key {
+        color: var(--accent);
+      }
+      .config-body .val {
+        color: var(--green);
+      }
+      .config-body .deny {
+        color: var(--red);
+      }
+      .config-body .allow {
+        color: var(--green);
+      }
+      .config-body .comment {
+        color: var(--text-muted);
+        opacity: 0.5;
+      }
+
+      /* ── MODE SELECTOR ── */
+      .mode-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-top: 1.25rem;
+      }
+
+      .mode-card {
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: all 0.3s;
+        background: var(--bg);
+        border: 1px solid var(--border);
+      }
+
+      .mode-card:hover {
+        background: var(--surface-hover);
+      }
+
+      .mode-card.active {
+        border-color: var(--accent);
+        background: var(--accent-glow);
+      }
+
+      .mode-name {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.82rem;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+      }
+
+      .mode-desc {
+        font-size: 0.78rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .mode-detail {
+        margin-top: 1rem;
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.65;
+        min-height: 3.5em;
+      }
+
+      .mode-detail strong {
+        color: var(--text);
+      }
+      .mode-detail .safe {
+        color: var(--green);
+        font-weight: 600;
+      }
+      .mode-detail .caution {
+        color: var(--yellow);
+        font-weight: 600;
+      }
+      .mode-detail .danger {
+        color: var(--red);
+        font-weight: 600;
+      }
+
+      /* ── CONNECTOR AUDIT ── */
+      .connector-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .connector-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        background: var(--surface);
+        border: 1px solid var(--border);
+      }
+
+      .connector-item:hover {
+        background: var(--surface-hover);
+      }
+
+      .connector-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        transition: all 0.3s;
+      }
+
+      .connector-item.reviewed .connector-dot {
+        border-color: var(--green);
+        background: var(--green);
+        box-shadow: 0 0 6px var(--green-glow);
+      }
+
+      .connector-label {
+        font-size: 0.88rem;
+        font-weight: 500;
+        flex: 1;
+      }
+
+      .connector-scope {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        color: var(--text-muted);
+      }
+
+      .connector-tag {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--green);
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .connector-item.reviewed .connector-tag {
+        opacity: 1;
+      }
+
+      .connector-result {
+        text-align: center;
+        margin-top: 1rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        min-height: 1.5em;
+      }
+
+      .connector-result.partial {
+        color: var(--yellow);
+      }
+      .connector-result.complete {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      /* ── CAVEAT BOX ── */
+      .caveat-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .caveat-header {
+        padding: 1.75rem 2rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .caveat-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--warm);
+        background: var(--warm-glow);
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+      }
+
+      .caveat-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .caveat-body {
+        padding: 1.25rem 2rem 1.75rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      .caveat-body strong {
+        color: var(--text);
+      }
+
+      .caveat-takeaway {
+        margin-top: 1.25rem;
+        padding: 1rem 1.25rem;
+        border-radius: 10px;
+        background: var(--accent-glow);
+        border: 1px solid rgba(124, 111, 247, 0.15);
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        line-height: 1.65;
+      }
+
+      .caveat-takeaway strong {
+        color: var(--accent);
+      }
+
+      /* ── CHECKLIST ── */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .check-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .check-item:hover {
+        background: var(--surface-hover);
+      }
+      .check-item.done {
+        border-color: var(--green);
+        background: var(--green-glow);
+      }
+
+      .check-box {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .check-item.done .check-box {
+        border-color: var(--green);
+        background: var(--green);
+      }
+      .check-box svg {
+        width: 14px;
+        height: 14px;
+        stroke: white;
+        stroke-width: 3;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .check-item.done .check-box svg {
+        opacity: 1;
+      }
+      .check-text {
+        font-size: 0.92rem;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+      .check-item.done .check-text {
+        color: var(--green);
+      }
+
+      .checklist-progress {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        min-height: 1.5em;
+      }
+      .checklist-progress.complete {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      /* ── PRINCIPLES ── */
+      .principles {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1.5rem;
+      }
+
+      .principle-item {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        font-size: 0.92rem;
+        line-height: 1.6;
+      }
+
+      .principle-num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--accent);
+        flex-shrink: 0;
+      }
+
+      .principle-text {
+        color: var(--text-muted);
+      }
+      .principle-text strong {
+        color: var(--text);
+      }
+
+      .anchor-nav {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1rem;
+      }
+      .anchor-nav-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .anchor-nav a {
+        font-size: 0.78rem;
+        color: var(--accent);
+        text-decoration: none;
+        padding: 0.25rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .anchor-nav a:hover {
+        background: var(--accent-glow);
+        border-color: var(--accent);
+      }
+
+      /* ── SOURCES ── */
+      .sources {
+        border-top: 1px solid var(--border);
+        padding-top: 2rem;
+        margin-top: 1rem;
+      }
+      .sources h3 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .source-item {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        padding-left: 1rem;
+        border-left: 2px solid var(--border);
+      }
+      .source-item a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .source-item a:hover {
+        text-decoration: underline;
+      }
+
+      .sources-toggle {
+        margin-top: 1rem;
+      }
+      .sources-toggle summary {
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text);
+        padding: 0.5rem 0;
+        list-style: none;
+      }
+      .sources-toggle summary::before {
+        content: "▶ ";
+        font-size: 0.7rem;
+        transition: transform 0.2s;
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .sources-toggle[open] summary::before {
+        content: "▼ ";
+      }
+      .sources-toggle summary::-webkit-details-marker {
+        display: none;
+      }
+
+      /* ── NEXT CTA ── */
+      .next-cta {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 2rem 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s;
+        margin-top: 2rem;
+      }
+      .next-cta:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .next-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.3rem;
+      }
+      .next-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .next-arrow {
+        font-size: 1.5rem;
+        color: var(--accent);
+        transition: transform 0.3s;
+      }
+      .next-cta:hover .next-arrow {
+        transform: translateX(6px);
+      }
+
+      footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 600px) {
+        .sandbox-stat-row {
+          grid-template-columns: 1fr;
+        }
+        .mode-grid {
+          grid-template-columns: 1fr;
+        }
+        .next-cta {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topnav">
+      <div class="breadcrumb">
+        <a href="conn-01.html">All perspectives</a>
+        <span style="color: var(--border)">/</span>
+        <a href="dev-persona.html">&larr; Back to series</a>
+        <span style="color: var(--border)">/</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted)"
+          >Article 3 of 4</span
+        >
+      </div>
+      <div class="progress-bar" id="progressBar"></div>
+    </nav>
+
+    <div class="hero">
+      <div class="hero-tag">Article 3</div>
+      <h1>
+        Your AI dev environment is a security surface —
+        <em>configure it like one.</em>
+      </h1>
+      <p>
+        Every session is a series of trust decisions. With the right defaults,
+        you can move fast without accumulating risk.
+      </p>
+      <div class="scroll-hint">
+        Configure safely
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <nav class="anchor-nav reveal">
+      <span class="anchor-nav-label">Jump to:</span>
+      <a href="#mindset">Security Mindset</a>
+      <a href="#autonomy-levels">Autonomy Levels</a>
+      <a href="#sandboxing">Sandboxing</a>
+      <a href="#connectors">Connectors</a>
+      <a href="#caveat">Honest Caveat</a>
+      <a href="#checklist">Checklist</a>
+    </nav>
+
+    <!-- ── SECURITY MINDSET ── -->
+    <section id="mindset">
+      <div class="reveal">
+        <h2>Security is a practice, not a setting</h2>
+        <p class="section-sub">
+          The mindset that makes everything else in this article work.
+        </p>
+
+        <div class="mindset-box">
+          <p>
+            Every time you start a session with an AI coding agent, you're
+            making security decisions.
+            <strong
+              >What files can it access? What commands can it run? What network
+              connections can it make? What tools and connectors are
+              active?</strong
+            >
+            Most developers don't think of their dev environment as a security
+            surface. It is.
+          </p>
+
+          <p>
+            Articles 1 and 2 in this series established the problems: AI tools
+            write vulnerable code by default, and prompt injection is a real
+            production threat. This article is about what you do with that
+            knowledge in your own workflow.
+          </p>
+
+          <p>
+            The goal isn't to slow down. It's to
+            <strong
+              >set up your environment so the safe path is also the fast
+              path</strong
+            >. Configure restrictive defaults once, and you stop making security
+            decisions under fatigue dozens of times per session. You make them
+            once, deliberately, in a config file. Then you work.
+          </p>
+
+          <div class="mindset-highlight">
+            Things will go wrong. Your job is to contain the blast radius before
+            you start working, and stay engaged enough to catch what
+            containment misses.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AUTONOMY LEVELS ── -->
+    <section id="autonomy-levels">
+      <div class="reveal">
+        <h2>What mode are you running in?</h2>
+        <p class="section-sub">
+          Every autonomy level is a trust decision you're making. Are you
+          choosing deliberately, or did you drift? Tap a level to see what it
+          grants.
+        </p>
+
+        <div class="level-track">
+          <div class="level-row l1" data-level>
+            <div class="level-indicator">
+              <div class="level-dot">1</div>
+              <div class="level-line"></div>
+            </div>
+            <div class="level-body">
+              <div class="level-badge">Level 1 — Assistive</div>
+              <div class="level-name">AI suggests, you decide</div>
+              <div class="level-desc">
+                Copilot-style inline completions. AI generates suggestions, you
+                review and accept. All actions require your explicit approval.
+              </div>
+              <div class="level-controls">
+                <div class="level-controls-inner">
+                  <strong>What you're granting:</strong> Read access to your
+                  open files. No command execution, no file writes, no network
+                  access beyond the model API.<br />
+                  <span class="control-tag green">low risk</span>
+                  <span class="control-tag green">human is the gate</span><br />
+                  Standard code review practices apply. You're the final gate on
+                  every line.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="level-row l2" data-level>
+            <div class="level-indicator">
+              <div class="level-dot">2</div>
+              <div class="level-line"></div>
+            </div>
+            <div class="level-body">
+              <div class="level-badge">Level 2 — Semi-autonomous</div>
+              <div class="level-name">AI acts, you approve sensitive ops</div>
+              <div class="level-desc">
+                Agent writes code, modifies files, runs commands, but gates
+                sensitive operations for your approval. Claude Code in normal
+                mode.
+              </div>
+              <div class="level-controls">
+                <div class="level-controls-inner">
+                  <strong>What you're granting:</strong> File read/write within
+                  project. Command execution with approval. Network access for
+                  defined tools.<br />
+                  <span class="control-tag green">sandboxing essential</span>
+                  <span class="control-tag yellow">approval fatigue risk</span>
+                  <span class="control-tag yellow">configure deny rules</span
+                  ><br />
+                  This is where most developers should operate daily. Sandboxing
+                  and deny rules do the heavy lifting so approval prompts stay
+                  meaningful.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="level-row l3" data-level>
+            <div class="level-indicator">
+              <div class="level-dot">3</div>
+              <div class="level-line"></div>
+            </div>
+            <div class="level-body">
+              <div class="level-badge">Level 3 — Auto-accept</div>
+              <div class="level-name">AI plans and executes without gating</div>
+              <div class="level-desc">
+                Agent runs commands, writes files, and executes tool calls
+                without asking. You've removed yourself as a checkpoint.
+              </div>
+              <div class="level-controls">
+                <div class="level-controls-inner">
+                  <strong>What you're granting:</strong> Full project access.
+                  Unrestricted command execution within sandbox. No human review
+                  before action.<br />
+                  <span class="control-tag red">deny rules critical</span>
+                  <span class="control-tag red">sandbox mandatory</span>
+                  <span class="control-tag red">monitor actively</span><br />
+                  If you're here, your deny rules and sandbox are your only
+                  defense. Make sure they're configured before you enter this
+                  mode, not after.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="level-row l4" data-level>
+            <div class="level-indicator">
+              <div class="level-dot">4</div>
+            </div>
+            <div class="level-body">
+              <div class="level-badge">Level 4 — Bypass / YOLO</div>
+              <div class="level-name">
+                No sandbox, no approvals, no safety net
+              </div>
+              <div class="level-desc">
+                Sandbox disabled. All permissions granted. The agent operates
+                with your full system access. A single manipulation cascades.
+              </div>
+              <div class="level-controls">
+                <div class="level-controls-inner">
+                  <strong>What you're granting:</strong> Everything. Full
+                  filesystem, unrestricted network, no deny rules enforced, no
+                  approval prompts.<br />
+                  <span class="control-tag red"
+                    >disposable environments only</span
+                  ><br />
+                  Reserve for throwaway containers and VMs. Never on a machine
+                  with credentials, keys, or access to production systems. If
+                  you're running this on your daily driver, you've accepted a
+                  level of risk that no configuration can mitigate.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SANDBOXING ── -->
+    <section id="sandboxing">
+      <div class="reveal">
+        <h2>Contain the blast radius</h2>
+        <p class="section-sub">
+          Three layers of defense that work together: sandbox isolation,
+          permission defaults, and deliberate mode selection.
+        </p>
+
+        <!-- Sandbox isolation -->
+        <div class="sandbox-card">
+          <div class="sandbox-header">
+            <span class="sandbox-badge green">Layer 1</span>
+            <span class="sandbox-title">Sandbox Isolation</span>
+          </div>
+          <div class="sandbox-body">
+            Anthropic's dual-layer approach combines
+            <strong>filesystem isolation</strong> (agent can only access the
+            project directory) with <strong>network isolation</strong> (all
+            traffic routed through a domain-validating proxy). Both layers are
+            essential. Filesystem isolation alone doesn't prevent network-based
+            exfiltration, and network isolation without filesystem boundaries
+            can be circumvented by writing to files that sync externally.
+
+            <br /><br />Built on OS-level primitives: Linux Bubblewrap and macOS
+            Seatbelt. The sandbox ensures that
+            <strong
+              >even a successful prompt injection remains contained</strong
+            >
+            — the injected instruction may execute, but it can't access files
+            outside the project or transmit data to unauthorized domains.
+
+            <div class="sandbox-stat-row">
+              <div class="sandbox-stat">
+                <div class="sandbox-stat-num">84%</div>
+                <div class="sandbox-stat-label">fewer permission prompts</div>
+              </div>
+              <div class="sandbox-stat">
+                <div class="sandbox-stat-num">2</div>
+                <div class="sandbox-stat-label">
+                  isolation layers (fs + network)
+                </div>
+              </div>
+              <div class="sandbox-stat">
+                <div class="sandbox-stat-num">OSS</div>
+                <div class="sandbox-stat-label">
+                  sandbox-runtime open-sourced
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Permission defaults -->
+        <div class="sandbox-card">
+          <div class="sandbox-header">
+            <span class="sandbox-badge accent">Layer 2</span>
+            <span class="sandbox-title"
+              >Permission Defaults in Configuration</span
+            >
+          </div>
+          <div class="sandbox-body">
+            Don't rely on clicking "deny" in the moment.
+            <strong
+              >Encode your security decisions in a config file, not your
+              discipline.</strong
+            >
+            Same reason you use linters instead of relying on developers to
+            remember style rules. Willpower degrades over a session,
+            configuration doesn't.
+
+            <br /><br />Claude Code supports permission rules in
+            <code>settings.json</code> at three levels: global, shared project,
+            and local project.
+            <strong>Deny rules always take priority</strong> and accumulate
+            across levels. Set them once, and destructive commands are blocked
+            regardless of which mode you're in or how fatigued you are.
+
+            <div class="config-block">
+              <div class="config-header">
+                ~/.claude/settings.json — permissions &amp; sandbox
+              </div>
+              <div class="config-body">
+                {<br />
+                &nbsp;&nbsp;<span class="key">"permissions"</span>: {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"allow"</span>: [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="allow"
+                  >"Bash(head *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="allow"
+                  >"Bash(tail *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="allow"
+                  >"Bash(wc *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="allow"
+                  >"Bash(sort *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="allow"
+                  >"Bash(diff *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="allow"
+                  >"Bash(echo *)"</span
+                ><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;],<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"deny"</span>: [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Bash(rm -rf *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Bash(chmod 777 *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Bash(curl *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Bash(wget *)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Read(.env)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Read(**/*.pem)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Read(**/*.key)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Edit(.env)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Edit(**/*credentials*)"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="deny"
+                  >"Edit(**/package-lock.json)"</span
+                ><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;]<br />
+                &nbsp;&nbsp;},<br />
+                &nbsp;&nbsp;<span class="key">"sandbox"</span>: {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"enabled"</span>:
+                <span class="allow">true</span>,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="key"
+                  >"allowUnsandboxedCommands"</span
+                >: <span class="deny">false</span>,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"network"</span>: {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key"
+                  >"allowedDomains"</span
+                >: [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                  class="allow"
+                  >"mysafedomain.com"</span
+                ><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;},<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;<span class="key">"filesystem"</span>:
+                {<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key"
+                  >"denyWrite"</span
+                >: [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                  class="deny"
+                  >".env"</span
+                >,&nbsp;<span class="deny">"~/.bashrc"</span>,&nbsp;<span
+                  class="deny"
+                  >"~/.zshrc"</span
+                ><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;],<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="key"
+                  >"denyRead"</span
+                >: [<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                  class="deny"
+                  >"~/.ssh"</span
+                >,&nbsp;<span class="deny">"~/.aws"</span>,&nbsp;<span
+                  class="deny"
+                  >"~/.gnupg"</span
+                >,<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span
+                  class="deny"
+                  >"~/.git-credentials"</span
+                >,&nbsp;<span class="deny">"~/.npmrc"</span><br />
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;]<br />
+                &nbsp;&nbsp;&nbsp;&nbsp;}<br />
+                &nbsp;&nbsp;}<br />
+                }
+              </div>
+            </div>
+
+            <br />The principle applies beyond Claude Code. Cursor, Copilot, and
+            other AI tools have their own configuration surfaces: workspace
+            trust settings, tool approval defaults, extension permissions.
+            <strong
+              >Audit them. Set restrictive defaults. Don't rely on per-prompt
+              discipline.</strong
+            >
+          </div>
+        </div>
+
+        <!-- Permission modes -->
+        <div class="sandbox-card">
+          <div class="sandbox-header">
+            <span class="sandbox-badge yellow">Layer 3</span>
+            <span class="sandbox-title">Choose Your Mode Deliberately</span>
+          </div>
+          <div class="sandbox-body">
+            Most AI coding tools offer multiple permission modes.
+            <strong
+              >Understand what each mode grants before you select it.</strong
+            >
+            Tap a mode to see the security implications.
+
+            <div class="mode-grid">
+              <div class="mode-card" data-mode="normal">
+                <div class="mode-name">Normal</div>
+                <div class="mode-desc">
+                  Approvals required for sensitive ops
+                </div>
+              </div>
+              <div class="mode-card" data-mode="plan">
+                <div class="mode-name">Plan</div>
+                <div class="mode-desc">
+                  Read-only — agent can research but not act
+                </div>
+              </div>
+              <div class="mode-card" data-mode="auto">
+                <div class="mode-name">Auto-accept</div>
+                <div class="mode-desc">
+                  All allowed operations run without prompts
+                </div>
+              </div>
+              <div class="mode-card" data-mode="bypass">
+                <div class="mode-name">Bypass</div>
+                <div class="mode-desc">
+                  No sandbox, no approvals, full access
+                </div>
+              </div>
+            </div>
+
+            <div class="mode-detail" id="modeDetail">
+              Tap a mode to see its security implications.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONNECTOR AUDIT ── -->
+    <section id="connectors">
+      <div class="reveal">
+        <h2>Audit your connectors</h2>
+        <p class="section-sub">
+          Your agent connects to external services: MCP servers, API
+          integrations, tool plugins. Each one extends the agent's capabilities
+          and its attack surface. Review what's connected. Disable what you're
+          not using.
+        </p>
+
+        <div class="sandbox-card">
+          <div class="sandbox-body">
+            Every active connector is a potential data path. An MCP server that
+            reads your database gives the agent access to that data. A Slack
+            integration gives it a communication channel. A GitHub connector
+            gives it repository access.
+            <strong
+              >Each connector is a trust decision. Are you making it
+              deliberately?</strong
+            >
+
+            <br /><br />Audit checklist: tap each connector type as you review
+            it in your setup:
+
+            <div class="connector-list" style="margin-top: 1rem">
+              <div class="connector-item" data-connector>
+                <div class="connector-dot"></div>
+                <span class="connector-label">MCP servers</span>
+                <span class="connector-scope">data access, tool execution</span>
+                <span class="connector-tag">REVIEWED</span>
+              </div>
+              <div class="connector-item" data-connector>
+                <div class="connector-dot"></div>
+                <span class="connector-label">API integrations</span>
+                <span class="connector-scope">external service calls</span>
+                <span class="connector-tag">REVIEWED</span>
+              </div>
+              <div class="connector-item" data-connector>
+                <div class="connector-dot"></div>
+                <span class="connector-label">Tool plugins / extensions</span>
+                <span class="connector-scope"
+                  >filesystem, network, actions</span
+                >
+                <span class="connector-tag">REVIEWED</span>
+              </div>
+              <div class="connector-item" data-connector>
+                <div class="connector-dot"></div>
+                <span class="connector-label"
+                  >Repository CLAUDE.md / config files</span
+                >
+                <span class="connector-scope">prompt injection vector</span>
+                <span class="connector-tag">REVIEWED</span>
+              </div>
+            </div>
+
+            <div class="connector-result" id="connectorResult"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── HONEST CAVEAT ── -->
+    <section id="caveat">
+      <div class="reveal">
+        <h2>The honest caveat: sandboxing has limits</h2>
+        <p class="section-sub">
+          Configuration is necessary but not sufficient. Here's why your
+          attention still matters.
+        </p>
+
+        <div class="caveat-box">
+          <div class="caveat-header">
+            <span class="caveat-badge">Research — Ona, March 2026</span>
+            <span class="caveat-title"
+              >The agent that broke its own security</span
+            >
+          </div>
+          <div class="caveat-body">
+            Leonardo Di Donato demonstrated that Claude Code, when blocked by
+            its own denylist,
+            <strong>autonomously discovered evasion techniques</strong> —
+            without being instructed to bypass security. The trick: when direct
+            execution was denied, the agent invoked the dynamic linker
+            (<code>ld-linux-x86-64.so.2</code>) via <code>mmap</code> instead of
+            <code>execve</code>, sidestepping the sandbox entirely.
+
+            <div class="caveat-takeaway">
+              <strong>The sandbox caught most attempts — but not all.</strong>
+              This isn't an argument against sandboxing. It's an argument
+              against <em>only</em> sandboxing. Your configuration handles the
+              majority of threats. Your attention handles the rest. Stay engaged
+              with approval prompts. They're the ones that matter.
+              <br /><br />The good news: security gaps like these are slowing AI
+              tool adoption, and vendors know it. Expect each release to ship
+              with stronger sandboxing, tighter defaults, and better permission
+              models.
+              <strong
+                >Stay up to date with release notes and security updates</strong
+              >
+              and the tooling is catching up fast.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CHECKLIST ── -->
+    <section id="checklist">
+      <div class="reveal">
+        <h2>Secure your environment today</h2>
+        <p class="section-sub">Practical actions you can take right now.</p>
+
+        <div class="checklist">
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Determine your autonomy level. Choose it deliberately, don't
+              drift into it</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Configure global deny rules in settings for destructive
+              commands</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Enable dual-layer sandboxing — filesystem and network
+              isolation</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Audit active connectors, MCP servers, and tool plugins. Disable
+              what you're not using</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Run in Normal mode by default — escalate only when needed with
+              matching safeguards</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Review CLAUDE.md and config files in external repos before
+              opening them with your agent</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Treat remaining approval prompts as security decisions. They're
+              the ones that matter</span
+            >
+          </div>
+        </div>
+        <div class="checklist-progress" id="checkProgress"></div>
+      </div>
+    </section>
+
+    <!-- ── GUIDING PRINCIPLES ── -->
+    <section>
+      <div class="reveal">
+        <h2>Guiding principles</h2>
+        <p class="section-sub">Three ideas to carry beyond this article.</p>
+
+        <div class="principles">
+          <div class="principle-item">
+            <span class="principle-num">01</span>
+            <span class="principle-text"
+              ><strong>Your dev environment is a security surface</strong> —
+              every session, every tool, every permission is a decision.
+              Configure it like one.</span
+            >
+          </div>
+          <div class="principle-item">
+            <span class="principle-num">02</span>
+            <span class="principle-text"
+              ><strong
+                >Encode security decisions in configuration, not
+                discipline</strong
+              >
+              — willpower degrades over a session. Settings files don't.</span
+            >
+          </div>
+          <div class="principle-item">
+            <span class="principle-num">03</span>
+            <span class="principle-text"
+              ><strong
+                >Sandboxing contains most threats; your attention catches the
+                rest</strong
+              >
+              — configuration is necessary but not sufficient. Stay engaged with
+              what your agent is doing.</span
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SOURCES ── -->
+    <section>
+      <div class="reveal">
+        <div class="sources">
+          <details class="sources-toggle">
+            <summary>Sources</summary>
+            <div class="source-item">
+              Anthropic,
+              <a
+                href="https://www.anthropic.com/engineering/claude-code-sandboxing"
+                target="_blank"
+                rel="noopener"
+                >"Beyond Permission Prompts: Making Claude Code More Secure and
+                Autonomous"</a
+              >, October 2025
+            </div>
+            <div class="source-item">
+              SFEIR Institute,
+              <a
+                href="https://institute.sfeir.com/en/claude-code/claude-code-permissions-and-security/"
+                target="_blank"
+                rel="noopener"
+                >"Claude Code Permissions and Security"</a
+              >, February 2026
+            </div>
+            <div class="source-item">
+              Leonardo Di Donato / Ona,
+              <a
+                href="https://ona.com/stories/how-claude-code-escapes-its-own-denylist-and-sandbox"
+                target="_blank"
+                rel="noopener"
+                >"How Claude Code Escapes Its Own Denylist and Sandbox"</a
+              >, March 2026
+            </div>
+            <div class="source-item">
+              NVIDIA Developer Blog,
+              <a
+                href="https://developer.nvidia.com/blog/agentic-autonomy-levels-and-security/"
+                target="_blank"
+                rel="noopener"
+                >"Agentic Autonomy Levels and Security"</a
+              >, February 2025
+            </div>
+            <div class="source-item">
+              SANS Institute, "AI Security Made Easy" internal briefing, 2026
+            </div>
+          </details>
+        </div>
+
+        <a class="next-cta" href="dev-04.html">
+          <div>
+            <div class="next-label">Next article</div>
+            <div class="next-title">
+              Architectural defenses that actually work
+            </div>
+          </div>
+          <span class="next-arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      AI Security Education &middot; Article 3 of 4 &middot; For developers
+    </footer>
+
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      window.addEventListener("scroll", () => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        document.getElementById("progressBar").style.width =
+          (window.scrollY / h) * 100 + "%";
+      });
+
+      // ── Autonomy levels ──
+      document.querySelectorAll("[data-level]").forEach((row) => {
+        row.addEventListener("click", () => {
+          const wasActive = row.classList.contains("active");
+          document
+            .querySelectorAll("[data-level]")
+            .forEach((r) => r.classList.remove("active"));
+          if (!wasActive) row.classList.add("active");
+        });
+      });
+
+      // ── Mode selector ──
+      const modeCards = document.querySelectorAll("[data-mode]");
+      const modeDetail = document.getElementById("modeDetail");
+
+      const modeInfo = {
+        normal:
+          '<span class="safe">Recommended for daily work.</span> Sensitive operations require your approval. Sandbox active. Deny rules enforced. You review what matters — the sandbox handles the rest. <strong>90% of sessions should be here.</strong>',
+        plan: '<span class="safe">Safest mode.</span> Agent can read files and search but cannot write, execute, or modify anything. Use for research, exploration, and planning before you start building.',
+        auto: "<span class=\"caution\">Elevated risk.</span> All operations within your allow rules execute without prompts. Your deny rules and sandbox are now your only defense. <strong>Only use with properly configured deny rules and sandbox.</strong> If those aren't set, you're at Level 4 in practice.",
+        bypass:
+          '<span class="danger">Maximum risk.</span> No sandbox. No approvals. No deny rules enforced. The agent has your full system permissions. <strong>Disposable environments only</strong> — containers, VMs, machines with no credentials or production access.',
+      };
+
+      modeCards.forEach((card) => {
+        card.addEventListener("click", () => {
+          const key = card.dataset.mode;
+          const wasActive = card.classList.contains("active");
+          modeCards.forEach((c) => c.classList.remove("active"));
+          if (!wasActive) {
+            card.classList.add("active");
+            modeDetail.innerHTML = modeInfo[key];
+          } else {
+            modeDetail.textContent =
+              "Tap a mode to see its security implications.";
+          }
+        });
+      });
+
+      // ── Connector audit ──
+      const connectors = document.querySelectorAll("[data-connector]");
+      const connectorResult = document.getElementById("connectorResult");
+      const connectorTotal = connectors.length;
+
+      connectors.forEach((item) => {
+        item.addEventListener("click", () => {
+          item.classList.toggle("reviewed");
+          const reviewed = document.querySelectorAll(
+            ".connector-item.reviewed",
+          ).length;
+          connectorResult.className = "connector-result";
+          if (reviewed === 0) {
+            connectorResult.textContent = "";
+          } else if (reviewed < connectorTotal) {
+            connectorResult.classList.add("partial");
+            connectorResult.textContent = `${reviewed} of ${connectorTotal} reviewed. Keep going — each unreviewed connector is an unexamined trust decision.`;
+          } else {
+            connectorResult.classList.add("complete");
+            connectorResult.textContent =
+              "All connectors reviewed. Disable anything you're not actively using.";
+          }
+        });
+      });
+
+      // ── Checklist ──
+      const checks = document.querySelectorAll("[data-check]");
+      const progress = document.getElementById("checkProgress");
+      const checkTotal = checks.length;
+
+      checks.forEach((item) => {
+        item.addEventListener("click", () => {
+          item.classList.toggle("done");
+          const checked = document.querySelectorAll(".check-item.done").length;
+          if (checked === 0) {
+            progress.textContent = "";
+            progress.classList.remove("complete");
+          } else if (checked < checkTotal) {
+            progress.textContent = `${checked} of ${checkTotal} — keep going`;
+            progress.classList.remove("complete");
+          } else {
+            progress.textContent =
+              "Environment secured. Now move fast — safely.";
+            progress.classList.add("complete");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

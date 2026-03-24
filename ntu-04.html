@@ -1,0 +1,921 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>What Safe AI Use Actually Looks Like</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a24;
+        --surface-hover: #24243a;
+        --border: #2a2a3e;
+        --text: #e4e4ed;
+        --text-muted: #8888a4;
+        --accent: #7c6ff7;
+        --accent-glow: rgba(124, 111, 247, 0.15);
+        --red: #f76f6f;
+        --red-glow: rgba(247, 111, 111, 0.12);
+        --warm: #f39c6b;
+        --warm-glow: rgba(243, 156, 107, 0.12);
+        --green: #6bcf9f;
+        --green-glow: rgba(107, 207, 159, 0.15);
+        --green-solid: #4db88a;
+        --yellow: #f7d76f;
+        --yellow-glow: rgba(247, 215, 111, 0.12);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      *::selection {
+        background: rgba(124, 111, 247, 0.3);
+      }
+      a,
+      button,
+      [role="button"],
+      .spoke,
+      .tile,
+      [data-tile],
+      [data-spoke] {
+        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── NAV ── */
+      .topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(15, 15, 19, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .topnav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .topnav a:hover {
+        color: var(--accent);
+      }
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: var(--green);
+        width: 0%;
+        transition: width 0.1s linear;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6rem 2rem 3rem;
+        position: relative;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          var(--green-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .hero-tag {
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--green);
+        margin-bottom: 1.5rem;
+      }
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        max-width: 650px;
+        margin-bottom: 1.25rem;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--green);
+      }
+      .hero p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 500px;
+      }
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        animation: float 2.5s ease-in-out infinite;
+      }
+      .scroll-hint svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--text-muted);
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(8px);
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+      }
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+      .section-sub {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      /* ── FIVE RULES CARDS ── */
+      .rules-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .rule-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .rule-card:hover {
+        background: var(--surface-hover);
+        transform: translateY(-2px);
+      }
+
+      .rule-card.activated {
+        border-color: var(--green);
+        background: var(--green-glow);
+      }
+
+      .rule-card.activated::after {
+        content: "";
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 22px;
+        height: 22px;
+        background: var(--green);
+        border-radius: 50%;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+        background-size: 14px;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      .rule-card:nth-child(5) {
+        grid-column: 1 / -1;
+      }
+
+      .rule-num {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--border);
+        margin-bottom: 0.5rem;
+        transition: color 0.3s;
+      }
+      .rule-card.activated .rule-num {
+        color: var(--green);
+      }
+
+      .rule-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+      .rule-desc {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+      .rule-card.activated .rule-desc {
+        color: var(--text);
+      }
+
+      .rules-counter {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        min-height: 1.5em;
+      }
+      .rules-counter.done {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      /* ── MINDSET SECTION ── */
+      .mindset-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 2.5rem 2rem;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .mindset-section::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(
+          circle,
+          var(--accent-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .mindset-section h2 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 1.5rem;
+      }
+
+      .mindset-quote-block {
+        background: linear-gradient(
+          135deg,
+          var(--accent-glow),
+          rgba(107, 207, 159, 0.08)
+        );
+        border-left: 4px solid var(--accent);
+        border-radius: 0 16px 16px 0;
+        padding: 1.75rem 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+      }
+
+      .mindset-quote-block::before {
+        content: "\201C";
+        position: absolute;
+        top: -0.2rem;
+        left: 0.75rem;
+        font-size: 3.5rem;
+        font-weight: 700;
+        color: var(--accent);
+        opacity: 0.3;
+        line-height: 1;
+      }
+
+      .mindset-quote-block p {
+        font-size: 1.1rem;
+        font-weight: 500;
+        line-height: 1.8;
+        color: var(--text);
+        position: relative;
+        z-index: 1;
+      }
+
+      .mindset-quote-block p .highlight-phrase {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      .mindset-quote-block p .highlight-green {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      .mindset-section .mindset-intro {
+        font-size: 0.95rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+        max-width: 580px;
+        margin-bottom: 2rem;
+      }
+      .mindset-section .mindset-intro strong {
+        color: var(--text);
+      }
+
+      .mindset-pillars {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .pillar {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.15rem;
+        padding: 1.25rem 1.4rem;
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .pillar:hover {
+        border-color: var(--accent);
+      }
+
+      .pillar.lit {
+        border-color: var(--accent);
+        background: var(--accent-glow);
+      }
+
+      .pillar-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        flex-shrink: 0;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        transition: all 0.3s;
+      }
+
+      .pillar.lit .pillar-icon {
+        background: var(--accent);
+        border-color: var(--accent);
+      }
+
+      .pillar-text {
+        flex: 1;
+      }
+      .pillar-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+      }
+      .pillar-desc {
+        font-size: 0.82rem;
+        color: var(--text-muted);
+        line-height: 1.6;
+      }
+      .pillar.lit .pillar-desc {
+        color: var(--text);
+      }
+
+      .pillar-quote {
+        display: none;
+        margin-top: 0.6rem;
+        padding: 0.6rem 0.85rem;
+        background: rgba(124, 111, 247, 0.08);
+        border-left: 3px solid var(--accent);
+        border-radius: 0 8px 8px 0;
+        font-size: 0.8rem;
+        font-style: italic;
+        color: var(--accent);
+        line-height: 1.6;
+      }
+
+      .pillar.lit .pillar-quote {
+        display: block;
+      }
+
+      .mindset-closer {
+        text-align: center;
+        margin-top: 1.75rem;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        min-height: 1.5em;
+        transition: all 0.3s;
+      }
+      .mindset-closer.done {
+        color: var(--accent);
+        font-weight: 600;
+      }
+
+      /* ── FINAL MESSAGE ── */
+      .final-msg {
+        background: linear-gradient(
+          135deg,
+          var(--green-glow),
+          var(--accent-glow)
+        );
+        border: 1px solid rgba(107, 207, 159, 0.2);
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        text-align: center;
+      }
+      .final-msg h2 {
+        font-size: 1.6rem;
+        margin-bottom: 0.75rem;
+        color: var(--green);
+      }
+      .final-msg p {
+        font-size: 1rem;
+        color: var(--text-muted);
+        max-width: 480px;
+        margin: 0 auto;
+        line-height: 1.7;
+      }
+      .final-msg p strong {
+        color: var(--text);
+      }
+
+      /* ── BACK TO START ── */
+      .back-cta {
+        display: block;
+        text-align: center;
+        margin-top: 2rem;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.25rem 2rem;
+        text-decoration: none;
+        color: var(--text);
+        font-size: 0.95rem;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+      .back-cta:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .back-cta span {
+        color: var(--text-muted);
+        font-weight: 400;
+        font-size: 0.85rem;
+        display: block;
+        margin-top: 0.25rem;
+      }
+
+      /* ── SOURCES ── */
+      .sources {
+        border-top: 1px solid var(--border);
+        padding-top: 2rem;
+        margin-top: 1rem;
+      }
+      .sources h3 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .source-item {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        padding-left: 1rem;
+        border-left: 2px solid var(--border);
+      }
+      .source-item a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .source-item a:hover {
+        text-decoration: underline;
+      }
+
+      .sources-toggle {
+        margin-top: 1rem;
+      }
+      .sources-toggle summary {
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text);
+        padding: 0.5rem 0;
+        list-style: none;
+      }
+      .sources-toggle summary::before {
+        content: "▶ ";
+        font-size: 0.7rem;
+        transition: transform 0.2s;
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .sources-toggle[open] summary::before {
+        content: "▼ ";
+      }
+      .sources-toggle summary::-webkit-details-marker {
+        display: none;
+      }
+
+      footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 520px) {
+        .rules-grid {
+          grid-template-columns: 1fr;
+        }
+        .rule-card:nth-child(5) {
+          grid-column: auto;
+        }
+        .back-cta {
+          padding: 1rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="topnav">
+      <div class="breadcrumb">
+        <a href="conn-01.html">All perspectives</a>
+        <span style="color: var(--border)">/</span>
+        <a href="ntu-persona.html">&larr; Back to guide</a>
+        <span style="color: var(--border)">/</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted)"
+          >Article 4 of 4</span
+        >
+      </div>
+      <div class="progress-bar" id="progressBar"></div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-tag">Article 4 — the positive one</div>
+      <h1>What <em>safe</em> AI use actually looks like</h1>
+      <p>
+        It starts with you. Not with tools, not with settings — with how you
+        think.
+      </p>
+      <div class="scroll-hint">
+        Start with your mindset
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── SECURITY MINDSET (MOVED TO TOP) ── -->
+    <section>
+      <div class="reveal">
+        <div class="mindset-section">
+          <h2>It starts with a security mindset</h2>
+
+          <div class="mindset-quote-block">
+            <p>
+              Before settings, before tools, before any checklist — the most
+              powerful thing you can build is
+              <span class="highlight-phrase">a way of thinking</span>. Not
+              paranoia — <span class="highlight-green">curiosity</span>. Not
+              expertise — <span class="highlight-green">awareness</span>. These
+              three habits separate people who get caught off guard from people
+              who don't.
+            </p>
+          </div>
+
+          <div class="mindset-pillars">
+            <div class="pillar" data-pillar>
+              <div class="pillar-icon">&#129300;</div>
+              <div class="pillar-text">
+                <div class="pillar-title">Question things</div>
+                <div class="pillar-desc">
+                  When something feels off — an unexpected link, a weird
+                  request, an action you didn't ask for — don't ignore that
+                  feeling. Ask why. The AI won't be offended.
+                </div>
+                <div class="pillar-quote">
+                  "Why did the AI add that link? I didn't ask for it."<br />"Why
+                  does it need access to my entire drive for one document?"
+                </div>
+              </div>
+            </div>
+
+            <div class="pillar" data-pillar>
+              <div class="pillar-icon">&#128269;</div>
+              <div class="pillar-text">
+                <div class="pillar-title">Explore what it does</div>
+                <div class="pillar-desc">
+                  You don't need to understand how AI works. But paying
+                  attention to what it's doing — what it's reading, what it's
+                  sending, what permissions it has — keeps you ahead of
+                  problems.
+                </div>
+                <div class="pillar-quote">
+                  "What did the AI just do with my file?"<br />"Where is this
+                  information being stored?"
+                </div>
+              </div>
+            </div>
+
+            <div class="pillar" data-pillar>
+              <div class="pillar-icon">&#128737;</div>
+              <div class="pillar-text">
+                <div class="pillar-title">Prepare for when things go wrong</div>
+                <div class="pillar-desc">
+                  Don't assume everything will work perfectly. Assume that at
+                  some point, something will fail — and set yourself up so that
+                  when it does, the damage is small and fixable.
+                </div>
+                <div class="pillar-quote">
+                  "If this conversation leaked, would I be okay?"<br />"If I
+                  accidentally shared this, could I undo it?"
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mindset-closer" id="mindsetCloser"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── FIVE RULES ── -->
+    <section>
+      <div class="reveal">
+        <h2>Your 5 personal safety rules</h2>
+        <p class="section-sub">
+          Tap each rule to commit to it. These are yours to keep.
+        </p>
+
+        <div class="rules-grid">
+          <div class="rule-card" data-rule>
+            <div class="rule-num">01</div>
+            <div class="rule-title">Set it and forget it</div>
+            <div class="rule-desc">
+              Configure safe defaults once. Let the settings protect you so you
+              don't have to think about it every time.
+            </div>
+          </div>
+          <div class="rule-card" data-rule>
+            <div class="rule-num">02</div>
+            <div class="rule-title">Give the minimum</div>
+            <div class="rule-desc">
+              Only share what the AI needs for this specific task. Everything
+              extra is unnecessary risk.
+            </div>
+          </div>
+          <div class="rule-card" data-rule>
+            <div class="rule-num">03</div>
+            <div class="rule-title">Pause on "send" and "access"</div>
+            <div class="rule-desc">
+              When the AI wants to do something — not just read — take two
+              seconds to decide if it should.
+            </div>
+          </div>
+          <div class="rule-card" data-rule>
+            <div class="rule-num">04</div>
+            <div class="rule-title">Scan before you share</div>
+            <div class="rule-desc">
+              Glance at the output before it leaves your screen. Look for
+              anything you didn't ask for.
+            </div>
+          </div>
+          <div class="rule-card" data-rule>
+            <div class="rule-num">05</div>
+            <div class="rule-title">When in doubt, ask</div>
+            <div class="rule-desc">
+              There are no stupid questions. Ask a colleague, ask IT, ask the AI
+              itself to explain what it's doing. Asking is free.
+            </div>
+          </div>
+        </div>
+
+        <div class="rules-counter" id="rulesCounter"></div>
+      </div>
+    </section>
+
+    <!-- ── FINAL MESSAGE ── -->
+    <section>
+      <div class="reveal">
+        <div class="final-msg">
+          <h2>You don't need to be an expert.</h2>
+          <p>
+            You need a security mindset:
+            <strong
+              >question things, explore what AI does, and prepare for when
+              things go wrong.</strong
+            >
+            Combine that with five simple habits — and you're safer than most.
+          </p>
+        </div>
+
+        <a class="back-cta" href="ntu-persona.html">
+          Back to your guide
+          <span>Review all four articles anytime</span>
+        </a>
+
+        <div class="sources">
+          <details class="sources-toggle">
+            <summary>Sources</summary>
+            <div class="source-item">
+              Anthropic,
+              <a
+                href="https://www.anthropic.com/engineering/claude-code-sandboxing"
+                target="_blank"
+                rel="noopener"
+                >"Beyond Permission Prompts: Making Claude Code More Secure"</a
+              >, October 2025 — dual-layer sandboxing and 84% prompt reduction
+            </div>
+            <div class="source-item">
+              SFEIR Institute,
+              <a
+                href="https://institute.sfeir.com/en/claude-code/claude-code-permissions-and-security/"
+                target="_blank"
+                rel="noopener"
+                >"Claude Code Permissions and Security"</a
+              >, February 2026 — graduated permission modes and safe defaults
+            </div>
+            <div class="source-item">
+              NVIDIA Developer Blog,
+              <a
+                href="https://developer.nvidia.com/blog/agentic-autonomy-levels-and-security/"
+                target="_blank"
+                rel="noopener"
+                >"Agentic Autonomy Levels and Security"</a
+              >, February 2025 — autonomy levels framework
+            </div>
+            <div class="source-item">
+              SANS Institute, "AI Security Made Easy", 2026 — zero-trust
+              guardrails and layered defense principles
+            </div>
+            <div class="source-item">
+              Simon Willison,
+              <a
+                href="https://simonwillison.net/2025/Sep/26/how-to-stop-ais-lethal-trifecta/"
+                target="_blank"
+                rel="noopener"
+                >"How to Stop AI's Lethal Trifecta"</a
+              >, September 2025 — architectural elimination of attack vectors
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      AI Security Education &middot; Article 4 of 4 &middot; For everyday AI
+      users
+    </footer>
+
+    <script>
+      // ── Scroll reveal ──
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      // ── Progress bar ──
+      window.addEventListener("scroll", () => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        document.getElementById("progressBar").style.width =
+          (window.scrollY / h) * 100 + "%";
+      });
+
+      // ── Mindset pillars ──
+      let pillarsLit = 0;
+
+      document.querySelectorAll("[data-pillar]").forEach((pillar) => {
+        pillar.addEventListener("click", () => {
+          pillar.classList.toggle("lit");
+          pillarsLit = document.querySelectorAll(".pillar.lit").length;
+
+          const closer = document.getElementById("mindsetCloser");
+          if (pillarsLit === 0) {
+            closer.textContent = "";
+            closer.classList.remove("done");
+          } else if (pillarsLit < 3) {
+            closer.textContent =
+              pillarsLit + " of 3 — keep building your mindset";
+            closer.classList.remove("done");
+          } else {
+            closer.textContent =
+              "Question it. Explore it. Prepare for it. That's the security mindset.";
+            closer.classList.add("done");
+          }
+        });
+      });
+
+      // ── Five rules ──
+      let rulesActivated = 0;
+
+      document.querySelectorAll("[data-rule]").forEach((card) => {
+        card.addEventListener("click", () => {
+          card.classList.toggle("activated");
+          rulesActivated = document.querySelectorAll(
+            ".rule-card.activated",
+          ).length;
+
+          const counter = document.getElementById("rulesCounter");
+          if (rulesActivated === 0) {
+            counter.textContent = "";
+            counter.classList.remove("done");
+          } else if (rulesActivated < 5) {
+            counter.textContent = rulesActivated + " of 5 rules activated";
+            counter.classList.remove("done");
+          } else {
+            counter.textContent = "All five. You're ready. Go use AI — safely.";
+            counter.classList.add("done");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

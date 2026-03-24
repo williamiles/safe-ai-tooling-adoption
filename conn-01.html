@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      One Tool, Limitless Capabilities, Three Perspectives — AI Security
+      Education
+    </title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a24;
+        --surface-hover: #24243a;
+        --border: #2a2a3e;
+        --text: #e4e4ed;
+        --text-muted: #8888a4;
+        --accent: #7c6ff7;
+        --accent-glow: rgba(124, 111, 247, 0.15);
+        --red: #f76f6f;
+        --red-glow: rgba(247, 111, 111, 0.12);
+        --warm: #f39c6b;
+        --warm-glow: rgba(243, 156, 107, 0.12);
+        --green: #6bcf9f;
+        --green-glow: rgba(107, 207, 159, 0.15);
+        --yellow: #f7d76f;
+        --yellow-glow: rgba(247, 215, 111, 0.12);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      *::selection {
+        background: rgba(124, 111, 247, 0.3);
+      }
+      a,
+      button,
+      [role="button"],
+      .spoke,
+      .tile,
+      [data-tile],
+      [data-spoke] {
+        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 45vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 4rem 2rem 2rem;
+        position: relative;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          var(--accent-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .hero-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1.25rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.12;
+        max-width: 700px;
+        margin-bottom: 1.25rem;
+      }
+
+      .hero h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+
+      .hero p {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 540px;
+        line-height: 1.7;
+      }
+
+      /* ── MAIN CONTAINER ── */
+      .main {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 0 2rem 2rem;
+      }
+
+      /* ── DIAGRAM ── */
+      .diagram-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 2rem;
+        position: relative;
+      }
+
+      .diagram-center {
+        text-align: center;
+        margin-bottom: 1.25rem;
+      }
+
+      .diagram-core {
+        display: inline-block;
+        background: var(--accent-glow);
+        border: 1px solid rgba(124, 111, 247, 0.2);
+        border-radius: 14px;
+        padding: 0.75rem 1.75rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: var(--accent);
+      }
+
+      .diagram-connector {
+        text-align: center;
+        padding: 0.5rem 0;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.1em;
+      }
+
+      .diagram-spokes {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.75rem;
+      }
+
+      /* ── SPOKE BUTTONS ── */
+      .spoke {
+        text-align: center;
+        padding: 1.1rem 0.75rem 0.9rem;
+        border-radius: 14px;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        position: relative;
+      }
+
+      .spoke:hover {
+        transform: translateY(-3px);
+      }
+
+      .spoke.ntu {
+        background: var(--accent-glow);
+        border: 2px solid rgba(124, 111, 247, 0.25);
+      }
+      .spoke.bl {
+        background: var(--warm-glow);
+        border: 2px solid rgba(243, 156, 107, 0.25);
+      }
+      .spoke.dev {
+        background: var(--green-glow);
+        border: 2px solid rgba(107, 207, 159, 0.25);
+      }
+
+      .spoke.ntu:hover {
+        border-color: rgba(124, 111, 247, 0.5);
+      }
+      .spoke.bl:hover {
+        border-color: rgba(243, 156, 107, 0.5);
+      }
+      .spoke.dev:hover {
+        border-color: rgba(107, 207, 159, 0.5);
+      }
+
+      .spoke.ntu.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 16px var(--accent-glow);
+      }
+      .spoke.bl.active {
+        border-color: var(--warm);
+        box-shadow: 0 0 16px var(--warm-glow);
+      }
+      .spoke.dev.active {
+        border-color: var(--green);
+        box-shadow: 0 0 16px var(--green-glow);
+      }
+
+      .spoke-icon {
+        font-size: 1.4rem;
+        margin-bottom: 0.3rem;
+        display: block;
+      }
+
+      .spoke-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+      }
+
+      .spoke.ntu .spoke-label {
+        color: var(--accent);
+      }
+      .spoke.bl .spoke-label {
+        color: var(--warm);
+      }
+      .spoke.dev .spoke-label {
+        color: var(--green);
+      }
+
+      .spoke-hint {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        margin-top: 0.35rem;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+      }
+
+      .spoke:hover .spoke-hint {
+        opacity: 1;
+      }
+      .spoke.active .spoke-hint {
+        opacity: 0;
+      }
+
+      .spoke-chevron {
+        display: block;
+        margin: 0.3rem auto 0;
+        width: 14px;
+        height: 14px;
+        transition: transform 0.3s;
+      }
+
+      .spoke.ntu .spoke-chevron {
+        stroke: var(--accent);
+      }
+      .spoke.bl .spoke-chevron {
+        stroke: var(--warm);
+      }
+      .spoke.dev .spoke-chevron {
+        stroke: var(--green);
+      }
+
+      .spoke.active .spoke-chevron {
+        transform: rotate(180deg);
+      }
+
+      /* ── EXPANDED PANEL ── */
+      .panel-wrapper {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.5s ease;
+      }
+
+      .panel-wrapper.open {
+        max-height: 600px;
+      }
+
+      .panel {
+        margin-top: 1rem;
+        border-radius: 14px;
+        padding: 1.75rem;
+        display: none;
+      }
+
+      .panel.visible {
+        display: block;
+      }
+
+      .panel.ntu {
+        background: var(--accent-glow);
+        border: 1px solid rgba(124, 111, 247, 0.15);
+      }
+      .panel.bl {
+        background: var(--warm-glow);
+        border: 1px solid rgba(243, 156, 107, 0.15);
+      }
+      .panel.dev {
+        background: var(--green-glow);
+        border: 1px solid rgba(107, 207, 159, 0.15);
+      }
+
+      .panel-quote {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.45;
+        margin-bottom: 1rem;
+        font-style: italic;
+      }
+
+      .panel-quote::before {
+        content: "\201C";
+      }
+      .panel-quote::after {
+        content: "\201D";
+      }
+
+      .panel-body {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+        margin-bottom: 0.75rem;
+      }
+
+      .panel-body strong {
+        color: var(--text);
+      }
+
+      .panel-tension {
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.6rem 0.85rem;
+        border-radius: 10px;
+        margin-bottom: 1.25rem;
+        background: rgba(0, 0, 0, 0.2);
+        line-height: 1.6;
+      }
+
+      .panel.ntu .panel-tension {
+        color: var(--accent);
+      }
+      .panel.bl .panel-tension {
+        color: var(--warm);
+      }
+      .panel.dev .panel-tension {
+        color: var(--green);
+      }
+
+      .panel-cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.65rem 1.25rem;
+        border-radius: 12px;
+        text-decoration: none;
+        font-size: 0.85rem;
+        font-weight: 600;
+        transition: all 0.3s;
+      }
+
+      .panel-cta:hover {
+        transform: translateY(-2px);
+      }
+      .panel-cta .arrow {
+        transition: transform 0.3s;
+      }
+      .panel-cta:hover .arrow {
+        transform: translateX(4px);
+      }
+
+      .panel.ntu .panel-cta {
+        background: var(--accent);
+        color: white;
+      }
+      .panel.bl .panel-cta {
+        background: var(--warm);
+        color: var(--bg);
+      }
+      .panel.dev .panel-cta {
+        background: var(--green);
+        color: var(--bg);
+      }
+
+      .panel-articles {
+        margin-top: 0.75rem;
+        font-size: 0.72rem;
+        color: var(--text-muted);
+      }
+
+      /* ── BOTTOM ── */
+      .bottom-msg {
+        text-align: center;
+        max-width: 540px;
+        margin: 2rem auto 0;
+        padding: 0 2rem;
+      }
+
+      .bottom-msg p {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      .bottom-msg strong {
+        color: var(--text);
+      }
+
+      footer {
+        text-align: center;
+        padding: 2rem 2rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        max-width: 760px;
+        margin: 1rem auto 0;
+      }
+
+      @media (max-width: 600px) {
+        .diagram-spokes {
+          grid-template-columns: 1fr;
+        }
+        .panel {
+          padding: 1.25rem;
+        }
+        .panel-wrapper.open {
+          max-height: 800px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero">
+      <div class="hero-label">Safe AI Tooling Adoption</div>
+      <h1>One tool. Limitless capabilities. <em>Three perspectives.</em></h1>
+      <p>
+        AI is the most powerful tool your organization has ever adopted. What
+        you can do with it depends on your role — and so do the risks you need
+        to understand.
+      </p>
+    </div>
+
+    <!-- ── DIAGRAM WITH EMBEDDED PANELS ── -->
+    <div class="main reveal">
+      <div class="diagram-box">
+        <div class="diagram-center">
+          <div class="diagram-core">
+            AI tools deployed across the organization
+          </div>
+        </div>
+
+        <div class="diagram-connector">CHOOSE YOUR PERSPECTIVE</div>
+
+        <div class="diagram-spokes">
+          <div class="spoke ntu" data-spoke="ntu">
+            <span class="spoke-icon">&#128100;</span>
+            <div class="spoke-label">Everyday user</div>
+            <div class="spoke-hint">Tap to explore</div>
+            <svg
+              class="spoke-chevron"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
+          <div class="spoke bl" data-spoke="bl">
+            <span class="spoke-icon">&#127970;</span>
+            <div class="spoke-label">Business leader</div>
+            <div class="spoke-hint">Tap to explore</div>
+            <svg
+              class="spoke-chevron"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
+          <div class="spoke dev" data-spoke="dev">
+            <span class="spoke-icon">&#128187;</span>
+            <div class="spoke-label">Developer</div>
+            <div class="spoke-hint">Tap to explore</div>
+            <svg
+              class="spoke-chevron"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- Expandable panels -->
+        <div class="panel-wrapper" id="panelWrapper">
+          <div class="panel ntu" data-panel="ntu">
+            <div class="panel-quote">
+              We started using these AI tools because they're genuinely helpful
+              — but nobody sat us down and explained what to watch out for.
+            </div>
+            <div class="panel-body">
+              You're smart for exploring AI. These tools help you draft emails,
+              summarize documents, brainstorm ideas, and get things done faster
+              than ever. That curiosity and willingness to learn new tools is
+              exactly what makes you effective. But these tools can also read
+              your files, access your accounts, and act on your behalf — and the
+              line between helpful and risky isn't always visible.
+            </div>
+            <div class="panel-body">
+              <strong
+                >You don't need to become technical to stay safe. You need a
+                security mindset.</strong
+              >
+              That means building a habit of asking "what could go wrong?"
+              before you act — and taking small steps to limit the damage if
+              something does. A few specific things can go wrong with AI, and
+              once you know what they are, you'll spot them without slowing
+              down.
+            </div>
+            <div class="panel-tension">
+              The shift isn't about learning to fear these tools — it's about
+              moving from "this works, so it's fine" to "this works — but what
+              did I just give it access to?"
+            </div>
+            <a class="panel-cta" href="ntu-persona.html">
+              Start the Everyday User guide <span class="arrow">&rarr;</span>
+            </a>
+            <div class="panel-articles">
+              4 short articles &middot; No jargon &middot; Practical habits you
+              can use today
+            </div>
+          </div>
+
+          <div class="panel bl" data-panel="bl">
+            <div class="panel-quote">
+              We adopted AI because it's critical to how we compete — but the
+              rollout moved fast and we're still catching up on what it means
+              for risk.
+            </div>
+            <div class="panel-body">
+              AI adoption isn't optional — it's essential to how every
+              organization evolves. You made the right call. But the
+              introduction was fast, and in most organizations it happened
+              before the risks were fully understood or the workforce was
+              trained. Your employees are exploring powerful capabilities
+              without guidance. Your developers are more productive than ever
+              but operating in ways your existing security policies weren't
+              designed for.
+            </div>
+            <div class="panel-body">
+              <strong
+                >The question isn't whether to use AI — it's whether you've
+                built the security mindset and culture to use it
+                responsibly.</strong
+              >
+              That starts with understanding your exposure, educating your
+              workforce, establishing clear ownership, and putting governance in
+              place that doesn't kill the speed advantage. You bear the
+              responsibility for how this rolls out.
+            </div>
+            <div class="panel-tension">
+              The shift isn't about slowing down adoption — it's about moving
+              from "we deployed it" to "we deployed it with a security strategy,
+              trained our people, and know who owns each risk."
+            </div>
+            <a class="panel-cta" href="bl-persona.html">
+              Start the Business Leader briefing
+              <span class="arrow">&rarr;</span>
+            </a>
+            <div class="panel-articles">
+              4 articles &middot; Organizational framing &middot; Named owners
+              and governance actions
+            </div>
+          </div>
+
+          <div class="panel dev" data-panel="dev">
+            <div class="panel-quote">
+              AI tools have made us faster and broader than we've ever been —
+              but we're accepting permissions we haven't reviewed, running
+              agents in permissive modes, and trusting output we haven't
+              verified.
+            </div>
+            <div class="panel-body">
+              AI tools amplify your skills and your productivity. You can work
+              in domains and codebases you have no former knowledge about. But
+              AI tools have two blind spots you need to know.
+              <strong>They write vulnerable code</strong> — repeating security
+              mistakes that have existed for decades.
+              <strong>And they have access to everything you do</strong> — your
+              credentials, your environment, your production systems. One is a
+              code quality problem. The other is a blast radius problem. Both
+              are yours to manage.
+            </div>
+            <div class="panel-body">
+              <strong
+                >You need a security mindset matched to the speed you're now
+                operating at.</strong
+              >
+              That means knowing how to configure your AI tooling with safe
+              defaults, leveraging the built-in security settings most
+              developers skip, understanding what the AI will miss, and taking
+              responsibility for the code you ship — regardless of who wrote the
+              first draft.
+            </div>
+            <div class="panel-tension">
+              The shift isn't about giving up productivity — it's about moving
+              from "the AI wrote it and tests pass" to "I've verified the
+              output, limited the blast radius, and locked down what this agent
+              can reach."
+            </div>
+            <a class="panel-cta" href="dev-persona.html">
+              Start the Developer series <span class="arrow">&rarr;</span>
+            </a>
+            <div class="panel-articles">
+              5 articles &middot; Full technical depth &middot; Architectural
+              patterns and production incidents
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bottom-msg">
+        <p>
+          <strong>A security mindset is the common thread.</strong> Whether you
+          use AI, lead teams that use it, or build with it — the habit is the
+          same: "what could go wrong? and how can we minimize the consequences!"
+          Pick the track that fits your role. If you lead a team, share all
+          three.
+        </p>
+      </div>
+    </div>
+
+    <footer>
+      AI Security Education &middot; One tool &middot; Three perspectives
+    </footer>
+
+    <script>
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      const spokes = document.querySelectorAll("[data-spoke]");
+      const panels = document.querySelectorAll("[data-panel]");
+      const wrapper = document.getElementById("panelWrapper");
+
+      spokes.forEach((spoke) => {
+        spoke.addEventListener("click", () => {
+          const key = spoke.dataset.spoke;
+          const wasActive = spoke.classList.contains("active");
+
+          spokes.forEach((s) => s.classList.remove("active"));
+          panels.forEach((p) => p.classList.remove("visible"));
+
+          if (wasActive) {
+            wrapper.classList.remove("open");
+          } else {
+            spoke.classList.add("active");
+            const panel = document.querySelector(`[data-panel="${key}"]`);
+            panel.classList.add("visible");
+            wrapper.classList.add("open");
+
+            setTimeout(() => {
+              panel.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }, 100);
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Your AI Coding Assistant Writes Vulnerable Code by Default</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a24;
+        --surface-hover: #24243a;
+        --border: #2a2a3e;
+        --text: #e4e4ed;
+        --text-muted: #8888a4;
+        --accent: #7c6ff7;
+        --accent-glow: rgba(124, 111, 247, 0.15);
+        --red: #f76f6f;
+        --red-glow: rgba(247, 111, 111, 0.12);
+        --warm: #f39c6b;
+        --warm-glow: rgba(243, 156, 107, 0.12);
+        --green: #6bcf9f;
+        --green-glow: rgba(107, 207, 159, 0.15);
+        --yellow: #f7d76f;
+        --yellow-glow: rgba(247, 215, 111, 0.12);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      *::selection {
+        background: rgba(124, 111, 247, 0.3);
+      }
+      a,
+      button,
+      [role="button"],
+      .spoke,
+      .tile,
+      [data-tile],
+      [data-spoke] {
+        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88em;
+        background: var(--accent-glow);
+        color: var(--accent);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── NAV ── */
+      .topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(15, 15, 19, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .topnav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .topnav a:hover {
+        color: var(--accent);
+      }
+      .topnav .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .topnav .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.1s linear;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6rem 2rem 3rem;
+        position: relative;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          var(--red-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .hero-tag {
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        max-width: 750px;
+        margin-bottom: 1.25rem;
+      }
+
+      .hero h1 em {
+        font-style: normal;
+        color: var(--red);
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 560px;
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        animation: float 2.5s ease-in-out infinite;
+      }
+      .scroll-hint svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--text-muted);
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(8px);
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+      }
+
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+
+      .section-sub {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      /* ── STAT BLOCKS ── */
+      .stat-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .stat-block {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .stat-block::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+      }
+
+      .stat-block.red::before {
+        background: var(--red);
+      }
+      .stat-block.warm::before {
+        background: var(--warm);
+      }
+      .stat-block.accent::before {
+        background: var(--accent);
+      }
+
+      .stat-number {
+        font-size: 2.2rem;
+        font-weight: 700;
+        font-family: "JetBrains Mono", monospace;
+        line-height: 1;
+        margin-bottom: 0.5rem;
+      }
+
+      .stat-block.red .stat-number {
+        color: var(--red);
+      }
+      .stat-block.warm .stat-number {
+        color: var(--warm);
+      }
+      .stat-block.accent .stat-number {
+        color: var(--accent);
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.4;
+      }
+
+      /* ── VULN CLASS GRID ── */
+      .vuln-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+      }
+
+      .vuln-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .vuln-card:hover {
+        background: var(--surface-hover);
+      }
+
+      .vuln-card.expanded {
+        border-color: var(--red);
+        background: var(--red-glow);
+      }
+
+      .vuln-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 3px;
+        height: 100%;
+        background: var(--border);
+        transition: background 0.3s;
+      }
+
+      .vuln-card.expanded::before {
+        background: var(--red);
+      }
+
+      .vuln-num {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.7rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        margin-bottom: 0.3rem;
+      }
+
+      .vuln-card.expanded .vuln-num {
+        color: var(--red);
+      }
+
+      .vuln-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.2rem;
+      }
+
+      .vuln-detail {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        line-height: 1.5;
+        max-height: 0;
+        overflow: hidden;
+        transition:
+          max-height 0.4s ease,
+          margin 0.3s ease;
+      }
+
+      .vuln-card.expanded .vuln-detail {
+        max-height: 120px;
+        margin-top: 0.5rem;
+      }
+
+      /* ── AGENT COMPARISON ── */
+      .agent-table {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+
+      .agent-row {
+        display: grid;
+        grid-template-columns: 1.2fr 1fr 1fr 1fr;
+        border-bottom: 1px solid var(--border);
+        font-size: 0.85rem;
+      }
+
+      .agent-row:last-child {
+        border-bottom: none;
+      }
+
+      .agent-row.header {
+        font-weight: 600;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--text-muted);
+      }
+
+      .agent-cell {
+        padding: 0.85rem 1rem;
+        display: flex;
+        align-items: center;
+      }
+
+      .agent-cell.name {
+        font-weight: 600;
+      }
+
+      .agent-cell .count {
+        font-family: "JetBrains Mono", monospace;
+        font-weight: 600;
+      }
+
+      .agent-cell .count.high {
+        color: var(--red);
+      }
+      .agent-cell .count.med {
+        color: var(--warm);
+      }
+      .agent-cell .count.low {
+        color: var(--yellow);
+      }
+
+      .agent-cell .note {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        margin-left: 0.5rem;
+      }
+
+      /* ── CASE STUDY ── */
+      .case-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .case-header {
+        padding: 1.75rem 2rem 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .case-badge {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--red);
+        background: var(--red-glow);
+        padding: 0.25rem 0.6rem;
+        border-radius: 6px;
+      }
+
+      .case-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .case-body {
+        padding: 1.25rem 2rem 1.75rem;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      .case-body strong {
+        color: var(--text);
+      }
+
+      .case-findings {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+
+      .case-finding {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        font-size: 0.85rem;
+      }
+
+      .finding-label {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--red);
+        flex-shrink: 0;
+        min-width: 60px;
+      }
+
+      .finding-text {
+        color: var(--text-muted);
+      }
+
+      /* ── CHECKLIST ── */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .check-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .check-item:hover {
+        background: var(--surface-hover);
+      }
+
+      .check-item.done {
+        border-color: var(--green);
+        background: var(--green-glow);
+      }
+
+      .check-box {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .check-item.done .check-box {
+        border-color: var(--green);
+        background: var(--green);
+      }
+
+      .check-box svg {
+        width: 14px;
+        height: 14px;
+        stroke: white;
+        stroke-width: 3;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .check-item.done .check-box svg {
+        opacity: 1;
+      }
+
+      .check-text {
+        font-size: 0.92rem;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+
+      .check-item.done .check-text {
+        color: var(--green);
+      }
+
+      .checklist-progress {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        min-height: 1.5em;
+      }
+
+      .checklist-progress.complete {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      .anchor-nav {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1rem;
+      }
+      .anchor-nav-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .anchor-nav a {
+        font-size: 0.78rem;
+        color: var(--accent);
+        text-decoration: none;
+        padding: 0.25rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .anchor-nav a:hover {
+        background: var(--accent-glow);
+        border-color: var(--accent);
+      }
+
+      /* ── SOURCES ── */
+      .sources {
+        border-top: 1px solid var(--border);
+        padding-top: 2rem;
+        margin-top: 1rem;
+      }
+
+      .sources h3 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+
+      .source-item {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        padding-left: 1rem;
+        border-left: 2px solid var(--border);
+      }
+
+      .source-item a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .source-item a:hover {
+        text-decoration: underline;
+      }
+
+      .sources-toggle {
+        margin-top: 1rem;
+      }
+      .sources-toggle summary {
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text);
+        padding: 0.5rem 0;
+        list-style: none;
+      }
+      .sources-toggle summary::before {
+        content: "▶ ";
+        font-size: 0.7rem;
+        transition: transform 0.2s;
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .sources-toggle[open] summary::before {
+        content: "▼ ";
+      }
+      .sources-toggle summary::-webkit-details-marker {
+        display: none;
+      }
+
+      /* ── NEXT CTA ── */
+      .next-cta {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 2rem 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+      }
+
+      .next-cta:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      .next-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.3rem;
+      }
+
+      .next-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+
+      .next-arrow {
+        font-size: 1.5rem;
+        color: var(--accent);
+        transition: transform 0.3s;
+      }
+
+      .next-cta:hover .next-arrow {
+        transform: translateX(6px);
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 600px) {
+        .stat-row {
+          grid-template-columns: 1fr;
+        }
+        .vuln-grid {
+          grid-template-columns: 1fr;
+        }
+        .agent-row {
+          grid-template-columns: 1fr;
+          gap: 0;
+        }
+        .agent-row.header {
+          display: none;
+        }
+        .agent-cell {
+          padding: 0.5rem 1rem;
+        }
+        .agent-cell.name {
+          padding-top: 0.85rem;
+          font-size: 0.9rem;
+        }
+        .next-cta {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── NAV ── -->
+    <nav class="topnav">
+      <div class="breadcrumb">
+        <a href="conn-01.html">All perspectives</a>
+        <span style="color: var(--border)">/</span>
+        <a href="dev-persona.html">&larr; Back to series</a>
+        <span style="color: var(--border)">/</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted)"
+          >Article 1 of 5</span
+        >
+      </div>
+      <div class="progress-bar" id="progressBar"></div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-tag">Article 1</div>
+      <h1>
+        Your AI coding assistant writes <em>vulnerable code</em> by default.
+      </h1>
+      <p>
+        DryRun Security tested the three leading AI coding agents across
+        realistic applications. The results are concrete, reproducible, and
+        worth internalizing.
+      </p>
+      <div class="scroll-hint">
+        See the data
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <nav class="anchor-nav reveal">
+      <span class="anchor-nav-label">Jump to:</span>
+      <a href="#headline-numbers">Headline Numbers</a>
+      <a href="#recurring-classes">10 Vuln Classes</a>
+      <a href="#agent-breakdown">Agent Breakdown</a>
+      <a href="#case-study">Moltbook Case Study</a>
+      <a href="#workflow-changes">Workflow Changes</a>
+    </nav>
+
+    <!-- ── THE NUMBERS ── -->
+    <section id="headline-numbers">
+      <div class="reveal">
+        <h2>The headline numbers</h2>
+        <p class="section-sub">
+          30 pull requests. Two realistic test applications. Three agents. March
+          2026.
+        </p>
+
+        <div class="stat-row">
+          <div class="stat-block red">
+            <div class="stat-number">87%</div>
+            <div class="stat-label">
+              of PRs contained at least one vulnerability
+            </div>
+          </div>
+          <div class="stat-block warm">
+            <div class="stat-number">143</div>
+            <div class="stat-label">total vulnerabilities across 38 scans</div>
+          </div>
+          <div class="stat-block accent">
+            <div class="stat-number">10</div>
+            <div class="stat-label">recurring vulnerability classes</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── 10 VULNERABILITY CLASSES ── -->
+    <section id="recurring-classes">
+      <div class="reveal">
+        <h2>The 10 recurring classes</h2>
+        <p class="section-sub">
+          Every one of these is a well-known vulnerability class. Every one was
+          introduced by AI agents in 2026. Tap to see the pattern.
+        </p>
+      </div>
+
+      <div class="vuln-grid">
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#01</div>
+          <div class="vuln-name">Broken access control</div>
+          <div class="vuln-detail">
+            Missing authorization checks on state-changing endpoints. Agents
+            generate functional routes but skip ownership verification. Any
+            authenticated user can modify any resource.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#02</div>
+          <div class="vuln-name">Business logic failures</div>
+          <div class="vuln-detail">
+            Authorization logic that checks the wrong field or validates
+            presence instead of correctness. The code runs, the tests pass, but
+            the security invariant doesn't hold.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#03</div>
+          <div class="vuln-name">OAuth implementation flaws</div>
+          <div class="vuln-detail">
+            Missing <code>state</code> parameter in OAuth flows, enabling
+            CSRF-based account takeover. Agents implement the happy path but
+            omit anti-forgery protections.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#04</div>
+          <div class="vuln-name">WebSocket auth gaps</div>
+          <div class="vuln-detail">
+            WebSocket connections established without authentication checks.
+            Agents set up the transport layer but skip the auth handshake, so any
+            client can connect and receive events.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#05</div>
+          <div class="vuln-name">Rate limiting absence</div>
+          <div class="vuln-detail">
+            No rate limiting on authentication endpoints. Login, registration,
+            and password reset routes are fully functional and fully
+            brute-forceable.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#06</div>
+          <div class="vuln-name">Weak JWT secrets</div>
+          <div class="vuln-detail">
+            Hardcoded JWT secrets like <code>"secret"</code> or
+            <code>"your-secret-key"</code>. Agents generate working token flows
+            but use placeholder secrets that ship to production.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#07</div>
+          <div class="vuln-name">2FA bypass</div>
+          <div class="vuln-detail">
+            2FA implementation that can be disabled without re-authentication.
+            One agent introduced a 2FA-disable endpoint that accepted any
+            authenticated request. No password confirmation, no existing 2FA
+            challenge.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#08</div>
+          <div class="vuln-name">User enumeration</div>
+          <div class="vuln-detail">
+            Login and registration endpoints that return different error
+            messages for "user not found" vs "wrong password." Agents optimize
+            for helpful UX and leak account existence.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#09</div>
+          <div class="vuln-name">Session management failures</div>
+          <div class="vuln-detail">
+            Sessions not invalidated on password change or logout. Old tokens
+            remain valid indefinitely. A compromised session stays compromised.
+          </div>
+        </div>
+
+        <div class="vuln-card reveal" data-vuln>
+          <div class="vuln-num">#10</div>
+          <div class="vuln-name">Non-revocable refresh tokens</div>
+          <div class="vuln-detail">
+            Refresh tokens with no revocation mechanism. Once issued, they can't
+            be invalidated, even if the user changes their password or their
+            account is compromised.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AGENT COMPARISON ── -->
+    <section id="agent-breakdown">
+      <div class="reveal">
+        <h2>Agent-by-agent breakdown</h2>
+        <p class="section-sub">
+          Claude Code, OpenAI Codex, Google Gemini. Two test apps: a web
+          application and a game backend.
+        </p>
+
+        <div class="agent-table">
+          <div class="agent-row header">
+            <div class="agent-cell">Agent</div>
+            <div class="agent-cell">Web app issues</div>
+            <div class="agent-cell">Game issues</div>
+            <div class="agent-cell">Notable finding</div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-cell name">Claude Code</div>
+            <div class="agent-cell"><span class="count high">13</span></div>
+            <div class="agent-cell"><span class="count med">—</span></div>
+            <div class="agent-cell">
+              <span class="note">Introduced 2FA-disable bypass</span>
+            </div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-cell name">OpenAI Codex</div>
+            <div class="agent-cell"><span class="count med">8</span></div>
+            <div class="agent-cell"><span class="count low">6</span></div>
+            <div class="agent-cell">
+              <span class="note">Fewest total issues</span>
+            </div>
+          </div>
+
+          <div class="agent-row">
+            <div class="agent-cell name">Google Gemini</div>
+            <div class="agent-cell"><span class="count med">—</span></div>
+            <div class="agent-cell"><span class="count high">most</span></div>
+            <div class="agent-cell">
+              <span class="note">Highest severity findings overall</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── MOLTBOOK CASE STUDY ── -->
+    <section id="case-study">
+      <div class="reveal">
+        <h2>Case study: Moltbook</h2>
+        <p class="section-sub">
+          What happens when these vulnerability classes ship to production at
+          platform scale.
+        </p>
+
+        <div class="case-box">
+          <div class="case-header">
+            <span class="case-badge">Production incident</span>
+            <span class="case-title">Moltbook — AI social network</span>
+          </div>
+          <div class="case-body">
+            Moltbook was built rapidly using AI development tools, the kind of
+            vibe-coded, ship-fast approach that's increasingly common. Wiz
+            Research found the platform had
+            <strong
+              >no Row Level Security (RLS) policies on its Supabase
+              backend</strong
+            >. The exposed database was accessible without authentication.
+
+            <div class="case-findings">
+              <div class="case-finding">
+                <span class="finding-label">RLS</span>
+                <span class="finding-text"
+                  >No Row Level Security policies configured. Full database
+                  access without authentication</span
+                >
+              </div>
+              <div class="case-finding">
+                <span class="finding-label">TOKENS</span>
+                <span class="finding-text"
+                  >1.5M authentication tokens for AI agents exposed
+                  publicly</span
+                >
+              </div>
+              <div class="case-finding">
+                <span class="finding-label">PII</span>
+                <span class="finding-text"
+                  >35,000+ email addresses and private messages containing
+                  third-party API keys (including OpenAI keys)</span
+                >
+              </div>
+              <div class="case-finding">
+                <span class="finding-label">WRITE</span>
+                <span class="finding-text"
+                  >Write access enabled prompt injection and content integrity
+                  attacks beyond data exposure</span
+                >
+              </div>
+              <div class="case-finding">
+                <span class="finding-label">RATIO</span>
+                <span class="finding-text"
+                  >88:1 agent-to-human ratio (1.5M agents, 17K human owners) —
+                  no verification mechanisms</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CHECKLIST ── -->
+    <section id="workflow-changes">
+      <div class="reveal">
+        <h2>What to change in your workflow</h2>
+        <p class="section-sub">Specific process changes. Tap to commit.</p>
+
+        <div class="checklist">
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Scan every AI-generated PR individually, not just full-repo
+              scans</span
+            >
+          </div>
+
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Add security requirements to your prompts: auth checks, rate
+              limiting, secret rotation</span
+            >
+          </div>
+
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Flag JWT/session/auth PRs for mandatory security review. They
+              cluster the most vulnerabilities</span
+            >
+          </div>
+
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Use contextual analysis tools that trace data flows, not just
+              pattern-matching scanners</span
+            >
+          </div>
+
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Conduct security review during the planning phase, before the
+              agent generates code</span
+            >
+          </div>
+
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Write a security test first, verify it fails, then implement the
+              fix and confirm it passes</span
+            >
+          </div>
+
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Add the 10 vulnerability classes to your PR review template as
+              explicit checkpoints</span
+            >
+          </div>
+        </div>
+
+        <div class="checklist-progress" id="checkProgress"></div>
+      </div>
+    </section>
+
+    <!-- ── SOURCES ── -->
+    <section>
+      <div class="reveal">
+        <div class="sources">
+          <details class="sources-toggle">
+            <summary>Sources</summary>
+            <div class="source-item">
+              DryRun Security / Help Net Security,
+              <a
+                href="https://www.helpnetsecurity.com/2026/03/13/claude-code-openai-codex-google-gemini-ai-coding-agent-security/"
+                target="_blank"
+                rel="noopener"
+                >"AI Coding Agents Keep Repeating Decade-Old Security
+                Mistakes"</a
+              >, March 2026
+            </div>
+            <div class="source-item">
+              Wiz Research,
+              <a
+                href="https://www.wiz.io/blog/exposed-moltbook-database-reveals-millions-of-api-keys"
+                target="_blank"
+                rel="noopener"
+                >"Hacking Moltbook: The AI Social Network Any Human Can
+                Control"</a
+              >, February 2026
+            </div>
+            <div class="source-item">
+              SANS Institute, "AI Security Made Easy" internal briefing, 2026
+            </div>
+          </details>
+        </div>
+
+        <a class="next-cta" href="dev-02.html">
+          <div>
+            <div class="next-label">Next article</div>
+            <div class="next-title">Prompt injection is a Unsolved problem</div>
+          </div>
+          <span class="next-arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      AI Security Education &middot; Article 1 of 5 &middot; For developers
+    </footer>
+
+    <script>
+      // ── Scroll reveal ──
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      // ── Reading progress ──
+      window.addEventListener("scroll", () => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        document.getElementById("progressBar").style.width =
+          (window.scrollY / h) * 100 + "%";
+      });
+
+      // ── Vulnerability cards ──
+      document.querySelectorAll("[data-vuln]").forEach((card) => {
+        card.addEventListener("click", () => {
+          const wasOpen = card.classList.contains("expanded");
+          // Close all others in same row
+          document
+            .querySelectorAll("[data-vuln]")
+            .forEach((c) => c.classList.remove("expanded"));
+          if (!wasOpen) card.classList.add("expanded");
+        });
+      });
+
+      // ── Checklist ──
+      const checks = document.querySelectorAll("[data-check]");
+      const progress = document.getElementById("checkProgress");
+      const total = checks.length;
+
+      checks.forEach((item) => {
+        item.addEventListener("click", () => {
+          item.classList.toggle("done");
+          const checked = document.querySelectorAll(".check-item.done").length;
+          if (checked === 0) {
+            progress.textContent = "";
+            progress.classList.remove("complete");
+          } else if (checked < total) {
+            progress.textContent = `${checked} of ${total} — keep going`;
+            progress.classList.remove("complete");
+          } else {
+            progress.textContent =
+              "Your review process now covers what the agents miss.";
+            progress.classList.add("complete");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

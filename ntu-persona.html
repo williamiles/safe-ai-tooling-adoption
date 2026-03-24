@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Security — For Everyday AI Users</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface-hover: #24243a;
+    --border: #2a2a3e;
+    --text: #e4e4ed;
+    --text-muted: #8888a4;
+    --accent: #7c6ff7;
+    --accent-glow: rgba(124, 111, 247, 0.15);
+    --accent-soft: #6c5ce7;
+    --warm: #f39c6b;
+    --green: #6bcf9f;
+    --green-glow: rgba(107, 207, 159, 0.15);
+    --red: #f76f6f;
+    --red-glow: rgba(247, 111, 111, 0.12);
+    --yellow: #f7d76f;
+    --yellow-glow: rgba(247, 215, 111, 0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  *::selection { background: rgba(124, 111, 247, 0.3); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+
+  /* ── Scroll-triggered fade-in ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5rem 2rem 2rem;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-label {
+    font-size: 0.8rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    line-height: 1.15;
+    max-width: 700px;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max-width: 540px;
+    margin-bottom: 2.5rem;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    animation: float 2.5s ease-in-out infinite;
+  }
+
+  .scroll-hint svg { width: 20px; height: 20px; stroke: var(--text-muted); }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(8px); }
+  }
+
+  /* ── SECTION LAYOUT ── */
+  section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 5rem 2rem;
+  }
+
+  section h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  section .section-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2.5rem;
+  }
+
+  /* ── INTERACTIVE TILES — "I use AI for..." ── */
+  .tile-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .tile:hover { background: var(--surface-hover); transform: translateY(-2px); }
+
+  .tile.selected {
+    border-color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .tile.selected::after {
+    content: '';
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 22px;
+    height: 22px;
+    background: var(--accent);
+    border-radius: 50%;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+    background-size: 14px;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+
+  .tile-icon {
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .tile-label {
+    font-weight: 500;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .tile-example {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .tile-counter {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    min-height: 1.4em;
+    transition: opacity 0.3s;
+  }
+
+  /* ── THE DOUBT — animated questions ── */
+  .doubt-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .doubt-bubble {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    font-size: 1.05rem;
+    font-style: italic;
+    color: var(--text-muted);
+    opacity: 0;
+    transform: translateX(-20px);
+    transition: all 0.6s ease;
+    position: relative;
+    padding-left: 3rem;
+  }
+
+  .doubt-bubble.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .doubt-bubble::before {
+    content: '?';
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 0.85rem;
+    color: var(--accent);
+  }
+
+  /* ── VALIDATION ── */
+  .validation-box {
+    background: linear-gradient(135deg, var(--accent-glow), var(--green-glow));
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3rem 2.5rem;
+    text-align: center;
+  }
+
+  .validation-box h2 {
+    font-size: 1.8rem;
+    margin-bottom: 0.75rem;
+    color: var(--green);
+  }
+
+  .validation-box p {
+    font-size: 1.05rem;
+    color: var(--text-muted);
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  .validation-box p strong {
+    color: var(--text);
+  }
+
+  /* ── ARTICLE CARDS ── */
+  .article-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .article-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.75rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    cursor: pointer;
+  }
+
+  .article-card:hover {
+    background: var(--surface-hover);
+    border-color: var(--accent);
+    transform: translateX(4px);
+  }
+
+  .article-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--accent-glow);
+    border: 1px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .article-card-body { flex: 1; }
+
+  .article-card-title {
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .article-card-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .article-card-arrow {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: transform 0.3s;
+  }
+
+  .article-card:hover .article-card-arrow {
+    transform: translateX(4px);
+    color: var(--accent);
+  }
+
+  .article-card.locked {
+    opacity: 0.45;
+    pointer-events: none;
+  }
+
+  .article-card.locked .article-num {
+    background: var(--surface);
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 520px) {
+    .tile-grid { grid-template-columns: 1fr 1fr; }
+    .article-card { flex-direction: column; text-align: center; gap: 0.75rem; }
+  }
+
+  .persona-topnav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(15,15,19,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex;
+    align-items: center;
+  }
+  .persona-topnav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .persona-topnav a:hover { color: var(--accent); }
+  .doubt-bubble { cursor: default; }
+</style>
+</head>
+<body>
+
+<nav class="persona-topnav">
+  <a href="conn-01.html">&larr; All perspectives</a>
+</nav>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<div class="hero">
+  <div class="hero-label">For everyday AI users</div>
+  <h1>You're exploring AI — that's smart.<br>Let's make sure it stays safe.</h1>
+  <p>This isn't about becoming technical. It's about building a security mindset — one small habit that keeps you in control.</p>
+  <a href="#articles" style="display:inline-block;margin-top:1.5rem;color:var(--accent);text-decoration:none;font-size:0.85rem;font-weight:500;letter-spacing:0.05em;transition:opacity 0.2s;opacity:0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">&darr; Jump to articles</a>
+  <div class="scroll-hint">
+    Scroll
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M19 12l-7 7-7-7"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════════════════ THIS IS YOU ════════════════════ -->
+<section>
+  <div class="reveal">
+    <h2>This is probably you</h2>
+    <p class="section-sub">Tap everything that sounds familiar.</p>
+
+    <div class="tile-grid">
+      <div class="tile" data-tile>
+        <span class="tile-icon">&#9993;</span>
+        <div class="tile-label">Writing emails</div>
+        <div class="tile-example">"Help me reply to this client"</div>
+      </div>
+
+      <div class="tile" data-tile>
+        <span class="tile-icon">&#128196;</span>
+        <div class="tile-label">Summarizing documents</div>
+        <div class="tile-example">"Give me the key points"</div>
+      </div>
+
+      <div class="tile" data-tile>
+        <span class="tile-icon">&#128161;</span>
+        <div class="tile-label">Brainstorming ideas</div>
+        <div class="tile-example">"Help me think through this"</div>
+      </div>
+
+      <div class="tile" data-tile>
+        <span class="tile-icon">&#128203;</span>
+        <div class="tile-label">Filling in spreadsheets</div>
+        <div class="tile-example">"Organize this data for me"</div>
+      </div>
+
+      <div class="tile" data-tile>
+        <span class="tile-icon">&#128172;</span>
+        <div class="tile-label">Getting quick answers</div>
+        <div class="tile-example">"What does this term mean?"</div>
+      </div>
+
+      <div class="tile" data-tile>
+        <span class="tile-icon">&#9997;</span>
+        <div class="tile-label">Editing and rewriting</div>
+        <div class="tile-example">"Make this sound more professional"</div>
+      </div>
+    </div>
+
+    <div class="tile-counter" id="tileCounter"></div>
+  </div>
+</section>
+
+<!-- ════════════════════ THE QUIET DOUBT ════════════════════ -->
+<section>
+  <div class="reveal">
+    <h2>But sometimes you wonder...</h2>
+    <p class="section-sub">These thoughts are more common than you think.</p>
+  </div>
+
+  <div class="doubt-container">
+    <div class="doubt-bubble reveal">
+      "When I paste an email into the AI, who else can see it?"
+    </div>
+    <div class="doubt-bubble reveal">
+      "Could someone hide instructions in a file that trick my AI?"
+    </div>
+    <div class="doubt-bubble reveal">
+      "I gave it access to my documents. Was that a mistake?"
+    </div>
+    <div class="doubt-bubble reveal">
+      "If something went wrong, would I even notice?"
+    </div>
+    <div class="doubt-bubble reveal">
+      "I want to use this well — I just don't know what to watch out for."
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ VALIDATION ════════════════════ -->
+<section>
+  <div class="reveal">
+    <div class="validation-box">
+      <h2>You're right to wonder.</h2>
+      <p>
+        These are real risks — not sci-fi scenarios. But staying safe doesn't require technical knowledge. It requires a <strong>security mindset</strong> — the habit of asking "what could go wrong? and how can we minimize the consequences!" before you act.<br><br>
+        That's what this guide builds — one article at a time.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════ ARTICLE ON-RAMPS ════════════════════ -->
+<section id="articles">
+  <div class="reveal">
+    <h2>Your guide — four short reads</h2>
+    <p class="section-sub">Each takes under 2 minutes. Start anywhere.</p>
+
+    <div class="article-cards">
+      <a class="article-card" href="ntu-01.html">
+        <div class="article-num">1</div>
+        <div class="article-card-body">
+          <div class="article-card-title">Your AI assistant can be tricked</div>
+          <div class="article-card-desc">How hidden instructions in ordinary files can make your AI do things you didn't ask for.</div>
+        </div>
+        <span class="article-card-arrow">&rarr;</span>
+      </a>
+
+      <a class="article-card" href="ntu-02.html">
+        <div class="article-num">2</div>
+        <div class="article-card-body">
+          <div class="article-card-title">Something will go wrong — here's how to limit the damage</div>
+          <div class="article-card-desc">A personal security mindset that works even when things don't.</div>
+        </div>
+        <span class="article-card-arrow">&rarr;</span>
+      </a>
+
+      <a class="article-card" href="ntu-03.html">
+        <div class="article-num">3</div>
+        <div class="article-card-body">
+          <div class="article-card-title">The 3 mistakes people make with AI tools</div>
+          <div class="article-card-desc">Common habits that leave you exposed — and what to do instead.</div>
+        </div>
+        <span class="article-card-arrow">&rarr;</span>
+      </a>
+
+      <a class="article-card" href="ntu-04.html">
+        <div class="article-num">4</div>
+        <div class="article-card-body">
+          <div class="article-card-title">What safe AI use actually looks like</div>
+          <div class="article-card-desc">Five personal safety rules anyone can follow.</div>
+        </div>
+        <span class="article-card-arrow">&rarr;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div style="margin-bottom:1rem;">AI Security Education &middot; Built for everyone</div>
+  <div style="font-size:0.7rem;color:var(--text-muted);opacity:0.7;">Share with your team: <a href="bl-persona.html" style="color:var(--accent);text-decoration:none;">Business Leaders</a> &middot; <a href="dev-persona.html" style="color:var(--accent);text-decoration:none;">Developers</a></div>
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        // stagger doubt bubbles
+        const delay = entry.target.classList.contains('doubt-bubble')
+          ? Array.from(document.querySelectorAll('.doubt-bubble')).indexOf(entry.target) * 150
+          : 0;
+        setTimeout(() => entry.target.classList.add('visible'), delay);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Interactive tiles ──
+  const tiles = document.querySelectorAll('[data-tile]');
+  const counter = document.getElementById('tileCounter');
+  let selected = 0;
+
+  const responses = [
+    '',
+    "That's a popular one.",
+    'You and millions of others.',
+    'You really rely on AI — that\'s totally normal.',
+    'You\'re a power user already.',
+    'AI is woven into your day.',
+    'All of them? You\'re exactly who this guide is for.'
+  ];
+
+  tiles.forEach(tile => {
+    tile.addEventListener('click', () => {
+      tile.classList.toggle('selected');
+      selected = document.querySelectorAll('.tile.selected').length;
+      counter.textContent = responses[selected] || responses[responses.length - 1];
+      counter.style.opacity = selected > 0 ? '1' : '0';
+    });
+  });
+</script>
+</body>
+</html>

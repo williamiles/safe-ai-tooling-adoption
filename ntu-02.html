@@ -1,0 +1,1353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Something Will Go Wrong — Here's How to Limit the Damage</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a24;
+        --surface-hover: #24243a;
+        --border: #2a2a3e;
+        --text: #e4e4ed;
+        --text-muted: #8888a4;
+        --accent: #7c6ff7;
+        --accent-glow: rgba(124, 111, 247, 0.15);
+        --red: #f76f6f;
+        --red-glow: rgba(247, 111, 111, 0.12);
+        --warm: #f39c6b;
+        --warm-glow: rgba(243, 156, 107, 0.12);
+        --green: #6bcf9f;
+        --green-glow: rgba(107, 207, 159, 0.15);
+        --yellow: #f7d76f;
+        --yellow-glow: rgba(247, 215, 111, 0.12);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      *::selection { background: rgba(124, 111, 247, 0.3); }
+      a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── NAV ── */
+      .topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(15, 15, 19, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .topnav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .topnav a:hover {
+        color: var(--accent);
+      }
+      .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.1s linear;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6rem 2rem 3rem;
+        position: relative;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          var(--warm-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .hero-tag {
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+      }
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        max-width: 680px;
+        margin-bottom: 1.25rem;
+      }
+      .hero h1 em {
+        font-style: normal;
+        color: var(--warm);
+      }
+      .hero p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 500px;
+      }
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        animation: float 2.5s ease-in-out infinite;
+      }
+      .scroll-hint svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--text-muted);
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(8px);
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+      }
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+      .section-sub {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      /* ── MINDSET SHIFT ── */
+      .mindset-compare {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+      }
+
+      .mindset-card {
+        border-radius: 16px;
+        padding: 1.75rem;
+        border: 1px solid var(--border);
+        text-align: center;
+      }
+
+      .mindset-card.old {
+        background: var(--red-glow);
+        border-color: rgba(247, 111, 111, 0.2);
+      }
+
+      .mindset-card.new {
+        background: var(--green-glow);
+        border-color: rgba(107, 207, 159, 0.2);
+      }
+
+      .mindset-emoji {
+        font-size: 2rem;
+        margin-bottom: 0.75rem;
+      }
+      .mindset-label {
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        margin-bottom: 0.75rem;
+      }
+      .mindset-card.old .mindset-label {
+        color: var(--red);
+      }
+      .mindset-card.new .mindset-label {
+        color: var(--green);
+      }
+
+      .mindset-card p {
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.5;
+      }
+
+      .mindset-card .sub {
+        font-size: 0.85rem;
+        font-weight: 400;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+      }
+
+      /* ── INTERACTIVE BLAST RADIUS ── */
+      .blast-wrapper {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .blast-tabs {
+        display: flex;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .blast-tab {
+        flex: 1;
+        padding: 1rem;
+        text-align: center;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        background: none;
+        color: var(--text-muted);
+        font-family: inherit;
+        position: relative;
+      }
+
+      .blast-tab:first-child {
+        border-right: 1px solid var(--border);
+      }
+
+      .blast-tab.active {
+        color: var(--text);
+      }
+
+      .blast-tab.active::after {
+        content: "";
+        position: absolute;
+        bottom: -1px;
+        left: 20%;
+        right: 20%;
+        height: 2px;
+      }
+
+      .blast-tab[data-tab="no-walls"].active::after {
+        background: var(--red);
+      }
+      .blast-tab[data-tab="with-walls"].active::after {
+        background: var(--green);
+      }
+
+      .blast-scene {
+        padding: 2.5rem 2rem;
+        display: none;
+      }
+
+      .blast-scene.active {
+        display: block;
+      }
+
+      .blast-visual {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+        min-height: 120px;
+      }
+
+      .blast-node {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        transition: all 0.4s ease;
+        border: 2px solid var(--border);
+        background: var(--surface);
+        position: relative;
+      }
+
+      .blast-node.hit {
+        border-color: var(--red);
+        background: var(--red-glow);
+        animation: shake 0.4s ease;
+      }
+
+      .blast-node.safe {
+        border-color: var(--green);
+        background: var(--green-glow);
+      }
+
+      .blast-node.origin {
+        border-color: var(--red);
+        background: var(--red-glow);
+      }
+
+      .blast-node .node-label {
+        position: absolute;
+        bottom: -20px;
+        font-size: 0.6rem;
+        color: var(--text-muted);
+        white-space: nowrap;
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        25% {
+          transform: translateX(-4px);
+        }
+        75% {
+          transform: translateX(4px);
+        }
+      }
+
+      .blast-connector {
+        width: 24px;
+        height: 2px;
+        background: var(--border);
+        transition: background 0.4s;
+      }
+
+      .blast-connector.hit {
+        background: var(--red);
+      }
+
+      .blast-group {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .blast-wall {
+        width: 4px;
+        height: 50px;
+        background: var(--green);
+        border-radius: 2px;
+        margin: 0 0.25rem;
+      }
+
+      .blast-narrative {
+        font-size: 0.92rem;
+        color: var(--text-muted);
+        text-align: center;
+        line-height: 1.7;
+        min-height: 3.5em;
+      }
+
+      .blast-narrative strong {
+        color: var(--text);
+      }
+      .blast-narrative .red {
+        color: var(--red);
+      }
+      .blast-narrative .green {
+        color: var(--green);
+      }
+
+      .blast-play-btn {
+        display: block;
+        margin: 1.5rem auto 0;
+        background: var(--accent);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 0.65rem 1.75rem;
+        font-family: inherit;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .blast-play-btn:hover {
+        filter: brightness(1.15);
+        transform: translateY(-1px);
+      }
+
+      /* ── PASSWORD ANALOGY ── */
+      .analogy-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 2rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+      }
+
+      .analogy-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        flex-shrink: 0;
+        background: var(--accent-glow);
+        border: 1px solid rgba(124, 111, 247, 0.2);
+      }
+
+      .analogy-box h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.35rem;
+      }
+      .analogy-box p {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      /* ── INTERACTIVE SCENARIOS ── */
+      .scenario-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .scenario {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .scenario:hover {
+        background: var(--surface-hover);
+      }
+
+      .scenario-header {
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .scenario-icon {
+        font-size: 1.3rem;
+        flex-shrink: 0;
+      }
+
+      .scenario-q {
+        flex: 1;
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+
+      .scenario-toggle {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--surface-hover);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        transition: all 0.3s;
+        flex-shrink: 0;
+      }
+
+      .scenario.open .scenario-toggle {
+        transform: rotate(45deg);
+        background: var(--accent-glow);
+        color: var(--accent);
+      }
+
+      .scenario-answer {
+        max-height: 0;
+        overflow: hidden;
+        transition:
+          max-height 0.4s ease,
+          padding 0.4s ease;
+      }
+
+      .scenario.open .scenario-answer {
+        max-height: 300px;
+      }
+
+      .scenario-answer-inner {
+        padding: 0 1.5rem 1.25rem;
+        padding-left: 3.75rem;
+      }
+
+      .scenario-bad,
+      .scenario-better {
+        font-size: 0.88rem;
+        line-height: 1.7;
+        margin-bottom: 0.5rem;
+        padding: 0.6rem 0.85rem;
+        border-radius: 10px;
+      }
+
+      .scenario-bad {
+        background: var(--red-glow);
+        border-left: 3px solid var(--red);
+        color: var(--text-muted);
+      }
+
+      .scenario-better {
+        background: var(--green-glow);
+        border-left: 3px solid var(--green);
+        color: var(--text);
+      }
+
+      .scenario-bad strong {
+        color: var(--red);
+      }
+      .scenario-better strong {
+        color: var(--green);
+      }
+
+      /* ── HABITS CHECKLIST ── */
+      .checklist {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .check-item {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .check-item:hover {
+        background: var(--surface-hover);
+      }
+      .check-item.done {
+        border-color: var(--green);
+        background: var(--green-glow);
+      }
+
+      .check-box {
+        width: 26px;
+        height: 26px;
+        border-radius: 8px;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .check-item.done .check-box {
+        border-color: var(--green);
+        background: var(--green);
+      }
+      .check-box svg {
+        width: 14px;
+        height: 14px;
+        stroke: white;
+        stroke-width: 3;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .check-item.done .check-box svg {
+        opacity: 1;
+      }
+
+      .check-text {
+        font-size: 0.92rem;
+        font-weight: 500;
+        transition: color 0.3s;
+      }
+      .check-item.done .check-text {
+        color: var(--green);
+      }
+
+      .checklist-progress {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        min-height: 1.5em;
+      }
+      .checklist-progress.complete {
+        color: var(--green);
+        font-weight: 600;
+      }
+
+      /* ── SOURCES ── */
+      .sources {
+        border-top: 1px solid var(--border);
+        padding-top: 2rem;
+        margin-top: 1rem;
+      }
+      .sources h3 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+      .source-item {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        padding-left: 1rem;
+        border-left: 2px solid var(--border);
+      }
+      .source-item a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .source-item a:hover {
+        text-decoration: underline;
+      }
+
+      .sources-toggle { margin-top: 1rem; }
+      .sources-toggle summary { font-size: 1rem; font-weight: 600; cursor: pointer; color: var(--text); padding: 0.5rem 0; list-style: none; }
+      .sources-toggle summary::before { content: '▶ '; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; margin-right: 0.4rem; }
+      .sources-toggle[open] summary::before { content: '▼ '; }
+      .sources-toggle summary::-webkit-details-marker { display: none; }
+
+      /* ── NEXT CTA ── */
+      .next-cta {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 2rem 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        margin-top: 2rem;
+      }
+      .next-cta:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+      .next-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.3rem;
+      }
+      .next-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .next-arrow {
+        font-size: 1.5rem;
+        color: var(--accent);
+        transition: transform 0.3s;
+      }
+      .next-cta:hover .next-arrow {
+        transform: translateX(6px);
+      }
+
+      footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 520px) {
+        .mindset-compare {
+          grid-template-columns: 1fr;
+        }
+        .blast-visual {
+          gap: 0.35rem;
+        }
+        .blast-node {
+          width: 44px;
+          height: 44px;
+          font-size: 1rem;
+        }
+        .analogy-box {
+          flex-direction: column;
+        }
+        .next-cta {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── NAV ── -->
+    <nav class="topnav">
+      <div class="breadcrumb">
+        <a href="conn-01.html">All perspectives</a>
+        <span style="color: var(--border)">/</span>
+        <a href="ntu-persona.html">&larr; Back to guide</a>
+        <span style="color: var(--border)">/</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted)"
+          >Article 2 of 4</span
+        >
+      </div>
+      <div class="progress-bar" id="progressBar"></div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-tag">Article 2</div>
+      <h1>
+        Something <em>will</em> go wrong.<br />Here's how to limit the damage.
+      </h1>
+      <p>
+        You can't prevent every mistake. But you can make sure one mistake
+        doesn't ruin everything.
+      </p>
+      <div class="scroll-hint">
+        The mindset shift
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── THE MINDSET SHIFT ── -->
+    <section>
+      <div class="reveal">
+        <h2>One shift changes everything</h2>
+        <p class="section-sub">
+          Stop trying to be perfect. Start building walls between your mistakes.
+        </p>
+
+        <div class="mindset-compare">
+          <div class="mindset-card old">
+            <div class="mindset-emoji">&#128560;</div>
+            <div class="mindset-label">The old thinking</div>
+            <p>"I need to never make a mistake."</p>
+            <p class="sub">
+              Stressful. Impossible. One slip and everything falls.
+            </p>
+          </div>
+          <div class="mindset-card new">
+            <div class="mindset-emoji">&#129529;</div>
+            <div class="mindset-label">The security mindset</div>
+            <p>"What could go wrong? And how can we minimize the consequences!"</p>
+            <p class="sub">Calm. Realistic. Damage stays small.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PASSWORD ANALOGY ── -->
+    <section>
+      <div class="reveal">
+        <div class="analogy-box">
+          <div class="analogy-icon">&#128273;</div>
+          <div>
+            <h3>You already know this pattern</h3>
+            <p>
+              You use a different password for every account. Why? Because if
+              one gets stolen, the thief can't get into everything else.
+              <strong>That's containment.</strong> The same idea works for AI
+              tools: don't let one mistake give away everything.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── INTERACTIVE BLAST RADIUS ── -->
+    <section>
+      <div class="reveal">
+        <h2>See the difference</h2>
+        <p class="section-sub">
+          Watch what happens when one thing goes wrong — with and without walls.
+        </p>
+
+        <div class="blast-wrapper">
+          <div class="blast-tabs">
+            <button class="blast-tab active" data-tab="no-walls">
+              Without walls
+            </button>
+            <button class="blast-tab" data-tab="with-walls">With walls</button>
+          </div>
+
+          <!-- Scene 1: No walls -->
+          <div class="blast-scene active" id="scene-no-walls">
+            <div class="blast-visual" id="visual-no-walls">
+              <div class="blast-node" data-idx="0">
+                <span>&#128231;</span><span class="node-label">Email</span>
+              </div>
+              <div class="blast-connector" data-cidx="0"></div>
+              <div class="blast-node" data-idx="1">
+                <span>&#128196;</span><span class="node-label">Files</span>
+              </div>
+              <div class="blast-connector" data-cidx="1"></div>
+              <div class="blast-node" data-idx="2">
+                <span>&#128197;</span><span class="node-label">Calendar</span>
+              </div>
+              <div class="blast-connector" data-cidx="2"></div>
+              <div class="blast-node" data-idx="3">
+                <span>&#128179;</span><span class="node-label">Banking</span>
+              </div>
+              <div class="blast-connector" data-cidx="3"></div>
+              <div class="blast-node" data-idx="4">
+                <span>&#128247;</span><span class="node-label">Photos</span>
+              </div>
+            </div>
+            <div class="blast-narrative" id="narrative-no-walls">
+              Everything is connected. Tap play to see what happens when the AI
+              reads a bad file.
+            </div>
+            <button class="blast-play-btn" id="play-no-walls">
+              Play scenario
+            </button>
+          </div>
+
+          <!-- Scene 2: With walls -->
+          <div class="blast-scene" id="scene-with-walls">
+            <div class="blast-visual" id="visual-with-walls">
+              <div class="blast-group">
+                <div class="blast-node" data-widx="0">
+                  <span>&#128231;</span><span class="node-label">Email</span>
+                </div>
+                <div class="blast-connector" data-wcidx="0"></div>
+                <div class="blast-node" data-widx="1">
+                  <span>&#128196;</span><span class="node-label">Files</span>
+                </div>
+              </div>
+              <div class="blast-wall"></div>
+              <div class="blast-group">
+                <div class="blast-node" data-widx="2">
+                  <span>&#128197;</span><span class="node-label">Calendar</span>
+                </div>
+              </div>
+              <div class="blast-wall"></div>
+              <div class="blast-group">
+                <div class="blast-node" data-widx="3">
+                  <span>&#128179;</span><span class="node-label">Banking</span>
+                </div>
+                <div class="blast-connector" data-wcidx="1"></div>
+                <div class="blast-node" data-widx="4">
+                  <span>&#128247;</span><span class="node-label">Photos</span>
+                </div>
+              </div>
+            </div>
+            <div class="blast-narrative" id="narrative-with-walls">
+              Walls separate your digital life into zones. Tap play to see the
+              same attack.
+            </div>
+            <button class="blast-play-btn" id="play-with-walls">
+              Play scenario
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── WHAT IF SCENARIOS ── -->
+    <section>
+      <div class="reveal">
+        <h2>What happens when...</h2>
+        <p class="section-sub">
+          Tap each scenario to see the risk — and the safer alternative.
+        </p>
+      </div>
+
+      <div class="scenario-stack">
+        <div class="scenario reveal" data-scenario>
+          <div class="scenario-header">
+            <span class="scenario-icon">&#128172;</span>
+            <span class="scenario-q"
+              >You paste your whole inbox into the AI for help?</span
+            >
+            <span class="scenario-toggle">+</span>
+          </div>
+          <div class="scenario-answer">
+            <div class="scenario-answer-inner">
+              <div class="scenario-bad">
+                <strong>Risk:</strong> The AI now has every name, address,
+                password reset link, and private conversation. One trick and all
+                of it can leak.
+              </div>
+              <div class="scenario-better">
+                <strong>Better:</strong> Copy only the specific email you need
+                help with. Leave the rest out.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario reveal" data-scenario>
+          <div class="scenario-header">
+            <span class="scenario-icon">&#128194;</span>
+            <span class="scenario-q"
+              >You give the AI access to your entire drive?</span
+            >
+            <span class="scenario-toggle">+</span>
+          </div>
+          <div class="scenario-answer">
+            <div class="scenario-answer-inner">
+              <div class="scenario-bad">
+                <strong>Risk:</strong> Tax returns, contracts, personal photos —
+                the AI can read all of it. A hidden instruction in one file
+                could expose everything else.
+              </div>
+              <div class="scenario-better">
+                <strong>Better:</strong> Share only the specific folder or file
+                you're working with. Remove access when you're done.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario reveal" data-scenario>
+          <div class="scenario-header">
+            <span class="scenario-icon">&#9989;</span>
+            <span class="scenario-q"
+              >You say "yes" to every permission the AI asks for?</span
+            >
+            <span class="scenario-toggle">+</span>
+          </div>
+          <div class="scenario-answer">
+            <div class="scenario-answer-inner">
+              <div class="scenario-bad">
+                <strong>Risk:</strong> The AI can now send emails, read your
+                calendar, and browse the web on your behalf. A single trick
+                could use all of those powers at once.
+              </div>
+              <div class="scenario-better">
+                <strong>Better:</strong> Read each permission request. Ask:
+                "Does the AI actually need this for what I'm doing right now?"
+                If not, say no.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="scenario reveal" data-scenario>
+          <div class="scenario-header">
+            <span class="scenario-icon">&#128260;</span>
+            <span class="scenario-q"
+              >You trust the AI's output without checking?</span
+            >
+            <span class="scenario-toggle">+</span>
+          </div>
+          <div class="scenario-answer">
+            <div class="scenario-answer-inner">
+              <div class="scenario-bad">
+                <strong>Risk:</strong> The AI might have been tricked and is now
+                showing you wrong information, or quietly doing something you
+                didn't ask for.
+              </div>
+              <div class="scenario-better">
+                <strong>Better:</strong> Glance at what the AI did before you
+                send, save, or share. If something looks odd — a link you didn't
+                expect, a message you didn't write — pause and check.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CONTAINMENT HABITS CHECKLIST ── -->
+    <section>
+      <div class="reveal">
+        <h2>Five containment habits</h2>
+        <p class="section-sub">
+          The security mindset in five daily habits. Tap each one you'll try.
+        </p>
+
+        <div class="checklist">
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Share the minimum — only the file or text the AI actually
+              needs</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Read permission requests before tapping "allow"</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Keep sensitive stuff separate — don't mix personal files with
+              work AI</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Glance before you send — check the AI's output before sharing it
+              with others</span
+            >
+          </div>
+          <div class="check-item" data-check>
+            <div class="check-box">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            </div>
+            <span class="check-text"
+              >Revoke access you no longer need — treat permissions like
+              borrowed keys</span
+            >
+          </div>
+        </div>
+        <div class="checklist-progress" id="checkProgress"></div>
+      </div>
+    </section>
+
+    <!-- ── SOURCES ── -->
+    <section>
+      <div class="reveal">
+        <div class="sources">
+          <details class="sources-toggle">
+            <summary>Sources</summary>
+            <div class="source-item">
+              Simon Willison,
+              <a
+                href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+                target="_blank"
+                rel="noopener"
+                >"The Lethal Trifecta"</a
+              >, June 2025
+            </div>
+            <div class="source-item">
+              Anthropic,
+              <a
+                href="https://www.anthropic.com/engineering/claude-code-sandboxing"
+                target="_blank"
+                rel="noopener"
+                >"Beyond Permission Prompts: Making Claude Code More Secure"</a
+              >, October 2025
+            </div>
+            <div class="source-item">
+              SANS Institute, "AI Security Made Easy", 2026
+            </div>
+          </details>
+        </div>
+
+        <a class="next-cta" href="ntu-03.html">
+          <div>
+            <div class="next-label">Next article</div>
+            <div class="next-title">
+              The 3 mistakes people make when using AI tools
+            </div>
+          </div>
+          <span class="next-arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      AI Security Education &middot; Article 2 of 4 &middot; For everyday AI
+      users
+    </footer>
+
+    <script>
+      // ── Scroll reveal ──
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      // ── Progress bar ──
+      window.addEventListener("scroll", () => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        document.getElementById("progressBar").style.width =
+          (window.scrollY / h) * 100 + "%";
+      });
+
+      // ── Blast radius tabs ──
+      document.querySelectorAll(".blast-tab").forEach((tab) => {
+        tab.addEventListener("click", () => {
+          document
+            .querySelectorAll(".blast-tab")
+            .forEach((t) => t.classList.remove("active"));
+          document
+            .querySelectorAll(".blast-scene")
+            .forEach((s) => s.classList.remove("active"));
+          tab.classList.add("active");
+          document
+            .getElementById("scene-" + tab.dataset.tab)
+            .classList.add("active");
+        });
+      });
+
+      // ── Blast: No walls animation ──
+      document
+        .getElementById("play-no-walls")
+        .addEventListener("click", function () {
+          const nodes = document.querySelectorAll(
+            "#visual-no-walls .blast-node",
+          );
+          const conns = document.querySelectorAll(
+            "#visual-no-walls .blast-connector",
+          );
+          const narr = document.getElementById("narrative-no-walls");
+
+          // Reset
+          nodes.forEach((n) => {
+            n.classList.remove("hit", "origin");
+          });
+          conns.forEach((c) => c.classList.remove("hit"));
+
+          const steps = [
+            () => {
+              nodes[0].classList.add("origin");
+              narr.innerHTML =
+                'A tricked email reaches your AI. The <span class="red">attack starts here</span>.';
+            },
+            () => {
+              conns[0].classList.add("hit");
+              nodes[1].classList.add("hit");
+              narr.innerHTML =
+                'It spreads to your <span class="red">files</span>...';
+            },
+            () => {
+              conns[1].classList.add("hit");
+              nodes[2].classList.add("hit");
+              narr.innerHTML = '...your <span class="red">calendar</span>...';
+            },
+            () => {
+              conns[2].classList.add("hit");
+              nodes[3].classList.add("hit");
+              narr.innerHTML =
+                '...your <span class="red">banking details</span>...';
+            },
+            () => {
+              conns[3].classList.add("hit");
+              nodes[4].classList.add("hit");
+              narr.innerHTML =
+                '...your <span class="red">photos</span>. <strong>Everything is exposed.</strong>';
+            },
+          ];
+
+          steps.forEach((fn, i) => setTimeout(fn, i * 1500));
+        });
+
+      // ── Blast: With walls animation ──
+      document
+        .getElementById("play-with-walls")
+        .addEventListener("click", function () {
+          const nodes = document.querySelectorAll(
+            "#visual-with-walls .blast-node",
+          );
+          const conns = document.querySelectorAll(
+            "#visual-with-walls .blast-connector",
+          );
+          const narr = document.getElementById("narrative-with-walls");
+
+          // Reset
+          nodes.forEach((n) => {
+            n.classList.remove("hit", "origin", "safe");
+          });
+          conns.forEach((c) => c.classList.remove("hit"));
+
+          const steps = [
+            () => {
+              nodes[0].classList.add("origin");
+              narr.innerHTML =
+                'Same attack. The tricked email hits your <span class="red">Email zone</span>.';
+            },
+            () => {
+              conns[0].classList.add("hit");
+              nodes[1].classList.add("hit");
+              narr.innerHTML =
+                'It reaches your <span class="red">Files</span> in the same zone...';
+            },
+            () => {
+              nodes[2].classList.add("safe");
+              narr.innerHTML =
+                'But the wall stops it. Your <span class="green">Calendar is safe</span>.';
+            },
+            () => {
+              nodes[3].classList.add("safe");
+              nodes[4].classList.add("safe");
+              narr.innerHTML =
+                'Your <span class="green">Banking</span> and <span class="green">Photos</span> are safe too. <strong>The damage stayed small.</strong>';
+            },
+          ];
+
+          steps.forEach((fn, i) => setTimeout(fn, i * 1500));
+        });
+
+      // ── Expandable scenarios ──
+      document.querySelectorAll("[data-scenario]").forEach((s) => {
+        s.addEventListener("click", () => {
+          const wasOpen = s.classList.contains("open");
+          document
+            .querySelectorAll("[data-scenario]")
+            .forEach((o) => o.classList.remove("open"));
+          if (!wasOpen) s.classList.add("open");
+        });
+      });
+
+      // ── Checklist ──
+      const checks = document.querySelectorAll("[data-check]");
+      const progress = document.getElementById("checkProgress");
+      const total = checks.length;
+
+      checks.forEach((item) => {
+        item.addEventListener("click", () => {
+          item.classList.toggle("done");
+          const checked = document.querySelectorAll(".check-item.done").length;
+          if (checked === 0) {
+            progress.textContent = "";
+            progress.classList.remove("complete");
+          } else if (checked < total) {
+            progress.textContent = `${checked} of ${total} — building your safety walls`;
+            progress.classList.remove("complete");
+          } else {
+            progress.textContent =
+              "Small habits, big protection. You've got this.";
+            progress.classList.add("complete");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

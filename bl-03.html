@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Governance Questions Every Leader Needs to Answer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface-hover: #24243a;
+    --border: #2a2a3e;
+    --text: #e4e4ed;
+    --text-muted: #8888a4;
+    --accent: #7c6ff7;
+    --accent-glow: rgba(124, 111, 247, 0.15);
+    --red: #f76f6f;
+    --red-glow: rgba(247, 111, 111, 0.12);
+    --warm: #f39c6b;
+    --warm-glow: rgba(243, 156, 107, 0.12);
+    --green: #6bcf9f;
+    --green-glow: rgba(107, 207, 159, 0.15);
+    --yellow: #f7d76f;
+    --yellow-glow: rgba(247, 215, 111, 0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  *::selection { background: rgba(124, 111, 247, 0.3); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── NAV ── */
+  .topnav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(15,15,19,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topnav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+  .topnav a:hover { color: var(--accent); }
+  .topnav .breadcrumb { display: flex; align-items: center; gap: 0.5rem; }
+
+  .topnav .progress-bar {
+    position: absolute;
+    bottom: 0; left: 0;
+    height: 2px;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.1s linear;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 6rem 2rem 3rem;
+    position: relative;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-tag {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.15;
+    max-width: 700px;
+    margin-bottom: 1.25rem;
+  }
+
+  .hero h1 em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .hero p {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+    max-width: 520px;
+  }
+
+  .scroll-hint {
+    position: absolute;
+    bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    animation: float 2.5s ease-in-out infinite;
+  }
+  .scroll-hint svg { width: 18px; height: 18px; stroke: var(--text-muted); }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+  /* ── SECTIONS ── */
+  section {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 2rem;
+  }
+
+  section h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+  }
+
+  .section-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  /* ── AUTONOMY LEVELS ── */
+  .level-selector {
+    display: flex;
+    gap: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+  }
+
+  .level-btn {
+    flex: 1;
+    padding: 1rem 0.5rem;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    transition: all 0.3s;
+    border-right: 1px solid var(--border);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .level-btn:last-child { border-right: none; }
+  .level-btn:hover { background: var(--surface-hover); }
+
+  .level-btn.active { color: var(--text); }
+  .level-btn.active.l1 { background: var(--green-glow); color: var(--green); }
+  .level-btn.active.l2 { background: var(--yellow-glow); color: var(--yellow); }
+  .level-btn.active.l3 { background: var(--warm-glow); color: var(--warm); }
+  .level-btn.active.l4 { background: var(--red-glow); color: var(--red); }
+
+  .level-num {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .level-detail {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .level-panel {
+    display: none;
+    padding: 2rem;
+  }
+
+  .level-panel.active { display: block; }
+
+  .level-panel h3 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  .level-panel .level-desc {
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .level-panel .level-desc strong { color: var(--text); }
+
+  .level-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .level-box {
+    padding: 1rem;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+
+  .level-box.example {
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+  }
+
+  .level-box.risk {
+    border: 1px solid rgba(247,111,111,0.15);
+    background: var(--red-glow);
+  }
+
+  .level-box-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+  }
+
+  .level-box.example .level-box-label { color: var(--text-muted); }
+  .level-box.risk .level-box-label { color: var(--red); }
+  .level-box p { color: var(--text-muted); }
+
+  .level-owner {
+    margin-top: 1.25rem;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    background: var(--accent-glow);
+    border: 1px solid rgba(124,111,247,0.15);
+    font-size: 0.85rem;
+  }
+
+  .level-owner strong {
+    color: var(--accent);
+  }
+
+  /* ── GOVERNANCE QUESTIONS ── */
+  .question-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .question-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: border-color 0.3s;
+  }
+
+  .question-card.open { border-color: var(--accent); }
+
+  .question-header {
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .question-num {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--accent-glow);
+    border: 1px solid rgba(124,111,247,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--accent);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .question-card.open .question-num {
+    background: var(--accent);
+    color: white;
+  }
+
+  .question-text {
+    font-size: 0.95rem;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .question-toggle {
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: transform 0.3s;
+    flex-shrink: 0;
+  }
+
+  .question-card.open .question-toggle { transform: rotate(45deg); color: var(--accent); }
+
+  .question-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .question-card.open .question-answer { max-height: 300px; }
+
+  .question-answer-inner {
+    padding: 0 1.5rem 1.5rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    border-top: 1px solid var(--border);
+    padding-top: 1.25rem;
+    margin: 0 1.5rem;
+  }
+
+  .question-answer-inner strong { color: var(--text); }
+
+  .answer-owner {
+    display: inline-block;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-glow);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  /* ── INCIDENT RESPONSE GAP ── */
+  .ir-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .ir-header {
+    padding: 1.75rem 2rem 0;
+  }
+
+  .ir-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+  }
+
+  .ir-header p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+  }
+
+  .ir-steps {
+    padding: 0 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .ir-step {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    background: var(--surface-hover);
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .ir-step:hover { background: var(--border); }
+
+  .ir-step.checked {
+    background: var(--green-glow);
+    border: 1px solid rgba(107,207,159,0.2);
+  }
+
+  .ir-step.missing {
+    background: var(--red-glow);
+    border: 1px solid rgba(247,111,111,0.15);
+  }
+
+  .ir-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .ir-step.checked .ir-dot { border-color: var(--green); background: var(--green); }
+  .ir-step.missing .ir-dot { border-color: var(--red); background: var(--red); }
+
+  .ir-label {
+    font-size: 0.88rem;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .ir-status {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .ir-step.checked .ir-status { opacity: 1; color: var(--green); }
+  .ir-step.missing .ir-status { opacity: 1; color: var(--red); }
+
+  .ir-result {
+    padding: 1.25rem 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.88rem;
+    text-align: center;
+    min-height: 3em;
+    transition: all 0.3s;
+  }
+
+  .ir-result.gap { color: var(--red); background: var(--red-glow); }
+  .ir-result.partial { color: var(--yellow); background: var(--yellow-glow); }
+  .ir-result.ready { color: var(--green); background: var(--green-glow); }
+
+  /* ── CHECKLIST ── */
+  .checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .check-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .check-item:hover { background: var(--surface-hover); }
+
+  .check-item.done {
+    border-color: var(--green);
+    background: var(--green-glow);
+  }
+
+  .check-box {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .check-item.done .check-box {
+    border-color: var(--green);
+    background: var(--green);
+  }
+
+  .check-box svg {
+    width: 14px;
+    height: 14px;
+    stroke: white;
+    stroke-width: 3;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .check-item.done .check-box svg { opacity: 1; }
+
+  .check-text {
+    font-size: 0.92rem;
+    font-weight: 500;
+    flex: 1;
+    transition: color 0.3s;
+  }
+
+  .check-item.done .check-text { color: var(--green); }
+
+  .check-owner {
+    font-size: 0.7rem;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+  }
+
+  .checklist-progress {
+    text-align: center;
+    margin-top: 1.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    min-height: 1.5em;
+  }
+
+  .checklist-progress.complete {
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  .anchor-nav {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+  .anchor-nav-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .anchor-nav a {
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .anchor-nav a:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+  }
+
+  /* ── SOURCES ── */
+  .sources {
+    border-top: 1px solid var(--border);
+    padding-top: 2rem;
+    margin-top: 1rem;
+  }
+
+  .sources h3 {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .source-item {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    border-left: 2px solid var(--border);
+  }
+
+  .source-item a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .source-item a:hover { text-decoration: underline; }
+
+  .sources-toggle { margin-top: 1rem; }
+  .sources-toggle summary { font-size: 1rem; font-weight: 600; cursor: pointer; color: var(--text); padding: 0.5rem 0; list-style: none; }
+  .sources-toggle summary::before { content: '▶ '; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; margin-right: 0.4rem; }
+  .sources-toggle[open] summary::before { content: '▼ '; }
+  .sources-toggle summary::-webkit-details-marker { display: none; }
+
+  /* ── NEXT CTA ── */
+  .next-cta {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2rem 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    margin-top: 2rem;
+  }
+
+  .next-cta:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .next-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.3rem;
+  }
+
+  .next-title { font-size: 1.1rem; font-weight: 600; }
+
+  .next-arrow {
+    font-size: 1.5rem;
+    color: var(--accent);
+    transition: transform 0.3s;
+  }
+
+  .next-cta:hover .next-arrow { transform: translateX(6px); }
+
+  /* ── FOOTER ── */
+  footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 520px) {
+    .level-selector { flex-direction: column; }
+    .level-btn { border-right: none; border-bottom: 1px solid var(--border); }
+    .level-btn:last-child { border-bottom: none; }
+    .level-row { grid-template-columns: 1fr; }
+    .next-cta { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav class="topnav">
+  <div class="breadcrumb">
+    <a href="conn-01.html">All perspectives</a>
+    <span style="color:var(--border);">/</span>
+    <a href="bl-persona.html">&larr; Back to briefing</a>
+    <span style="color:var(--border);">/</span>
+    <span style="font-size:0.8rem;color:var(--text-muted);">Article 3 of 4</span>
+  </div>
+  <div class="progress-bar" id="progressBar"></div>
+</nav>
+
+<!-- ── HERO ── -->
+<div class="hero">
+  <div class="hero-tag">Article 3</div>
+  <h1>Governance questions every leader <em>needs to answer.</em></h1>
+  <p>Before you deploy AI further, you need a framework for how much autonomy to grant — and who is accountable at each level.</p>
+  <div class="scroll-hint">
+    See the framework
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M19 12l-7 7-7-7"/>
+    </svg>
+  </div>
+</div>
+
+<nav class="anchor-nav reveal">
+  <span class="anchor-nav-label">Jump to:</span>
+  <a href="#autonomy-levels">Autonomy Levels</a>
+  <a href="#seven-questions">Seven Questions</a>
+  <a href="#ir-gap">IR Gap</a>
+  <a href="#action-items">Action Items</a>
+</nav>
+
+<!-- ── AUTONOMY LEVELS ── -->
+<section id="autonomy-levels">
+  <div class="reveal">
+    <h2>How much autonomy does your AI have?</h2>
+    <p class="section-sub">AI tools operate at different levels of autonomy. Each level carries different risks — and requires different governance. Tap a level to explore.</p>
+
+    <div class="level-selector">
+      <button class="level-btn l1 active" data-level="1">
+        <span class="level-num">1</span>
+        Assistive
+      </button>
+      <button class="level-btn l2" data-level="2">
+        <span class="level-num">2</span>
+        Semi-auto
+      </button>
+      <button class="level-btn l3" data-level="3">
+        <span class="level-num">3</span>
+        Autonomous
+      </button>
+      <button class="level-btn l4" data-level="4">
+        <span class="level-num">4</span>
+        Fully auto
+      </button>
+    </div>
+
+    <div class="level-detail">
+      <div class="level-panel active" data-level-panel="1">
+        <h3>Level 1 — Assistive AI</h3>
+        <div class="level-desc">The AI suggests, the human decides. Every action requires explicit approval. <strong>This is where most organizations start</strong> — employees using ChatGPT, Copilot, or Claude to draft emails, summarize documents, and brainstorm ideas.</div>
+        <div class="level-row">
+          <div class="level-box example">
+            <div class="level-box-label">In your organization</div>
+            <p>Employee pastes a client email into an AI tool to draft a reply. AI suggests text; the employee reviews and sends it.</p>
+          </div>
+          <div class="level-box risk">
+            <div class="level-box-label">Organizational risk</div>
+            <p>Sensitive data leaves the organization when employees share it with AI tools. No visibility into what's being shared or with which tools.</p>
+          </div>
+        </div>
+        <div class="level-owner">
+          <strong>Governance owner:</strong> You set the acceptable use policy. HR delivers the training. CISO defines which tools are approved.
+        </div>
+      </div>
+
+      <div class="level-panel" data-level-panel="2">
+        <h3>Level 2 — Semi-Autonomous AI</h3>
+        <div class="level-desc">The AI takes some actions on its own but asks for approval on sensitive operations. <strong>This is where many development teams are today</strong> — AI coding assistants that write and modify code, with the developer reviewing changes before they ship.</div>
+        <div class="level-row">
+          <div class="level-box example">
+            <div class="level-box-label">In your organization</div>
+            <p>A developer uses an AI assistant to write a login system. The AI generates code and modifies files; the developer reviews the pull request.</p>
+          </div>
+          <div class="level-box risk">
+            <div class="level-box-label">Organizational risk</div>
+            <p>77% of organizations lack the AI and data security practices to defend their pipelines and infrastructure. Approval fatigue leads developers to rubber-stamp changes under deadline pressure.</p>
+          </div>
+        </div>
+        <div class="level-owner">
+          <strong>Governance owner:</strong> Engineering leadership mandates security review. CISO provides scanning tooling. You allocate the budget.
+        </div>
+      </div>
+
+      <div class="level-panel" data-level-panel="3">
+        <h3>Level 3 — Autonomous AI Agents</h3>
+        <div class="level-desc">The AI plans and executes multi-step tasks with minimal supervision. It accesses internal systems, reads private data, and takes actions across tools. <strong>This is where the risk escalates sharply</strong> — the AI is making decisions with organizational consequences.</div>
+        <div class="level-row">
+          <div class="level-box example">
+            <div class="level-box-label">In your organization</div>
+            <p>An AI agent monitors support tickets, reads customer data, drafts responses, and sends them — with only periodic human review.</p>
+          </div>
+          <div class="level-box risk">
+            <div class="level-box-label">Organizational risk</div>
+            <p>An agent with access to private data, untrusted content, and external communication can be manipulated into disclosing sensitive information without anyone noticing.</p>
+          </div>
+        </div>
+        <div class="level-owner">
+          <strong>Governance owner:</strong> CISO defines access boundaries and monitoring. Engineering builds containment controls. You approve the risk level and sign off on deployment.
+        </div>
+      </div>
+
+      <div class="level-panel" data-level-panel="4">
+        <h3>Level 4 — Fully Autonomous Systems</h3>
+        <div class="level-desc">The AI operates independently across critical systems with no human in the loop. It makes decisions, takes actions, and handles consequences on its own. <strong>Very few organizations should be here today.</strong> The threat modeling required is exponentially more complex.</div>
+        <div class="level-row">
+          <div class="level-box example">
+            <div class="level-box-label">In your organization</div>
+            <p>An AI system manages infrastructure, deploys code, and responds to incidents autonomously — making production decisions without human approval.</p>
+          </div>
+          <div class="level-box risk">
+            <div class="level-box-label">Organizational risk</div>
+            <p>A single manipulation, data poisoning event, or logic error can cascade through production systems before any human is aware. Recovery costs scale with autonomy.</p>
+          </div>
+        </div>
+        <div class="level-owner">
+          <strong>Governance owner:</strong> This requires board-level risk acceptance. Dedicated security oversight, continuous monitoring, and a tested rollback strategy are non-negotiable.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── THE SEVEN QUESTIONS ── -->
+<section id="seven-questions">
+  <div class="reveal">
+    <h2>Seven questions you need to answer</h2>
+    <p class="section-sub">If you can't answer these for your organization, you have governance gaps. Tap each to see what a good answer looks like.</p>
+  </div>
+
+  <div class="question-grid">
+    <div class="question-card reveal" data-question>
+      <div class="question-header">
+        <div class="question-num">1</div>
+        <span class="question-text">Which AI tools are our employees using today?</span>
+        <span class="question-toggle">+</span>
+      </div>
+      <div class="question-answer">
+        <div class="question-answer-inner">
+          You need a <strong>complete inventory</strong> — not just officially purchased tools, but anything employees have signed up for individually. Shadow AI is your biggest blind spot. If you don't know what tools are in use, you can't govern them.
+          <br><span class="answer-owner">Owner: CISO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card reveal" data-question>
+      <div class="question-header">
+        <div class="question-num">2</div>
+        <span class="question-text">What data are those tools allowed to access?</span>
+        <span class="question-toggle">+</span>
+      </div>
+      <div class="question-answer">
+        <div class="question-answer-inner">
+          Define <strong>data classification tiers</strong> for AI usage. Public data — fine. Internal documents — with approved tools only. Client data, credentials, financial records — never shared with AI tools unless the tool has been security-evaluated and the data flow is controlled.
+          <br><span class="answer-owner">Owner: CISO + Legal</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card reveal" data-question>
+      <div class="question-header">
+        <div class="question-num">3</div>
+        <span class="question-text">Who is accountable when an AI tool causes a data breach?</span>
+        <span class="question-toggle">+</span>
+      </div>
+      <div class="question-answer">
+        <div class="question-answer-inner">
+          <strong>"The AI did it" is not an accountability statement.</strong> You need a named human owner for every AI deployment. At Level 1–2, the user and their manager share responsibility. At Level 3–4, the person who approved the deployment is accountable.
+          <br><span class="answer-owner">Owner: You</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card reveal" data-question>
+      <div class="question-header">
+        <div class="question-num">4</div>
+        <span class="question-text">How are we reviewing AI-generated outputs before they ship?</span>
+        <span class="question-toggle">+</span>
+      </div>
+      <div class="question-answer">
+        <div class="question-answer-inner">
+          For code: <strong>every AI-generated change scanned before merge</strong>. For content: human review before external publication. For automated actions: audit logs and periodic review. The review process must be mandatory, not optional — and it must match the autonomy level.
+          <br><span class="answer-owner">Owner: Engineering lead + CISO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card reveal" data-question>
+      <div class="question-header">
+        <div class="question-num">5</div>
+        <span class="question-text">Do we have an incident response plan that covers AI?</span>
+        <span class="question-toggle">+</span>
+      </div>
+      <div class="question-answer">
+        <div class="question-answer-inner">
+          Most IR plans predate AI deployment. <strong>You need AI-specific scenarios</strong>: manipulated AI disclosing data, poisoned AI outputs entering production, employees unknowingly sharing credentials through AI tools. If your IR plan doesn't cover these, it has a gap.
+          <br><span class="answer-owner">Owner: CISO</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card reveal" data-question>
+      <div class="question-header">
+        <div class="question-num">6</div>
+        <span class="question-text">What autonomy level have we approved — and who signed off?</span>
+        <span class="question-toggle">+</span>
+      </div>
+      <div class="question-answer">
+        <div class="question-answer-inner">
+          <strong>Each autonomy level should be a deliberate decision with a documented sign-off</strong> — not a gradual drift. If your teams have moved from Level 1 to Level 3 without explicit governance review, you've accepted risk you haven't evaluated.
+          <br><span class="answer-owner">Owner: You + Board</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card reveal" data-question>
+      <div class="question-header">
+        <div class="question-num">7</div>
+        <span class="question-text">How will we know when something goes wrong?</span>
+        <span class="question-toggle">+</span>
+      </div>
+      <div class="question-answer">
+        <div class="question-answer-inner">
+          <strong>Monitoring and detection</strong> — not just for traditional threats, but for AI-specific risks: unusual data flows from AI tools, unexpected external communications, AI outputs that deviate from expected behavior. If you can't detect it, you can't respond to it.
+          <br><span class="answer-owner">Owner: CISO + Engineering</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── INCIDENT RESPONSE GAP ── -->
+<section id="ir-gap">
+  <div class="reveal">
+    <h2>Does your incident response plan cover AI?</h2>
+    <p class="section-sub">Tap each item to mark it as "covered" or "missing" in your current plan. Two taps to cycle through states.</p>
+
+    <div class="ir-wrapper">
+      <div class="ir-header">
+        <h3>AI Incident Response Checklist</h3>
+        <p>Every item should have a named owner, a documented procedure, and a tested runbook.</p>
+      </div>
+
+      <div class="ir-steps">
+        <div class="ir-step" data-ir>
+          <div class="ir-dot"></div>
+          <span class="ir-label">Detection of AI-mediated data disclosure</span>
+          <span class="ir-status">&#10003;</span>
+        </div>
+        <div class="ir-step" data-ir>
+          <div class="ir-dot"></div>
+          <span class="ir-label">Response procedure for manipulated AI outputs</span>
+          <span class="ir-status">&#10003;</span>
+        </div>
+        <div class="ir-step" data-ir>
+          <div class="ir-dot"></div>
+          <span class="ir-label">Containment plan for compromised AI agent</span>
+          <span class="ir-status">&#10003;</span>
+        </div>
+        <div class="ir-step" data-ir>
+          <div class="ir-dot"></div>
+          <span class="ir-label">Employee reporting channel for AI security concerns</span>
+          <span class="ir-status">&#10003;</span>
+        </div>
+        <div class="ir-step" data-ir>
+          <div class="ir-dot"></div>
+          <span class="ir-label">Rollback procedure for AI-deployed changes</span>
+          <span class="ir-status">&#10003;</span>
+        </div>
+        <div class="ir-step" data-ir>
+          <div class="ir-dot"></div>
+          <span class="ir-label">Communication plan for AI-related breach disclosure</span>
+          <span class="ir-status">&#10003;</span>
+        </div>
+      </div>
+
+      <div class="ir-result" id="irResult"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CHECKLIST ── -->
+<section id="action-items">
+  <div class="reveal">
+    <h2>Your governance action items</h2>
+    <p class="section-sub">Decisions that are in your lane. Tap to commit.</p>
+
+    <div class="checklist">
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Determine which autonomy level your organization has approved — and document it</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Assign named accountability for each AI deployment</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Direct CISO to update the incident response plan for AI scenarios</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Require data classification tiers for AI tool usage across the organization</span>
+      </div>
+
+      <div class="check-item" data-check>
+        <div class="check-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <span class="check-text">Schedule a quarterly governance review for AI autonomy level and risk posture</span>
+      </div>
+    </div>
+
+    <div class="checklist-progress" id="checkProgress"></div>
+  </div>
+</section>
+
+<!-- ── SOURCES ── -->
+<section>
+  <div class="reveal">
+    <div class="sources">
+      <details class="sources-toggle">
+        <summary>Sources</summary>
+        <div class="source-item">NVIDIA Developer Blog, <a href="https://developer.nvidia.com/blog/agentic-autonomy-levels-and-security/" target="_blank" rel="noopener">"Agentic Autonomy Levels and Security"</a>, February 2025</div>
+        <div class="source-item">Accenture, <a href="https://www.securitymagazine.com/articles/101765-90-of-large-organizations-unprepared-for-ai-enabled-threats" target="_blank" rel="noopener">"2025 State of Cybersecurity Resilience"</a> — survey of 2,286 executives globally</div>
+      </details>
+    </div>
+    <a class="next-cta" href="bl-04.html">
+      <div>
+        <div class="next-label">Next article</div>
+        <div class="next-title">What AI security looks like when done right</div>
+      </div>
+      <span class="next-arrow">&rarr;</span>
+    </a>
+  </div>
+</section>
+
+<footer>
+  AI Security Education &middot; Article 3 of 4 &middot; For business leaders
+</footer>
+
+<script>
+  // ── Scroll reveal ──
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // ── Reading progress bar ──
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = (window.scrollY / h) * 100;
+    document.getElementById('progressBar').style.width = pct + '%';
+  });
+
+  // ── Autonomy levels ──
+  const levelBtns = document.querySelectorAll('.level-btn');
+  const levelPanels = document.querySelectorAll('.level-panel');
+
+  levelBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const level = btn.dataset.level;
+      levelBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      levelPanels.forEach(p => p.classList.remove('active'));
+      document.querySelector(`[data-level-panel="${level}"]`).classList.add('active');
+    });
+  });
+
+  // ── Governance questions (accordion) ──
+  document.querySelectorAll('[data-question]').forEach(card => {
+    card.addEventListener('click', () => {
+      const wasOpen = card.classList.contains('open');
+      document.querySelectorAll('[data-question]').forEach(c => c.classList.remove('open'));
+      if (!wasOpen) card.classList.add('open');
+    });
+  });
+
+  // ── IR gap assessment ──
+  const irSteps = document.querySelectorAll('[data-ir]');
+  const irResult = document.getElementById('irResult');
+
+  // Cycle: neutral → checked → missing → neutral
+  irSteps.forEach(step => {
+    step.addEventListener('click', () => {
+      if (!step.classList.contains('checked') && !step.classList.contains('missing')) {
+        step.classList.add('checked');
+      } else if (step.classList.contains('checked')) {
+        step.classList.remove('checked');
+        step.classList.add('missing');
+        step.querySelector('.ir-status').innerHTML = '&#10007;';
+      } else {
+        step.classList.remove('missing');
+        step.querySelector('.ir-status').innerHTML = '&#10003;';
+      }
+      updateIR();
+    });
+  });
+
+  function updateIR() {
+    const checked = document.querySelectorAll('.ir-step.checked').length;
+    const missing = document.querySelectorAll('.ir-step.missing').length;
+    const total = irSteps.length;
+    const responded = checked + missing;
+
+    irResult.className = 'ir-result';
+
+    if (responded === 0) {
+      irResult.textContent = '';
+      return;
+    }
+
+    if (missing === 0 && checked === total) {
+      irResult.classList.add('ready');
+      irResult.textContent = 'Your IR plan covers AI scenarios. Now test it with a tabletop exercise.';
+    } else if (missing > checked) {
+      irResult.classList.add('gap');
+      irResult.textContent = `${missing} gap${missing > 1 ? 's' : ''} identified. Your incident response plan needs an AI-specific update before your next deployment.`;
+    } else {
+      irResult.classList.add('partial');
+      irResult.textContent = `Partially covered. ${missing} gap${missing > 1 ? 's' : ''} remaining — close them before increasing AI autonomy.`;
+    }
+  }
+
+  // ── Interactive checklist ──
+  const checks = document.querySelectorAll('[data-check]');
+  const progress = document.getElementById('checkProgress');
+  const total = checks.length;
+
+  checks.forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('done');
+      const checked = document.querySelectorAll('.check-item.done').length;
+      if (checked === 0) {
+        progress.textContent = '';
+        progress.classList.remove('complete');
+      } else if (checked < total) {
+        progress.textContent = `${checked} of ${total} governance decisions made`;
+        progress.classList.remove('complete');
+      } else {
+        progress.textContent = 'Governance framework committed. Schedule the first quarterly review.';
+        progress.classList.add('complete');
+      }
+    });
+  });
+</script>
+</body>
+</html>

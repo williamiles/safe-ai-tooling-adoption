@@ -1,0 +1,1199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architectural Defenses That Actually Work</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a24;
+    --surface-hover: #24243a;
+    --border: #2a2a3e;
+    --text: #e4e4ed;
+    --text-muted: #8888a4;
+    --accent: #7c6ff7;
+    --accent-glow: rgba(124, 111, 247, 0.15);
+    --red: #f76f6f;
+    --red-glow: rgba(247, 111, 111, 0.12);
+    --warm: #f39c6b;
+    --warm-glow: rgba(243, 156, 107, 0.12);
+    --green: #6bcf9f;
+    --green-glow: rgba(107, 207, 159, 0.15);
+    --yellow: #f7d76f;
+    --yellow-glow: rgba(247, 215, 111, 0.12);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+  *::selection { background: rgba(124, 111, 247, 0.3); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.88em;
+    background: var(--accent-glow);
+    color: var(--accent);
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* ── NAV ── */
+  .topnav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(15,15,19,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0.75rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topnav a { color: var(--text-muted); text-decoration: none; font-size: 0.8rem; font-weight: 500; transition: color 0.2s; }
+  .topnav a:hover { color: var(--accent); }
+  .topnav .breadcrumb { display: flex; align-items: center; gap: 0.5rem; }
+  .topnav .progress-bar { position: absolute; bottom: 0; left: 0; height: 2px; background: var(--green); width: 0%; transition: width 0.1s linear; }
+
+  /* ── HERO ── */
+  .hero {
+    min-height: 85vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 6rem 2rem 3rem; position: relative;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; top: -10%; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, var(--green-glow) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-tag { font-size: 0.75rem; font-weight: 500; letter-spacing: 0.15em; text-transform: uppercase; color: var(--green); margin-bottom: 1.5rem; }
+  .hero h1 { font-size: clamp(2rem, 5vw, 3.2rem); font-weight: 700; line-height: 1.15; max-width: 750px; margin-bottom: 1.25rem; }
+  .hero h1 em { font-style: normal; color: var(--green); }
+  .hero p { font-size: 1.1rem; color: var(--text-muted); max-width: 580px; }
+  .scroll-hint { position: absolute; bottom: 2rem; display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; animation: float 2.5s ease-in-out infinite; }
+  .scroll-hint svg { width: 18px; height: 18px; stroke: var(--text-muted); }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(8px); } }
+
+  /* ── SECTIONS ── */
+  section { max-width: 760px; margin: 0 auto; padding: 4rem 2rem; }
+  section h2 { font-size: 1.5rem; font-weight: 600; margin-bottom: 0.4rem; }
+  .section-sub { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 2rem; }
+
+  /* ── FRAMING BOX ── */
+  .framing-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2rem;
+    font-size: 0.92rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+
+  .framing-box strong { color: var(--text); }
+
+  /* ── PATTERN SELECTOR ── */
+  .pattern-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .pattern-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 0.75rem;
+    text-align: center;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.3s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pattern-btn:hover { background: var(--surface-hover); color: var(--text); }
+
+  .pattern-btn.active {
+    border-color: var(--green);
+    background: var(--green-glow);
+    color: var(--green);
+  }
+
+  .pattern-btn .pattern-num {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  /* ── PATTERN DETAIL ── */
+  .pattern-detail {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .pattern-panel { display: none; }
+  .pattern-panel.active { display: block; }
+
+  .pattern-panel-header { padding: 1.75rem 2rem 0; }
+
+  .pattern-panel-header h3 { font-size: 1.15rem; font-weight: 600; margin-bottom: 0.2rem; }
+
+  .pattern-source {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-bottom: 1rem;
+  }
+
+  .pattern-body { padding: 0 2rem 1.75rem; }
+
+  .pattern-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  .pattern-desc strong { color: var(--text); }
+
+  .pattern-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .pattern-box {
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    font-size: 0.82rem;
+    line-height: 1.6;
+  }
+
+  .pattern-box.how {
+    background: var(--green-glow);
+    border: 1px solid rgba(107,207,159,0.15);
+  }
+
+  .pattern-box.limits {
+    background: var(--yellow-glow);
+    border: 1px solid rgba(247,215,111,0.15);
+  }
+
+  .pattern-box-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.35rem;
+  }
+
+  .pattern-box.how .pattern-box-label { color: var(--green); }
+  .pattern-box.limits .pattern-box-label { color: var(--yellow); }
+  .pattern-box p { color: var(--text-muted); }
+
+  .pattern-trifecta {
+    padding: 0.65rem 1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface-hover);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .pattern-trifecta strong { color: var(--green); }
+
+  .pattern-prompt {
+    text-align: center;
+    padding: 2.5rem 2rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  /* ── SECURITY TRINITY ── */
+  .trinity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .trinity-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .trinity-card:hover { background: var(--surface-hover); transform: translateY(-2px); }
+  .trinity-card.active { border-color: var(--green); background: var(--green-glow); }
+
+  .trinity-icon {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    display: block;
+  }
+
+  .trinity-name {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+  }
+
+  .trinity-sub {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+  }
+
+  .trinity-detail {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-top: 1rem;
+    overflow: hidden;
+  }
+
+  .trinity-panel { display: none; padding: 1.75rem 2rem; }
+  .trinity-panel.active { display: block; }
+
+  .trinity-panel h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.5rem; }
+
+  .trinity-panel .tri-desc {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 1rem;
+  }
+
+  .trinity-panel .tri-desc strong { color: var(--text); }
+
+  .tri-examples {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .tri-example {
+    font-size: 0.82rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--text-muted);
+    padding: 0.5rem 0.75rem;
+    background: var(--surface-hover);
+    border-radius: 6px;
+    border-left: 3px solid var(--green);
+  }
+
+  .trinity-prompt {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+  }
+
+  /* ── TRUST BOUNDARY DIAGRAM ── */
+  .boundary-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 2rem;
+  }
+
+  .boundary-zones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .boundary-zone {
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .boundary-zone.trusted {
+    background: var(--green-glow);
+    border: 1px solid rgba(107,207,159,0.2);
+  }
+
+  .boundary-zone.semi {
+    background: var(--yellow-glow);
+    border: 1px solid rgba(247,215,111,0.2);
+  }
+
+  .boundary-zone.untrusted {
+    background: var(--red-glow);
+    border: 1px solid rgba(247,111,111,0.15);
+  }
+
+  .zone-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.4rem;
+  }
+
+  .boundary-zone.trusted .zone-label { color: var(--green); }
+  .boundary-zone.semi .zone-label { color: var(--yellow); }
+  .boundary-zone.untrusted .zone-label { color: var(--red); }
+
+  .zone-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .zone-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.2);
+  }
+
+  .boundary-zone.trusted .zone-item { color: var(--green); }
+  .boundary-zone.semi .zone-item { color: var(--yellow); }
+  .boundary-zone.untrusted .zone-item { color: var(--red); }
+
+  .boundary-divider {
+    text-align: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0.25rem 0;
+    letter-spacing: 0.1em;
+  }
+
+  .boundary-rule {
+    margin-top: 1.25rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    background: var(--accent-glow);
+    border: 1px solid rgba(124,111,247,0.15);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .boundary-rule strong { color: var(--accent); }
+
+  /* ── DATA POISONING ── */
+  .poison-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .poison-header {
+    padding: 1.75rem 2rem 0;
+    display: flex; align-items: center; gap: 1rem;
+  }
+
+  .poison-badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--red);
+    background: var(--red-glow);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
+  }
+
+  .poison-title { font-size: 1.1rem; font-weight: 600; }
+
+  .poison-body {
+    padding: 1.25rem 2rem 1.75rem;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .poison-body strong { color: var(--text); }
+
+  .poison-findings {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+
+  .poison-finding {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .poison-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--red);
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+
+  .poison-text { color: var(--text-muted); }
+
+  .poison-defenses {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background: var(--green-glow);
+    border: 1px solid rgba(107,207,159,0.15);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .poison-defenses strong { color: var(--green); }
+
+  /* ── LAYER BUILDER ── */
+  .layer-builder {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .layer-header {
+    padding: 1.75rem 2rem 1rem;
+  }
+
+  .layer-header h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .layer-header p { font-size: 0.88rem; color: var(--text-muted); }
+
+  .layer-items {
+    padding: 0.5rem 2rem 1.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .layer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    background: var(--bg);
+    border: 1px solid var(--border);
+  }
+
+  .layer-item:hover { background: var(--surface-hover); }
+
+  .layer-item.on {
+    background: var(--green-glow);
+    border-color: rgba(107,207,159,0.2);
+  }
+
+  .layer-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+
+  .layer-item.on .layer-dot {
+    border-color: var(--green);
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green-glow);
+  }
+
+  .layer-label { font-size: 0.88rem; font-weight: 500; flex: 1; }
+
+  .layer-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--green);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .layer-item.on .layer-tag { opacity: 1; }
+
+  .layer-bar-wrapper {
+    padding: 0 2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .layer-bar-track {
+    height: 8px;
+    background: var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .layer-bar-fill {
+    height: 100%;
+    background: var(--green);
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  .layer-result {
+    padding: 1.25rem 2rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.85rem;
+    text-align: center;
+    min-height: 3em;
+  }
+
+  .layer-result.partial { color: var(--yellow); }
+  .layer-result.strong { color: var(--green); font-weight: 600; }
+
+  .anchor-nav {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+  .anchor-nav-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .anchor-nav a {
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .anchor-nav a:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+  }
+
+  /* ── SOURCES ── */
+  .sources { border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 1rem; }
+  .sources h3 { font-size: 0.85rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem; }
+  .source-item { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; padding-left: 1rem; border-left: 2px solid var(--border); }
+  .source-item a { color: var(--accent); text-decoration: none; }
+  .source-item a:hover { text-decoration: underline; }
+
+  .sources-toggle { margin-top: 1rem; }
+  .sources-toggle summary { font-size: 1rem; font-weight: 600; cursor: pointer; color: var(--text); padding: 0.5rem 0; list-style: none; }
+  .sources-toggle summary::before { content: '▶ '; font-size: 0.7rem; transition: transform 0.2s; display: inline-block; margin-right: 0.4rem; }
+  .sources-toggle[open] summary::before { content: '▼ '; }
+  .sources-toggle summary::-webkit-details-marker { display: none; }
+
+  /* ── BACK CTA ── */
+  .back-cta { background: var(--green-glow); border: 1px solid rgba(107,207,159,0.2); border-radius: 18px; padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; text-decoration: none; color: inherit; transition: all 0.3s; margin-top: 2rem; }
+  .back-cta:hover { border-color: var(--green); transform: translateY(-2px); }
+  .back-label { font-size: 0.75rem; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
+  .back-title { font-size: 1.1rem; font-weight: 600; }
+  .back-arrow { font-size: 1.5rem; color: var(--green); transition: transform 0.3s; }
+  .back-cta:hover .back-arrow { transform: translateX(-6px); }
+
+  footer { text-align: center; padding: 3rem 2rem; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border); max-width: 760px; margin: 0 auto; }
+
+  @media (max-width: 600px) {
+    .pattern-nav { grid-template-columns: repeat(2, 1fr); }
+    .pattern-row { grid-template-columns: 1fr; }
+    .trinity-grid { grid-template-columns: 1fr; }
+    .back-cta { flex-direction: column; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="breadcrumb">
+    <a href="conn-01.html">All perspectives</a>
+    <span style="color:var(--border);">/</span>
+    <a href="dev-persona.html">&larr; Back to series</a>
+    <span style="color:var(--border);">/</span>
+    <span style="font-size:0.8rem;color:var(--text-muted);">Article 4 of 4</span>
+  </div>
+  <div class="progress-bar" id="progressBar"></div>
+</nav>
+
+<div class="hero">
+  <div class="hero-tag">Article 4 &mdash; Final</div>
+  <h1>Architectural defenses that <em>actually work.</em></h1>
+  <p>Article 3 secured your dev environment. This one is about the AI-integrated systems you build and ship. Six design patterns, the Security Trinity, trust boundaries, and data poisoning defenses.</p>
+  <div class="scroll-hint">
+    See the defenses
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 5v14M19 12l-7 7-7-7"/>
+    </svg>
+  </div>
+</div>
+
+<nav class="anchor-nav reveal">
+  <span class="anchor-nav-label">Jump to:</span>
+  <a href="#framing">The Shift</a>
+  <a href="#six-patterns">Six Patterns</a>
+  <a href="#security-trinity">Security Trinity</a>
+  <a href="#trust-boundaries">Trust Boundaries</a>
+  <a href="#data-poisoning">Data Poisoning</a>
+  <a href="#defense-stack">Defense Stack</a>
+</nav>
+
+<!-- ── FRAMING ── -->
+<section id="framing">
+  <div class="reveal">
+    <h2>From your environment to your architecture</h2>
+    <p class="section-sub">A different security surface: the systems you ship to users.</p>
+
+    <div class="framing-box">
+      Article 3 was about securing the tools you use to build. This article is about <strong>securing what you build with them</strong>: AI-integrated applications, agent systems, RAG pipelines, and any product where an LLM processes untrusted input or accesses private data.
+
+      <br><br>The lethal trifecta from Article 2 (private data access + untrusted content + external communication) is the threat model. <strong>Every pattern here architecturally eliminates or constrains at least one leg.</strong> They're complementary. Layer them. And they're paired with a framework for thinking about agent security from first principles: what to evaluate, what to enforce, and what to observe.
+    </div>
+  </div>
+</section>
+
+<!-- ── SIX PATTERNS ── -->
+<section id="six-patterns">
+  <div class="reveal">
+    <h2>Six patterns, one goal</h2>
+    <p class="section-sub">Each pattern breaks at least one leg of the trifecta. Tap to explore.</p>
+
+    <div class="pattern-nav">
+      <button class="pattern-btn" data-pattern="dual">
+        <span class="pattern-num">01</span>
+        Dual LLM
+      </button>
+      <button class="pattern-btn" data-pattern="sandbox">
+        <span class="pattern-num">02</span>
+        Dual-layer sandbox
+      </button>
+      <button class="pattern-btn" data-pattern="context">
+        <span class="pattern-num">03</span>
+        Context minimization
+      </button>
+      <button class="pattern-btn" data-pattern="network">
+        <span class="pattern-num">04</span>
+        Network allowlist
+      </button>
+      <button class="pattern-btn" data-pattern="human">
+        <span class="pattern-num">05</span>
+        Human-in-the-loop
+      </button>
+      <button class="pattern-btn" data-pattern="guardrail">
+        <span class="pattern-num">06</span>
+        Hard-coded guardrails
+      </button>
+    </div>
+
+    <div class="pattern-detail">
+      <div class="pattern-prompt" id="patternPrompt">Tap a pattern above to see the details.</div>
+
+      <div class="pattern-panel" data-pattern-panel="dual">
+        <div class="pattern-panel-header">
+          <h3>Dual LLM Architecture</h3>
+          <div class="pattern-source">Simon Willison / independent research</div>
+        </div>
+        <div class="pattern-body">
+          <div class="pattern-desc">Separate the LLM that processes untrusted content from the LLM that has access to private data and tools. <strong>The "privileged" LLM never sees raw untrusted input.</strong> The "quarantined" LLM processes external content and produces structured outputs that are validated before passing to the privileged layer. An injected instruction in untrusted content reaches the quarantined LLM, which has no tools to exploit.</div>
+          <div class="pattern-row">
+            <div class="pattern-box how">
+              <div class="pattern-box-label">How it works</div>
+              <p>Untrusted input &rarr; quarantined LLM (no tools, no private data) &rarr; structured output &rarr; validator &rarr; privileged LLM (tools, data)</p>
+            </div>
+            <div class="pattern-box limits">
+              <div class="pattern-box-label">Limitations</div>
+              <p>Adds latency and complexity. Requires clear separation of trusted vs untrusted context. Validator must be robust against structured output manipulation.</p>
+            </div>
+          </div>
+          <div class="pattern-trifecta"><strong>Trifecta leg eliminated:</strong> Breaks the link between untrusted content and private data/tools</div>
+        </div>
+      </div>
+
+      <div class="pattern-panel" data-pattern-panel="sandbox">
+        <div class="pattern-panel-header">
+          <h3>Dual-Layer Sandboxing</h3>
+          <div class="pattern-source">Anthropic — Claude Code, October 2025</div>
+        </div>
+        <div class="pattern-body">
+          <div class="pattern-desc">Combine filesystem isolation and network isolation using OS-level primitives. <strong>Filesystem isolation restricts which files the agent can access. Network isolation routes all traffic through a proxy that validates domains.</strong> Both layers are essential — filesystem alone doesn't prevent network exfiltration, and network alone can be circumvented through filesystem manipulation. Article 3 covered this for your dev environment; here it applies to <strong>agent systems you deploy for users</strong>.</div>
+          <div class="pattern-row">
+            <div class="pattern-box how">
+              <div class="pattern-box-label">How it works</div>
+              <p>Agent runs in sandboxed process &rarr; filesystem access restricted to scoped directory &rarr; network traffic routed through domain-validating proxy</p>
+            </div>
+            <div class="pattern-box limits">
+              <div class="pattern-box-label">Limitations</div>
+              <p>Requires OS-level integration. Agent functionality may be constrained. Allowlist maintenance for legitimate domains is ongoing work. Path-based enforcement has known bypass vectors (see Article 3).</p>
+            </div>
+          </div>
+          <div class="pattern-trifecta"><strong>Trifecta legs constrained:</strong> Limits private data access (filesystem) + eliminates exfiltration (network)</div>
+        </div>
+      </div>
+
+      <div class="pattern-panel" data-pattern-panel="context">
+        <div class="pattern-panel-header">
+          <h3>Context Minimization</h3>
+          <div class="pattern-source">Google SAIF / defense-in-depth principle</div>
+        </div>
+        <div class="pattern-body">
+          <div class="pattern-desc"><strong>The agent should only see the data it needs for the current task, nothing more.</strong> Instead of giving an agent read access to an entire email inbox, retrieve only the specific email being processed. Instead of passing full database contents into RAG context, return only the relevant rows. This reduces the blast radius of a successful injection: even if the agent is manipulated, the data available to exfiltrate is minimal.</div>
+          <div class="pattern-row">
+            <div class="pattern-box how">
+              <div class="pattern-box-label">How it works</div>
+              <p>Task-scoped data retrieval &rarr; agent receives minimal context &rarr; injected instructions can only access what's in the current context window</p>
+            </div>
+            <div class="pattern-box limits">
+              <div class="pattern-box-label">Limitations</div>
+              <p>Requires careful scoping of data retrieval. May reduce agent effectiveness for tasks that genuinely need broad context. Implementation varies by data source.</p>
+            </div>
+          </div>
+          <div class="pattern-trifecta"><strong>Trifecta leg constrained:</strong> Minimizes private data exposure. Limits the blast radius of successful injection</div>
+        </div>
+      </div>
+
+      <div class="pattern-panel" data-pattern-panel="network">
+        <div class="pattern-panel-header">
+          <h3>Network Allowlisting</h3>
+          <div class="pattern-source">Anthropic sandbox / zero-trust networking</div>
+        </div>
+        <div class="pattern-body">
+          <div class="pattern-desc">Route all agent network traffic through a proxy that <strong>only allows connections to a pre-approved list of domains</strong>. An injected instruction telling the agent to send data to <code>attacker.com</code> fails because the proxy blocks the connection. This is the most direct way to eliminate the exfiltration leg of the trifecta. The agent physically cannot transmit data to unauthorized endpoints.</div>
+          <div class="pattern-row">
+            <div class="pattern-box how">
+              <div class="pattern-box-label">How it works</div>
+              <p>Agent &rarr; network proxy &rarr; domain validated against allowlist &rarr; approved: connection proceeds / denied: connection blocked + logged</p>
+            </div>
+            <div class="pattern-box limits">
+              <div class="pattern-box-label">Limitations</div>
+              <p>Allowlist must be maintained as legitimate integrations change. Doesn't prevent exfiltration through approved domains (e.g., embedding data in approved API calls).</p>
+            </div>
+          </div>
+          <div class="pattern-trifecta"><strong>Trifecta leg eliminated:</strong> Removes the exfiltration vector, the hardest leg to bypass when implemented at the network layer</div>
+        </div>
+      </div>
+
+      <div class="pattern-panel" data-pattern-panel="human">
+        <div class="pattern-panel-header">
+          <h3>Human-in-the-Loop Gating</h3>
+          <div class="pattern-source">Google SAIF / NVIDIA autonomy levels</div>
+        </div>
+        <div class="pattern-body">
+          <div class="pattern-desc">Require explicit human approval for sensitive operations: sending external communications, accessing restricted data, executing destructive actions. <strong>The gate must be on the action, not the plan.</strong> An agent can plan to exfiltrate data freely. The defense activates when it attempts to execute the action. Effective at lower autonomy levels but degrades at higher levels due to approval fatigue.</div>
+          <div class="pattern-row">
+            <div class="pattern-box how">
+              <div class="pattern-box-label">How it works</div>
+              <p>Agent plans action &rarr; action classified as sensitive &rarr; human reviews and approves/denies &rarr; only approved actions execute</p>
+            </div>
+            <div class="pattern-box limits">
+              <div class="pattern-box-label">Limitations</div>
+              <p>Approval fatigue leads to rubber-stamping. Doesn't scale to high-autonomy agents. Must be paired with sandboxing to reduce prompt volume to a sustainable level.</p>
+            </div>
+          </div>
+          <div class="pattern-trifecta"><strong>Trifecta leg constrained:</strong> Gates external communication, but only as reliable as the human reviewing it</div>
+        </div>
+      </div>
+
+      <div class="pattern-panel" data-pattern-panel="guardrail">
+        <div class="pattern-panel-header">
+          <h3>Hard-Coded Guardrails</h3>
+          <div class="pattern-source">SANS Institute — zero-trust AI principle</div>
+        </div>
+        <div class="pattern-body">
+          <div class="pattern-desc">Define actions that the AI can <strong>never</strong> perform, regardless of instructions, context, or confidence level. These are not probabilistic defenses. They're deterministic code checks that execute before the AI's output reaches any system. <code>if action == "delete_database": deny()</code>. No LLM reasoning, no prompt engineering, no guardrail that can be talked around. Hard-coded in application logic, not in the AI's instruction set.</div>
+          <div class="pattern-row">
+            <div class="pattern-box how">
+              <div class="pattern-box-label">How it works</div>
+              <p>AI output &rarr; deterministic policy check (not LLM-based) &rarr; allowed actions proceed / prohibited actions blocked unconditionally</p>
+            </div>
+            <div class="pattern-box limits">
+              <div class="pattern-box-label">Limitations</div>
+              <p>Only works for enumerable, predictable actions. Can't guard against novel or creative exfiltration methods. Must be maintained as the action space evolves.</p>
+            </div>
+          </div>
+          <div class="pattern-trifecta"><strong>Trifecta leg constrained:</strong> Prevents specific dangerous actions. Deterministic, not probabilistic</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SECURITY TRINITY ── -->
+<section id="security-trinity">
+  <div class="reveal">
+    <h2>The Security Trinity</h2>
+    <p class="section-sub">Three capabilities every agent system needs. If any one is missing, your security posture has a structural gap. Tap to explore.</p>
+
+    <div class="trinity-grid">
+      <div class="trinity-card" data-trinity="evaluate">
+        <span class="trinity-icon">&#128269;</span>
+        <div class="trinity-name">Evaluate</div>
+        <div class="trinity-sub">Assess before acting</div>
+      </div>
+      <div class="trinity-card" data-trinity="enforce">
+        <span class="trinity-icon">&#128737;</span>
+        <div class="trinity-name">Enforce</div>
+        <div class="trinity-sub">Constrain at runtime</div>
+      </div>
+      <div class="trinity-card" data-trinity="observe">
+        <span class="trinity-icon">&#128200;</span>
+        <div class="trinity-name">Observe</div>
+        <div class="trinity-sub">Detect after the fact</div>
+      </div>
+    </div>
+
+    <div class="trinity-detail">
+      <div class="trinity-prompt" id="trinityPrompt">Tap a capability to see implementation details.</div>
+
+      <div class="trinity-panel" data-trinity-panel="evaluate">
+        <h3>Evaluate — Assess before acting</h3>
+        <div class="tri-desc"><strong>Before an agent takes any action, evaluate the risk.</strong> This includes classifying the action type (read, write, execute, communicate), checking it against policy, and assessing whether the current context warrants the requested operation. Evaluation happens at the application layer, not inside the LLM's reasoning.</div>
+        <div class="tri-examples">
+          <div class="tri-example">classify_action(tool_call) &rarr; { type: "write", target: "production_db", risk: "high" }</div>
+          <div class="tri-example">check_policy(action, user_context) &rarr; DENY | APPROVE | REQUIRE_REVIEW</div>
+          <div class="tri-example">validate_parameters(tool_call) &rarr; reject if params exceed scoped permissions</div>
+        </div>
+      </div>
+
+      <div class="trinity-panel" data-trinity-panel="enforce">
+        <h3>Enforce — Constrain at runtime</h3>
+        <div class="tri-desc"><strong>Apply constraints that the agent cannot bypass, regardless of its instructions.</strong> Hard-coded guardrails, sandboxed execution, network allowlists, and filesystem restrictions. Enforcement must be deterministic and implemented outside the LLM: in application code, at the OS level, or in network infrastructure.</div>
+        <div class="tri-examples">
+          <div class="tri-example">sandbox.restrict(fs: ["/project"], net: ["api.internal.com"])</div>
+          <div class="tri-example">if action.type == "delete" && action.target.is_production: BLOCK</div>
+          <div class="tri-example">proxy.allow_domains(["github.com", "npm.org"]) // deny all others</div>
+        </div>
+      </div>
+
+      <div class="trinity-panel" data-trinity-panel="observe">
+        <h3>Observe — Detect after the fact</h3>
+        <div class="tri-desc"><strong>Log every action, monitor for anomalies, and maintain audit trails.</strong> Even with evaluation and enforcement, novel attacks will eventually succeed. Observation ensures you detect them, understand the blast radius, and can trace the full chain of actions. Every agent action must be attributable to a specific identity and context — no anonymous operations.</div>
+        <div class="tri-examples">
+          <div class="tri-example">audit_log.append({ agent, action, target, timestamp, user_context })</div>
+          <div class="tri-example">alert_if(network_requests.to_unknown_domains > 0)</div>
+          <div class="tri-example">trace(agent_session) &rarr; full action chain with identity propagation</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRUST BOUNDARIES ── -->
+<section id="trust-boundaries">
+  <div class="reveal">
+    <h2>Trust boundaries for agent systems</h2>
+    <p class="section-sub">Every input, output, and tool call crosses a trust boundary. Map yours explicitly.</p>
+
+    <div class="boundary-box">
+      <div class="boundary-zones">
+        <div class="boundary-zone trusted">
+          <div class="zone-label">Trusted zone — your code, your infra</div>
+          <div class="zone-items">
+            <span class="zone-item">system prompt</span>
+            <span class="zone-item">tool definitions</span>
+            <span class="zone-item">policy engine</span>
+            <span class="zone-item">guardrails</span>
+            <span class="zone-item">audit logs</span>
+          </div>
+        </div>
+
+        <div class="boundary-divider">── TRUST BOUNDARY ──</div>
+
+        <div class="boundary-zone semi">
+          <div class="zone-label">Semi-trusted — authenticated but not controlled</div>
+          <div class="zone-items">
+            <span class="zone-item">user input</span>
+            <span class="zone-item">internal APIs</span>
+            <span class="zone-item">database content</span>
+            <span class="zone-item">authenticated services</span>
+          </div>
+        </div>
+
+        <div class="boundary-divider">── TRUST BOUNDARY ──</div>
+
+        <div class="boundary-zone untrusted">
+          <div class="zone-label">Untrusted — assume adversarial</div>
+          <div class="zone-items">
+            <span class="zone-item">RAG context</span>
+            <span class="zone-item">shared documents</span>
+            <span class="zone-item">email content</span>
+            <span class="zone-item">web pages</span>
+            <span class="zone-item">third-party APIs</span>
+            <span class="zone-item">user-uploaded files</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="boundary-rule">
+        <strong>The rule:</strong> Data from untrusted zones must never flow into trusted zones without validation. The agent must never execute instructions originating from untrusted content. Identity must propagate through every boundary crossing. No action is anonymous.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DATA POISONING ── -->
+<section id="data-poisoning">
+  <div class="reveal">
+    <h2>Data poisoning: the supply chain attack for AI</h2>
+    <p class="section-sub">If you fine-tune models or use RLHF pipelines, this is the threat that bypasses all runtime defenses.</p>
+
+    <div class="poison-box">
+      <div class="poison-header">
+        <span class="poison-badge">Research — Anthropic, Oct 2025</span>
+        <span class="poison-title">Small Samples, Big Poison</span>
+      </div>
+      <div class="poison-body">
+        Anthropic demonstrated that as few as <strong>250 poisoned documents</strong> can create backdoors across all tested model sizes (600M to 13B parameters). The key finding: attackers need a fixed absolute number of poisoned samples, not a percentage of training data, making the attack trivially cheap regardless of dataset scale.
+
+        <div class="poison-findings">
+          <div class="poison-finding">
+            <span class="poison-label">COST</span>
+            <span class="poison-text">250 documents reliably succeeded, a near-constant number regardless of model or dataset size</span>
+          </div>
+          <div class="poison-finding">
+            <span class="poison-label">TRIGGER</span>
+            <span class="poison-text">Specific strings activate the backdoor; outputs appear normal otherwise</span>
+          </div>
+          <div class="poison-finding">
+            <span class="poison-label">DEFENSE</span>
+            <span class="poison-text">Provenance tracking and contributor trust scoring for all training data sources</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LAYER BUILDER ── -->
+<section id="defense-stack">
+  <div class="reveal">
+    <h2>Build your defense stack</h2>
+    <p class="section-sub">Which defenses are you implementing in the systems you ship? Tap to activate each layer.</p>
+
+    <div class="layer-builder">
+      <div class="layer-header">
+        <h3>Your Architectural Defenses</h3>
+        <p>Each active layer reduces your exposure. More layers = deeper defense-in-depth.</p>
+      </div>
+
+      <div class="layer-items">
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Dual LLM — separate trusted and untrusted processing</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Dual-layer sandbox — filesystem + network isolation</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Context minimization — task-scoped data retrieval</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Network allowlisting — proxy-enforced domain restrictions</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Security Trinity — evaluate, enforce, observe on every action</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Trust boundary mapping — explicit zone classification</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Hard-coded guardrails — deterministic action policy</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+        <div class="layer-item" data-layer>
+          <div class="layer-dot"></div>
+          <span class="layer-label">Data provenance — training pipeline integrity controls</span>
+          <span class="layer-tag">ACTIVE</span>
+        </div>
+      </div>
+
+      <div class="layer-bar-wrapper">
+        <div class="layer-bar-track">
+          <div class="layer-bar-fill" id="layerBarFill"></div>
+        </div>
+      </div>
+
+      <div class="layer-result" id="layerResult"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── SOURCES ── -->
+<section>
+  <div class="reveal">
+    <div class="sources">
+      <details class="sources-toggle">
+        <summary>Sources</summary>
+        <div class="source-item">Simon Willison, <a href="https://simonwillison.net/2025/Sep/26/how-to-stop-ais-lethal-trifecta/" target="_blank" rel="noopener">"How to Stop AI's Lethal Trifecta"</a>, September 2025</div>
+        <div class="source-item">Anthropic, <a href="https://www.anthropic.com/engineering/claude-code-sandboxing" target="_blank" rel="noopener">"Beyond Permission Prompts: Making Claude Code More Secure and Autonomous"</a>, October 2025</div>
+        <div class="source-item">Anthropic, <a href="https://www.anthropic.com/research/small-samples-poison" target="_blank" rel="noopener">"Small Samples, Big Poison"</a>, October 2025</div>
+        <div class="source-item">NVIDIA Developer Blog, <a href="https://developer.nvidia.com/blog/securing-llm-systems-against-prompt-injection/" target="_blank" rel="noopener">"Securing LLM Systems Against Prompt Injection"</a>, August 2023</div>
+        <div class="source-item">NVIDIA Developer Blog, <a href="https://developer.nvidia.com/blog/agentic-autonomy-levels-and-security/" target="_blank" rel="noopener">"Agentic Autonomy Levels and Security"</a>, February 2025</div>
+        <div class="source-item">NVIDIA Developer Blog, <a href="https://developer.nvidia.com/blog/securing-agentic-ai-how-semantic-prompt-injections-bypass-ai-guardrails/" target="_blank" rel="noopener">"Securing Agentic AI: Semantic Prompt Injections"</a>, July 2025</div>
+        <div class="source-item">Google, <a href="https://blog.google/technology/safety-security/google-ai-cyber-security-update-saif/" target="_blank" rel="noopener">"Google's Secure AI Framework (SAIF)"</a>, June 2023</div>
+        <div class="source-item">SANS Institute, "AI Security Made Easy" internal briefing, 2026</div>
+      </details>
+    </div>
+
+    <a class="back-cta" href="dev-persona.html">
+      <span class="back-arrow">&larr;</span>
+      <div>
+        <div class="back-label">Series complete</div>
+        <div class="back-title">Back to Developer Briefing</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<footer>AI Security Education &middot; Article 4 of 4 &middot; For developers</footer>
+
+<script>
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement.scrollHeight - window.innerHeight;
+    document.getElementById('progressBar').style.width = ((window.scrollY / h) * 100) + '%';
+  });
+
+  // ── Pattern selector ──
+  const patternBtns = document.querySelectorAll('[data-pattern]');
+  const patternPanels = document.querySelectorAll('[data-pattern-panel]');
+  const patternPrompt = document.getElementById('patternPrompt');
+
+  patternBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const key = btn.dataset.pattern;
+      const wasActive = btn.classList.contains('active');
+      patternBtns.forEach(b => b.classList.remove('active'));
+      patternPanels.forEach(p => p.classList.remove('active'));
+      if (!wasActive) {
+        btn.classList.add('active');
+        document.querySelector(`[data-pattern-panel="${key}"]`).classList.add('active');
+        patternPrompt.style.display = 'none';
+      } else {
+        patternPrompt.style.display = 'block';
+      }
+    });
+  });
+
+  // ── Security Trinity ──
+  const trinityCards = document.querySelectorAll('[data-trinity]');
+  const trinityPanels = document.querySelectorAll('[data-trinity-panel]');
+  const trinityPrompt = document.getElementById('trinityPrompt');
+
+  trinityCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const key = card.dataset.trinity;
+      const wasActive = card.classList.contains('active');
+      trinityCards.forEach(c => c.classList.remove('active'));
+      trinityPanels.forEach(p => p.classList.remove('active'));
+      if (!wasActive) {
+        card.classList.add('active');
+        document.querySelector(`[data-trinity-panel="${key}"]`).classList.add('active');
+        trinityPrompt.style.display = 'none';
+      } else {
+        trinityPrompt.style.display = 'block';
+      }
+    });
+  });
+
+  // ── Layer builder ──
+  const layers = document.querySelectorAll('[data-layer]');
+  const layerFill = document.getElementById('layerBarFill');
+  const layerResult = document.getElementById('layerResult');
+  const layerTotal = layers.length;
+
+  const layerMessages = [
+    '',
+    'One layer. A start — but single points of defense can be bypassed.',
+    'Two layers. Defense is building. Each layer catches what the other misses.',
+    'Three layers. Solid defense-in-depth. The trifecta is constrained on multiple fronts.',
+    'Four layers. Strong coverage. You\'re making injection exploitation significantly harder.',
+    'Five layers. Deep defense. An attacker would need to bypass multiple independent controls.',
+    'Six layers. Comprehensive. Your architecture addresses patterns, process, and observability.',
+    'Seven layers. Near-complete coverage. Runtime and supply chain defenses both active.',
+    'Full stack. Every layer active. Defense-in-depth at the architectural level — patterns, trinity, boundaries, and provenance.'
+  ];
+
+  layers.forEach(item => {
+    item.addEventListener('click', () => {
+      item.classList.toggle('on');
+      const active = document.querySelectorAll('.layer-item.on').length;
+      const pct = (active / layerTotal) * 100;
+      layerFill.style.width = pct + '%';
+      layerResult.className = 'layer-result';
+      if (active === 0) {
+        layerResult.textContent = '';
+      } else if (active < 4) {
+        layerResult.classList.add('partial');
+        layerResult.textContent = layerMessages[active];
+      } else {
+        layerResult.classList.add('strong');
+        layerResult.textContent = layerMessages[active];
+      }
+    });
+  });
+
+</script>
+</body>
+</html>

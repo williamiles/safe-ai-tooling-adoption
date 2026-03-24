@@ -1,0 +1,1261 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prompt Injection Is a Unsolved Problem</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a24;
+        --surface-hover: #24243a;
+        --border: #2a2a3e;
+        --text: #e4e4ed;
+        --text-muted: #8888a4;
+        --accent: #7c6ff7;
+        --accent-glow: rgba(124, 111, 247, 0.15);
+        --red: #f76f6f;
+        --red-glow: rgba(247, 111, 111, 0.12);
+        --warm: #f39c6b;
+        --warm-glow: rgba(243, 156, 107, 0.12);
+        --green: #6bcf9f;
+        --green-glow: rgba(107, 207, 159, 0.15);
+        --yellow: #f7d76f;
+        --yellow-glow: rgba(247, 215, 111, 0.12);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      *::selection {
+        background: rgba(124, 111, 247, 0.3);
+      }
+      a,
+      button,
+      [role="button"],
+      .spoke,
+      .tile,
+      [data-tile],
+      [data-spoke] {
+        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+      }
+
+      code {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.88em;
+        background: var(--accent-glow);
+        color: var(--accent);
+        padding: 0.1em 0.35em;
+        border-radius: 4px;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── NAV ── */
+      .topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(15, 15, 19, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .topnav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .topnav a:hover {
+        color: var(--accent);
+      }
+      .topnav .breadcrumb {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .topnav .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 2px;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.1s linear;
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 6rem 2rem 3rem;
+        position: relative;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -10%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          var(--warm-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .hero-tag {
+        font-size: 0.75rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        max-width: 750px;
+        margin-bottom: 1.25rem;
+      }
+
+      .hero h1 em {
+        font-style: normal;
+        color: var(--warm);
+      }
+
+      .hero p {
+        font-size: 1.1rem;
+        color: var(--text-muted);
+        max-width: 560px;
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.7rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        animation: float 2.5s ease-in-out infinite;
+      }
+      .scroll-hint svg {
+        width: 18px;
+        height: 18px;
+        stroke: var(--text-muted);
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(8px);
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 4rem 2rem;
+      }
+
+      section h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.4rem;
+      }
+
+      .section-sub {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2rem;
+      }
+
+      /* ── TRIFECTA DIAGRAM ── */
+      .trifecta-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 2rem;
+      }
+
+      .trifecta-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-align: center;
+      }
+
+      .trifecta-source {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-align: center;
+        margin-bottom: 1.5rem;
+      }
+
+      .trifecta-legs {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .trifecta-leg {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.25rem;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        border: 1px solid var(--border);
+        background: var(--bg);
+      }
+
+      .trifecta-leg:hover {
+        background: var(--surface-hover);
+      }
+
+      .trifecta-leg.active {
+        border-color: var(--red);
+        background: var(--red-glow);
+      }
+
+      .leg-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+        background: var(--surface-hover);
+        border: 1px solid var(--border);
+        transition: all 0.3s;
+      }
+
+      .trifecta-leg.active .leg-icon {
+        background: var(--red-glow);
+        border-color: rgba(247, 111, 111, 0.3);
+      }
+
+      .leg-body {
+        flex: 1;
+      }
+
+      .leg-name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 0.15rem;
+      }
+
+      .leg-desc {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+      }
+
+      .leg-check {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .trifecta-leg.active .leg-check {
+        border-color: var(--red);
+        background: var(--red);
+      }
+
+      .leg-check svg {
+        width: 12px;
+        height: 12px;
+        stroke: white;
+        stroke-width: 3;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .trifecta-leg.active .leg-check svg {
+        opacity: 1;
+      }
+
+      .trifecta-result {
+        text-align: center;
+        padding: 1rem;
+        border-radius: 12px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        min-height: 3em;
+        transition: all 0.4s;
+      }
+
+      .trifecta-result.partial {
+        background: var(--yellow-glow);
+        color: var(--yellow);
+        border: 1px solid rgba(247, 215, 111, 0.15);
+      }
+      .trifecta-result.complete {
+        background: var(--red-glow);
+        color: var(--red);
+        border: 1px solid rgba(247, 111, 111, 0.2);
+      }
+
+      /* ── PRODUCTION INCIDENTS ── */
+      .incident-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .incident-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        overflow: hidden;
+        cursor: pointer;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        transition: border-color 0.3s;
+      }
+
+      .incident-card.open {
+        border-color: var(--warm);
+      }
+
+      .incident-header {
+        padding: 1.25rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+      }
+
+      .incident-platform {
+        font-family: "JetBrains Mono", monospace;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: var(--warm);
+        background: var(--warm-glow);
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        flex-shrink: 0;
+      }
+
+      .incident-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        flex: 1;
+      }
+
+      .incident-toggle {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        transition: transform 0.3s;
+        flex-shrink: 0;
+      }
+
+      .incident-card.open .incident-toggle {
+        transform: rotate(45deg);
+        color: var(--warm);
+      }
+
+      .incident-detail {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.4s ease;
+      }
+
+      .incident-card.open .incident-detail {
+        max-height: 400px;
+      }
+
+      .incident-detail-inner {
+        padding: 0 1.5rem 1.5rem;
+        border-top: 1px solid var(--border);
+        padding-top: 1.25rem;
+        margin: 0 1.5rem;
+        font-size: 0.88rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      .incident-detail-inner strong {
+        color: var(--text);
+      }
+
+      .incident-detail-inner code {
+        font-size: 0.82em;
+      }
+
+      .incident-mechanism {
+        display: block;
+        margin-top: 0.75rem;
+        padding: 0.6rem 0.85rem;
+        border-radius: 8px;
+        font-size: 0.8rem;
+        font-family: "JetBrains Mono", monospace;
+        background: var(--surface-hover);
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+      }
+
+      .incident-mechanism strong {
+        color: var(--red);
+      }
+
+      /* ── AUDIT TOOL ── */
+      .audit-box {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+      }
+
+      .audit-header {
+        padding: 1.75rem 2rem 1rem;
+      }
+
+      .audit-header h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+
+      .audit-header p {
+        font-size: 0.88rem;
+        color: var(--text-muted);
+      }
+
+      .audit-items {
+        padding: 0.75rem 2rem 1.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .audit-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.85rem 1rem;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        background: var(--bg);
+        border: 1px solid var(--border);
+      }
+
+      .audit-item:hover {
+        background: var(--surface-hover);
+      }
+
+      .audit-item.yes {
+        background: var(--red-glow);
+        border-color: rgba(247, 111, 111, 0.2);
+      }
+
+      .audit-item.no {
+        background: var(--green-glow);
+        border-color: rgba(107, 207, 159, 0.2);
+      }
+
+      .audit-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        flex-shrink: 0;
+        transition: all 0.3s;
+      }
+
+      .audit-item.yes .audit-dot {
+        border-color: var(--red);
+        background: var(--red);
+      }
+      .audit-item.no .audit-dot {
+        border-color: var(--green);
+        background: var(--green);
+      }
+
+      .audit-label {
+        font-size: 0.88rem;
+        font-weight: 500;
+        flex: 1;
+      }
+
+      .audit-tag {
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+
+      .audit-item.yes .audit-tag {
+        opacity: 1;
+        color: var(--red);
+      }
+      .audit-item.no .audit-tag {
+        opacity: 1;
+        color: var(--green);
+      }
+
+      .audit-result {
+        padding: 1.25rem 2rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.88rem;
+        text-align: center;
+        min-height: 3em;
+      }
+
+      .audit-result.vulnerable {
+        color: var(--red);
+        background: var(--red-glow);
+      }
+      .audit-result.safe {
+        color: var(--green);
+        background: var(--green-glow);
+      }
+      .audit-result.partial {
+        color: var(--yellow);
+        background: var(--yellow-glow);
+      }
+
+      /* ── DEFENSE PRINCIPLE ── */
+      .defense-box {
+        background: linear-gradient(
+          135deg,
+          var(--green-glow),
+          var(--accent-glow)
+        );
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 2rem;
+      }
+
+      .defense-box h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--green);
+      }
+
+      .defense-box p {
+        font-size: 0.92rem;
+        color: var(--text-muted);
+        line-height: 1.7;
+      }
+
+      .defense-box p strong {
+        color: var(--text);
+      }
+
+      /* ── SOURCES ── */
+      .sources {
+        border-top: 1px solid var(--border);
+        padding-top: 2rem;
+        margin-top: 1rem;
+      }
+
+      .sources h3 {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-muted);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        margin-bottom: 1rem;
+      }
+
+      .source-item {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+        padding-left: 1rem;
+        border-left: 2px solid var(--border);
+      }
+
+      .source-item a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      .source-item a:hover {
+        text-decoration: underline;
+      }
+
+      .sources-toggle {
+        margin-top: 1rem;
+      }
+      .sources-toggle summary {
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        color: var(--text);
+        padding: 0.5rem 0;
+        list-style: none;
+      }
+      .sources-toggle summary::before {
+        content: "▶ ";
+        font-size: 0.7rem;
+        transition: transform 0.2s;
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .sources-toggle[open] summary::before {
+        content: "▼ ";
+      }
+      .sources-toggle summary::-webkit-details-marker {
+        display: none;
+      }
+
+      /* ── NEXT CTA ── */
+      .next-cta {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 2rem 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s;
+        margin-top: 2rem;
+      }
+
+      .next-cta:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+      }
+
+      .next-label {
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        margin-bottom: 0.3rem;
+      }
+      .next-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      .next-arrow {
+        font-size: 1.5rem;
+        color: var(--accent);
+        transition: transform 0.3s;
+      }
+      .next-cta:hover .next-arrow {
+        transform: translateX(6px);
+      }
+
+      footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        max-width: 760px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 520px) {
+        .next-cta {
+          flex-direction: column;
+          text-align: center;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ── NAV ── -->
+    <nav class="topnav">
+      <div class="breadcrumb">
+        <a href="conn-01.html">All perspectives</a>
+        <span style="color: var(--border)">/</span>
+        <a href="dev-persona.html">&larr; Back to series</a>
+        <span style="color: var(--border)">/</span>
+        <span style="font-size: 0.8rem; color: var(--text-muted)"
+          >Article 2 of 5</span
+        >
+      </div>
+      <div class="progress-bar" id="progressBar"></div>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-tag">Article 2</div>
+      <h1>
+        Prompt injection is a <em>production problem</em>, not a research
+        problem.
+      </h1>
+      <p>
+        It's been demonstrated in Microsoft 365 Copilot, GitHub, Slack, and
+        every major platform that connects an LLM to private data. Here's the
+        mechanism and the architectural test.
+      </p>
+      <div class="scroll-hint">
+        See the mechanism
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── THE LETHAL TRIFECTA ── -->
+    <section>
+      <div class="reveal">
+        <h2>The lethal trifecta</h2>
+        <p class="section-sub">
+          Three capabilities that are individually useful and collectively
+          dangerous. When all three are present in a single agent system, data
+          exfiltration via prompt injection becomes architecturally possible.
+          Tap each leg to activate.
+        </p>
+
+        <div class="trifecta-box">
+          <div class="trifecta-title">Lethal Trifecta</div>
+
+          <div class="trifecta-legs">
+            <div class="trifecta-leg" data-leg>
+              <div class="leg-icon">&#128274;</div>
+              <div class="leg-body">
+                <div class="leg-name">Access to private data</div>
+                <div class="leg-desc">
+                  The agent can read emails, documents, databases, or other
+                  sensitive resources
+                </div>
+              </div>
+              <div class="leg-check">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="trifecta-leg" data-leg>
+              <div class="leg-icon">&#128232;</div>
+              <div class="leg-body">
+                <div class="leg-name">Exposure to untrusted content</div>
+                <div class="leg-desc">
+                  The agent processes inputs it doesn't control: shared docs,
+                  emails, web pages, RAG context
+                </div>
+              </div>
+              <div class="leg-check">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="trifecta-leg" data-leg>
+              <div class="leg-icon">&#128640;</div>
+              <div class="leg-body">
+                <div class="leg-name">External communication capability</div>
+                <div class="leg-desc">
+                  The agent can send emails, post messages, make HTTP requests,
+                  or write to external systems
+                </div>
+              </div>
+              <div class="leg-check">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="trifecta-result" id="trifectaResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PRODUCTION INCIDENTS ── -->
+    <section>
+      <div class="reveal">
+        <h2>Production incidents — not proofs of concept</h2>
+        <p class="section-sub">
+          These happened in shipped products with real users. Tap each to see
+          the mechanism.
+        </p>
+      </div>
+
+      <div class="incident-grid">
+        <div class="incident-card reveal" data-incident>
+          <div class="incident-header">
+            <span class="incident-platform">M365 Copilot</span>
+            <span class="incident-title"
+              >Data exfiltration via indirect prompt injection</span
+            >
+            <span class="incident-toggle">+</span>
+          </div>
+          <div class="incident-detail">
+            <div class="incident-detail-inner">
+              EchoLeak (CVE-2025-32711): a zero-click attack where
+              <strong
+                >a crafted email causes Microsoft 365 Copilot to extract and
+                transmit private data</strong
+              >
+              without any user interaction. The attacker sends an email with
+              hidden instructions phrased to avoid Copilot's prompt injection
+              classifiers. When Copilot reads the email as context, it follows
+              the injected instructions and exfiltrates sensitive data via
+              Markdown reference-style links, a syntax Microsoft's filters
+              didn't cover. The exfiltration exploited an open redirect on
+              <code>*.teams.microsoft.com</code> to bypass Content Security
+              Policy.
+              <span class="incident-mechanism"
+                ><strong>Vector:</strong> crafted email with indirect prompt
+                injection → Copilot reads as context → exfiltrates via Markdown
+                reference links through Teams open redirect to attacker
+                server</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="incident-card reveal" data-incident>
+          <div class="incident-header">
+            <span class="incident-platform">GitHub MCP</span>
+            <span class="incident-title"
+              >Private repo exfiltration via poisoned issues</span
+            >
+            <span class="incident-toggle">+</span>
+          </div>
+          <div class="incident-detail">
+            <div class="incident-detail-inner">
+              Invariant Labs demonstrated that
+              <strong
+                >a malicious GitHub Issue in a public repository could hijack an
+                AI agent into exfiltrating private repository data</strong
+              >. The attacker creates an issue with embedded prompt injection
+              instructions. When a developer's agent reviews issues in that
+              public repo, it encounters the crafted issue, follows the injected
+              instructions, accesses the user's private repositories, and leaks
+              sensitive data, including private repo names, proprietary code,
+              and personal information, via a pull request back to the
+              attacker's public repo. Even Claude Opus's safety training was
+              insufficient to prevent the attack.
+              <span class="incident-mechanism"
+                ><strong>Vector:</strong> poisoned GitHub Issue in public repo →
+                agent reads as context → accesses private repos via MCP →
+                exfiltrates data via pull request to attacker-controlled
+                repo</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="incident-card reveal" data-incident>
+          <div class="incident-header">
+            <span class="incident-platform">Slack AI</span>
+            <span class="incident-title"
+              >Credential theft via indirect prompt injection</span
+            >
+            <span class="incident-toggle">+</span>
+          </div>
+          <div class="incident-detail">
+            <div class="incident-detail-inner">
+              PromptArmor demonstrated that
+              <strong
+                >an attacker could steal API keys, credentials, and private
+                messages from Slack AI without access to private
+                channels</strong
+              >. The attacker posts a message in a public channel containing
+              hidden instructions. When a user queries Slack AI, it pulls
+              context from public channels, private channels, and DMs — treating
+              all content with equal weight. The injected instructions cause
+              Slack AI to render a fake error message with a "reauthentication
+              link" — embedding the stolen data as URL parameters. Slack's
+              citation system failed to properly flag the attacker's content,
+              making the source difficult to trace.
+              <span class="incident-mechanism"
+                ><strong>Vector:</strong> injected message in public channel →
+                Slack AI ingests alongside private data → renders phishing link
+                with stolen credentials embedded as URL parameters</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── THE DISTINCTION ── -->
+    <section>
+      <div class="reveal">
+        <div class="defense-box">
+          <h3>Why prompt injection is an architectural problem</h3>
+          <p>
+            <strong
+              >Prompt injection is an attacker embedding instructions in content
+              the AI reads — often without the user's knowledge or
+              consent.</strong
+            >
+            The user never types anything malicious. The attack lives in an
+            email, a shared document, a GitHub issue, a Slack message — content
+            the AI ingests as context.<br /><br />
+            This is not a guardrail problem. It's an
+            <strong>architectural problem</strong> — LLMs cannot reliably
+            distinguish between instructions and data in their context window.
+            Every input is processed the same way.<br /><br />
+            No amount of prompt engineering, instruction tuning, or guardrail
+            layering provides 100% protection against indirect prompt injection.
+            In an adversarial context,
+            <strong>99% protection is a failing grade</strong>. The attacker
+            only needs one successful injection.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── AUDIT YOUR SYSTEMS ── -->
+    <section>
+      <div class="reveal">
+        <h2>Audit your systems for the trifecta</h2>
+        <p class="section-sub">
+          For each AI-integrated system you maintain, answer these three
+          questions. Tap "Yes" or "No" — two clicks to cycle. If all three are
+          "Yes," you have an exploitable system.
+        </p>
+
+        <div class="audit-box">
+          <div class="audit-header">
+            <h3>Trifecta Audit</h3>
+            <p>Pick one of your AI-integrated systems and evaluate it.</p>
+          </div>
+
+          <div class="audit-items">
+            <div class="audit-item" data-audit>
+              <div class="audit-dot"></div>
+              <span class="audit-label"
+                >Does it have access to private data (user files, emails,
+                databases)?</span
+              >
+              <span class="audit-tag">—</span>
+            </div>
+
+            <div class="audit-item" data-audit>
+              <div class="audit-dot"></div>
+              <span class="audit-label"
+                >Does it process content from untrusted sources (shared docs,
+                RAG, web)?</span
+              >
+              <span class="audit-tag">—</span>
+            </div>
+
+            <div class="audit-item" data-audit>
+              <div class="audit-dot"></div>
+              <span class="audit-label"
+                >Can it communicate externally (send emails, make requests, post
+                messages)?</span
+              >
+              <span class="audit-tag">—</span>
+            </div>
+          </div>
+
+          <div class="audit-result" id="auditResult"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── SOURCES ── -->
+    <section>
+      <div class="reveal">
+        <div class="sources">
+          <details class="sources-toggle">
+            <summary>Sources</summary>
+            <div class="source-item">
+              Simon Willison,
+              <a
+                href="https://simonwillison.net/2025/Jun/11/echoleak/"
+                target="_blank"
+                rel="noopener"
+                >"EchoLeak: Exploiting AI in Microsoft 365 Copilot"</a
+              >, June 2025 — CVE-2025-32711
+            </div>
+            <div class="source-item">
+              PromptArmor,
+              <a
+                href="https://promptarmor.substack.com/p/data-exfiltration-from-slack-ai-via"
+                target="_blank"
+                rel="noopener"
+                >"Data Exfiltration from Slack AI via Indirect Prompt
+                Injection"</a
+              >, August 2024
+            </div>
+            <div class="source-item">
+              Invariant Labs,
+              <a
+                href="https://invariantlabs.ai/blog/mcp-github-vulnerability"
+                target="_blank"
+                rel="noopener"
+                >"GitHub MCP Vulnerability: Prompt Injection via Poisoned
+                Issues"</a
+              >
+              — Private repo exfiltration via MCP tool chain
+            </div>
+            <div class="source-item">
+              Simon Willison,
+              <a
+                href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+                target="_blank"
+                rel="noopener"
+                >"The Lethal Trifecta"</a
+              >, June 2025
+            </div>
+            <div class="source-item">
+              Simon Willison,
+              <a
+                href="https://simonwillison.net/2025/Sep/26/how-to-stop-ais-lethal-trifecta/"
+                target="_blank"
+                rel="noopener"
+                >"How to Stop AI's Lethal Trifecta"</a
+              >, September 2025
+            </div>
+            <div class="source-item">
+              NVIDIA Developer Blog,
+              <a
+                href="https://developer.nvidia.com/blog/securing-llm-systems-against-prompt-injection/"
+                target="_blank"
+                rel="noopener"
+                >"Securing LLM Systems Against Prompt Injection"</a
+              >, August 2023
+            </div>
+            <div class="source-item">
+              NVIDIA Developer Blog,
+              <a
+                href="https://developer.nvidia.com/blog/securing-agentic-ai-how-semantic-prompt-injections-bypass-ai-guardrails/"
+                target="_blank"
+                rel="noopener"
+                >"Securing Agentic AI: How Semantic Prompt Injections Bypass AI
+                Guardrails"</a
+              >, July 2025
+            </div>
+            <div class="source-item">
+              NVIDIA Developer Blog,
+              <a
+                href="https://developer.nvidia.com/blog/how-hackers-exploit-ais-problem-solving-instincts/"
+                target="_blank"
+                rel="noopener"
+                >"How Hackers Exploit AI's Problem-Solving Instincts"</a
+              >, August 2025
+            </div>
+          </details>
+        </div>
+
+        <a class="next-cta" href="dev-03.html">
+          <div>
+            <div class="next-label">Next article</div>
+            <div class="next-title">
+              Your AI dev environment is a security surface — configure it like
+              one
+            </div>
+          </div>
+          <span class="next-arrow">&rarr;</span>
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      AI Security Education &middot; Article 2 of 5 &middot; For developers
+    </footer>
+
+    <script>
+      // ── Scroll reveal ──
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.12 },
+      );
+
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      // ── Progress bar ──
+      window.addEventListener("scroll", () => {
+        const h = document.documentElement.scrollHeight - window.innerHeight;
+        document.getElementById("progressBar").style.width =
+          (window.scrollY / h) * 100 + "%";
+      });
+
+      // ── Trifecta ──
+      const legs = document.querySelectorAll("[data-leg]");
+      const trifectaResult = document.getElementById("trifectaResult");
+
+      legs.forEach((leg) => {
+        leg.addEventListener("click", () => {
+          leg.classList.toggle("active");
+          const active = document.querySelectorAll(
+            ".trifecta-leg.active",
+          ).length;
+          trifectaResult.className = "trifecta-result";
+          if (active === 0) {
+            trifectaResult.textContent = "";
+          } else if (active < 3) {
+            trifectaResult.classList.add("partial");
+            trifectaResult.textContent = `${active} of 3 legs active. Remove any one leg to break the attack chain.`;
+          } else {
+            trifectaResult.classList.add("complete");
+            trifectaResult.textContent =
+              "All three legs present. This system is architecturally vulnerable to data exfiltration via prompt injection.";
+          }
+        });
+      });
+
+      // ── Incident accordion ──
+      document.querySelectorAll("[data-incident]").forEach((card) => {
+        card.addEventListener("click", () => {
+          const wasOpen = card.classList.contains("open");
+          document
+            .querySelectorAll("[data-incident]")
+            .forEach((c) => c.classList.remove("open"));
+          if (!wasOpen) card.classList.add("open");
+        });
+      });
+
+      // ── Audit tool (3-state: neutral → yes → no → neutral) ──
+      const auditItems = document.querySelectorAll("[data-audit]");
+      const auditResult = document.getElementById("auditResult");
+
+      auditItems.forEach((item) => {
+        item.addEventListener("click", () => {
+          const tag = item.querySelector(".audit-tag");
+          if (
+            !item.classList.contains("yes") &&
+            !item.classList.contains("no")
+          ) {
+            item.classList.add("yes");
+            tag.textContent = "YES";
+          } else if (item.classList.contains("yes")) {
+            item.classList.remove("yes");
+            item.classList.add("no");
+            tag.textContent = "NO";
+          } else {
+            item.classList.remove("no");
+            tag.textContent = "—";
+          }
+          updateAudit();
+        });
+      });
+
+      function updateAudit() {
+        const yeses = document.querySelectorAll(".audit-item.yes").length;
+        const nos = document.querySelectorAll(".audit-item.no").length;
+        const total = auditItems.length;
+        const answered = yeses + nos;
+
+        auditResult.className = "audit-result";
+
+        if (answered === 0) {
+          auditResult.textContent = "";
+        } else if (answered < total) {
+          auditResult.className = "audit-result partial";
+          auditResult.textContent = `${answered} of ${total} answered. Complete all three to get your assessment.`;
+        } else if (yeses === 3) {
+          auditResult.className = "audit-result vulnerable";
+          auditResult.textContent =
+            "Trifecta confirmed. This system can be exploited via indirect prompt injection. Architecturally eliminate at least one leg.";
+        } else if (yeses === 2) {
+          auditResult.className = "audit-result partial";
+          auditResult.textContent = `2 of 3 legs present. One architectural boundary is holding — verify it can't be bypassed and monitor it.`;
+        } else if (yeses <= 1) {
+          auditResult.className = "audit-result safe";
+          auditResult.textContent = `${yeses === 0 ? "No" : "Only 1"} trifecta leg${yeses === 1 ? "" : "s"} present. Architecturally, this system resists prompt injection exfiltration. Maintain those boundaries.`;
+        }
+      }
+    </script>
+  </body>
+</html>

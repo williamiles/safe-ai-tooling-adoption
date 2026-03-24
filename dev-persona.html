@@ -1,0 +1,770 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Security — For Developers</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #0f0f13;
+        --surface: #1a1a24;
+        --surface-hover: #24243a;
+        --border: #2a2a3e;
+        --text: #e4e4ed;
+        --text-muted: #8888a4;
+        --accent: #7c6ff7;
+        --accent-glow: rgba(124, 111, 247, 0.15);
+        --warm: #f39c6b;
+        --green: #6bcf9f;
+        --green-glow: rgba(107, 207, 159, 0.15);
+        --red: #f76f6f;
+        --red-glow: rgba(247, 111, 111, 0.12);
+        --yellow: #f7d76f;
+        --yellow-glow: rgba(247, 215, 111, 0.12);
+        --warm-glow: rgba(243, 156, 107, 0.12);
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        font-family:
+          "Inter",
+          -apple-system,
+          sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.6;
+        overflow-x: hidden;
+        -webkit-tap-highlight-color: transparent;
+      }
+      *::selection {
+        background: rgba(124, 111, 247, 0.3);
+      }
+      a,
+      button,
+      [role="button"],
+      .spoke,
+      .tile,
+      [data-tile],
+      [data-spoke] {
+        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+      }
+
+      .mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition:
+          opacity 0.7s ease,
+          transform 0.7s ease;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      /* ── HERO ── */
+      .hero {
+        min-height: 60vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 5rem 2rem 2rem;
+        position: relative;
+      }
+
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -20%;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 600px;
+        height: 600px;
+        background: radial-gradient(
+          circle,
+          var(--accent-glow) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .hero-label {
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--accent);
+        margin-bottom: 1.5rem;
+      }
+
+      .hero h1 {
+        font-size: clamp(2rem, 5vw, 3.5rem);
+        font-weight: 700;
+        line-height: 1.15;
+        max-width: 750px;
+        margin-bottom: 1.25rem;
+      }
+
+      .hero h1 code {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--accent);
+        font-size: 0.85em;
+        background: var(--accent-glow);
+        padding: 0.05em 0.25em;
+        border-radius: 6px;
+      }
+
+      .hero p {
+        font-size: 1.15rem;
+        color: var(--text-muted);
+        max-width: 540px;
+        margin-bottom: 2.5rem;
+      }
+
+      .scroll-hint {
+        position: absolute;
+        bottom: 2rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--text-muted);
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        animation: float 2.5s ease-in-out infinite;
+      }
+      .scroll-hint svg {
+        width: 20px;
+        height: 20px;
+        stroke: var(--text-muted);
+      }
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(8px);
+        }
+      }
+
+      /* ── SECTIONS ── */
+      section {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 5rem 2rem;
+      }
+
+      section h2 {
+        font-size: 1.6rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+      }
+
+      section .section-sub {
+        color: var(--text-muted);
+        font-size: 0.95rem;
+        margin-bottom: 2.5rem;
+      }
+
+      /* ── TILES ── */
+      .tile-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+      }
+
+      .tile {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      .tile:hover {
+        background: var(--surface-hover);
+        transform: translateY(-2px);
+      }
+
+      .tile.selected {
+        border-color: var(--accent);
+        background: var(--accent-glow);
+      }
+
+      .tile.selected::after {
+        content: "";
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 22px;
+        height: 22px;
+        background: var(--accent);
+        border-radius: 50%;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E");
+        background-size: 14px;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+
+      .tile-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+        display: block;
+      }
+
+      .tile-label {
+        font-weight: 500;
+        font-size: 0.95rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .tile-example {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .tile-counter {
+        text-align: center;
+        margin-top: 1.5rem;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        min-height: 1.4em;
+        transition: opacity 0.3s;
+      }
+
+      /* ── DOUBT BUBBLES ── */
+      .doubt-container {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+      }
+
+      .doubt-bubble {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.25rem 1.5rem;
+        font-size: 1rem;
+        color: var(--text-muted);
+        opacity: 0;
+        transform: translateX(-20px);
+        transition: all 0.6s ease;
+        position: relative;
+        padding-left: 3rem;
+      }
+
+      .doubt-bubble.visible {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .doubt-bubble::before {
+        content: ">";
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 28px;
+        height: 28px;
+        background: var(--accent-glow);
+        border: 1px solid var(--accent);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-style: normal;
+        font-weight: 600;
+        font-size: 0.85rem;
+        color: var(--accent);
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .doubt-bubble code {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--accent);
+        font-size: 0.9em;
+        background: var(--accent-glow);
+        padding: 0.1em 0.3em;
+        border-radius: 4px;
+      }
+
+      /* ── VALIDATION ── */
+      .validation-box {
+        background: linear-gradient(
+          135deg,
+          var(--accent-glow),
+          var(--green-glow)
+        );
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 3rem 2.5rem;
+        text-align: center;
+      }
+
+      .validation-box h2 {
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+        color: var(--green);
+      }
+
+      .validation-box p {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 540px;
+        margin: 0 auto;
+        line-height: 1.7;
+      }
+
+      .validation-box p strong {
+        color: var(--text);
+      }
+
+      .validation-box code {
+        font-family: "JetBrains Mono", monospace;
+        color: var(--accent);
+        font-size: 0.9em;
+      }
+
+      /* ── ARTICLE CARDS ── */
+      .article-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .article-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1.75rem 2rem;
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .article-card:hover {
+        background: var(--surface-hover);
+        border-color: var(--accent);
+        transform: translateX(4px);
+      }
+
+      .article-num {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--accent-glow);
+        border: 1px solid var(--accent);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--accent);
+        flex-shrink: 0;
+        font-family: "JetBrains Mono", monospace;
+      }
+
+      .article-card-body {
+        flex: 1;
+      }
+
+      .article-card-title {
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .article-card-desc {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+      }
+
+      .article-card-tag {
+        display: inline-block;
+        margin-top: 0.4rem;
+        font-size: 0.7rem;
+        font-family: "JetBrains Mono", monospace;
+        color: var(--text-muted);
+        background: var(--surface-hover);
+        padding: 0.15rem 0.5rem;
+        border-radius: 4px;
+      }
+
+      .article-card-arrow {
+        font-size: 1.2rem;
+        color: var(--text-muted);
+        transition: transform 0.3s;
+      }
+
+      .article-card:hover .article-card-arrow {
+        transform: translateX(4px);
+        color: var(--accent);
+      }
+
+      /* ── FOOTER ── */
+      footer {
+        text-align: center;
+        padding: 3rem 2rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+        border-top: 1px solid var(--border);
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      @media (max-width: 520px) {
+        .tile-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+        .article-card {
+          flex-direction: column;
+          text-align: center;
+          gap: 0.75rem;
+        }
+      }
+
+      .persona-topnav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(15, 15, 19, 0.85);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 2rem;
+        display: flex;
+        align-items: center;
+      }
+      .persona-topnav a {
+        color: var(--text-muted);
+        text-decoration: none;
+        font-size: 0.8rem;
+        font-weight: 500;
+        transition: color 0.2s;
+      }
+      .persona-topnav a:hover {
+        color: var(--accent);
+      }
+      .doubt-bubble {
+        cursor: default;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="persona-topnav">
+      <a href="conn-01.html">&larr; All perspectives</a>
+    </nav>
+
+    <!-- ── HERO ── -->
+    <div class="hero">
+      <div class="hero-label">For developers</div>
+      <h1>
+        Your AI tools ship fast.<br />Let's talk about what they
+        <code>ship</code>.
+      </h1>
+      <p>
+        You already know AI-generated code needs review. This series gives you
+        the specific vulnerability classes, architectural patterns, and
+        production defenses to act on.
+      </p>
+      <a
+        href="#articles"
+        style="
+          display: inline-block;
+          margin-top: 1.5rem;
+          color: var(--accent);
+          text-decoration: none;
+          font-size: 0.85rem;
+          font-weight: 500;
+          letter-spacing: 0.05em;
+          transition: opacity 0.2s;
+          opacity: 0.8;
+        "
+        onmouseover="this.style.opacity = '1'"
+        onmouseout="this.style.opacity = '0.8'"
+        >&darr; Jump to articles</a
+      >
+      <div class="scroll-hint">
+        Scroll
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 5v14M19 12l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── THIS IS YOU ── -->
+    <section>
+      <div class="reveal">
+        <h2>Your workflow</h2>
+        <p class="section-sub">Tap everything you've done in the last week.</p>
+
+        <div class="tile-grid">
+          <div class="tile" data-tile>
+            <span class="tile-icon">&#128187;</span>
+            <div class="tile-label">AI-generated PRs</div>
+            <div class="tile-example">copilot / claude code / cursor</div>
+          </div>
+
+          <div class="tile" data-tile>
+            <span class="tile-icon">&#9889;</span>
+            <div class="tile-label">Auto-accepted tool actions</div>
+            <div class="tile-example">--yes / yolo mode / auto-approve</div>
+          </div>
+
+          <div class="tile" data-tile>
+            <span class="tile-icon">&#128269;</span>
+            <div class="tile-label">AI-assisted debugging</div>
+            <div class="tile-example">"why is this failing?"</div>
+          </div>
+
+          <div class="tile" data-tile>
+            <span class="tile-icon">&#128230;</span>
+            <div class="tile-label">AI-generated boilerplate</div>
+            <div class="tile-example">auth flows / CRUD / migrations</div>
+          </div>
+
+          <div class="tile" data-tile>
+            <span class="tile-icon">&#128640;</span>
+            <div class="tile-label">Shipped AI code to prod</div>
+            <div class="tile-example">without dedicated security scan</div>
+          </div>
+
+          <div class="tile" data-tile>
+            <span class="tile-icon">&#128736;</span>
+            <div class="tile-label">Built or configured AI agents</div>
+            <div class="tile-example">tool use / RAG / agentic loops</div>
+          </div>
+        </div>
+
+        <div class="tile-counter" id="tileCounter"></div>
+      </div>
+    </section>
+
+    <!-- ── THE QUESTIONS ── -->
+    <section>
+      <div class="reveal">
+        <h2>The questions you should be asking</h2>
+        <p class="section-sub">
+          If you've thought about any of these, you're in the right place.
+        </p>
+      </div>
+
+      <div class="doubt-container">
+        <div class="doubt-bubble reveal">
+          What specific vulnerability classes do AI coding agents introduce —
+          and how often?
+        </div>
+        <div class="doubt-bubble reveal">
+          What security aspects are agents good at building — and where do they
+          introduce vulnerabilities in code?
+        </div>
+        <div class="doubt-bubble reveal">
+          Are there safe and less safe ways to use and build with AI?
+        </div>
+        <div class="doubt-bubble reveal">
+          When AI Agents (XBOW) top the hacking leaderboard, what does that mean
+          for defenders?
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VALIDATION ── -->
+    <section>
+      <div class="reveal">
+        <div class="validation-box">
+          <h2>Good questions deserve good answeres.</h2>
+          <p>
+            Four articles. Each one gives you something you can bring to your
+            next coding session, architecture discussion, or automation flows.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── ARTICLE ON-RAMPS ── -->
+    <section id="articles">
+      <div class="reveal">
+        <h2>The series</h2>
+        <p class="section-sub">
+          Each takes under 2 minutes. Start anywhere — they're independent.
+        </p>
+
+        <div class="article-cards">
+          <a class="article-card" href="dev-01.html">
+            <div class="article-num">1</div>
+            <div class="article-card-body">
+              <div class="article-card-title">
+                Your AI coding assistant writes vulnerable code by default
+              </div>
+              <div class="article-card-desc">
+                87% of PRs. 143 vulnerabilities. 10 recurring classes. The
+                DryRun data and what to do with it.
+              </div>
+              <span class="article-card-tag"
+                >broken-access-control, jwt, oauth</span
+              >
+            </div>
+            <span class="article-card-arrow">&rarr;</span>
+          </a>
+
+          <a class="article-card" href="dev-02.html">
+            <div class="article-num">2</div>
+            <div class="article-card-body">
+              <div class="article-card-title">
+                Prompt injection is a Unsolved problem
+              </div>
+              <div class="article-card-desc">
+                The lethal trifecta in Microsoft 365, GitHub, and Slack.
+                CVE-2024-12366. Architectural test.
+              </div>
+              <span class="article-card-tag"
+                >lethal-trifecta, data-exfiltration, indirect-injection</span
+              >
+            </div>
+            <span class="article-card-arrow">&rarr;</span>
+          </a>
+
+          <a class="article-card" href="dev-03.html">
+            <div class="article-num">3</div>
+            <div class="article-card-body">
+              <div class="article-card-title">
+                Your AI dev environment is a security surface — configure it
+                like one
+              </div>
+              <div class="article-card-desc">
+                Autonomy levels, sandboxing, permission defaults, connector
+                auditing, and why configuration isn't enough alone.
+              </div>
+              <span class="article-card-tag"
+                >sandboxing, permissions, security-mindset</span
+              >
+            </div>
+            <span class="article-card-arrow">&rarr;</span>
+          </a>
+
+          <a class="article-card" href="dev-04.html">
+            <div class="article-num">4</div>
+            <div class="article-card-body">
+              <div class="article-card-title">
+                Architectural defenses that actually work
+              </div>
+              <div class="article-card-desc">
+                Dual LLM pattern, dual-layer sandbox, context minimization,
+                trust boundaries, and the Security Trinity for AI systems you
+                build.
+              </div>
+              <span class="article-card-tag"
+                >dual-llm, trust-boundaries, agent-security</span
+              >
+            </div>
+            <span class="article-card-arrow">&rarr;</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div style="margin-bottom: 1rem">
+        AI Security Education &middot; Built for practitioners
+      </div>
+      <div style="font-size: 0.7rem; color: var(--text-muted); opacity: 0.7">
+        Share with your team:
+        <a
+          href="ntu-persona.html"
+          style="color: var(--accent); text-decoration: none"
+          >Everyday AI Users</a
+        >
+        &middot;
+        <a
+          href="bl-persona.html"
+          style="color: var(--accent); text-decoration: none"
+          >Business Leaders</a
+        >
+      </div>
+    </footer>
+
+    <script>
+      // ── Scroll reveal ──
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const delay = entry.target.classList.contains("doubt-bubble")
+                ? Array.from(
+                    document.querySelectorAll(".doubt-bubble"),
+                  ).indexOf(entry.target) * 150
+                : 0;
+              setTimeout(() => entry.target.classList.add("visible"), delay);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+
+      document
+        .querySelectorAll(".reveal")
+        .forEach((el) => observer.observe(el));
+
+      // ── Interactive tiles ──
+      const tiles = document.querySelectorAll("[data-tile]");
+      const counter = document.getElementById("tileCounter");
+      let selected = 0;
+
+      const responses = [
+        "",
+        "Typical week.",
+        "You're deep in the AI-assisted workflow.",
+        "You're shipping a lot of AI-generated code.",
+        "Your attack surface is growing with every PR.",
+        "You need specific defenses, not general warnings.",
+        "Every box. This series was written for you.",
+      ];
+
+      tiles.forEach((tile) => {
+        tile.addEventListener("click", () => {
+          tile.classList.toggle("selected");
+          selected = document.querySelectorAll(".tile.selected").length;
+          counter.textContent =
+            responses[selected] || responses[responses.length - 1];
+          counter.style.opacity = selected > 0 ? "1" : "0";
+        });
+      });
+    </script>
+  </body>
+</html>
