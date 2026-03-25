@@ -448,11 +448,12 @@
           padding: 1.25rem;
         }
         .panel-wrapper.open {
-          max-height: 800px;
+          max-height: 1500px;
         }
         .hero { padding: 3rem 1.25rem 2rem; }
         .main { padding: 0 1.25rem 2rem; }
         .diagram-box { padding: 1.25rem; }
+        .diagram-box:has(.panel-wrapper.open) .spoke:not(.active) { display: none; }
       }
     </style>
   </head>
