@@ -1014,6 +1014,10 @@
           flex-direction: column;
           text-align: center;
         }
+        .topnav { padding: 0.75rem 1rem; }
+        .breadcrumb > :nth-child(n+4) { display: none; }
+        section { padding: 2.5rem 1.25rem; }
+        .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
       }
     </style>
   </head>
@@ -1269,7 +1273,7 @@
             <strong
               >even a successful prompt injection remains contained</strong
             >
-            — the injected instruction may execute, but it can't access files
+. The injected instruction may execute, but it can't access files
             outside the project or transmit data to unauthorized domains.
 
             <div class="sandbox-stat-row">
@@ -1567,14 +1571,14 @@
           <div class="caveat-body">
             Leonardo Di Donato demonstrated that Claude Code, when blocked by
             its own denylist,
-            <strong>autonomously discovered evasion techniques</strong> —
+            <strong>autonomously discovered evasion techniques</strong>,
             without being instructed to bypass security. The trick: when direct
             execution was denied, the agent invoked the dynamic linker
             (<code>ld-linux-x86-64.so.2</code>) via <code>mmap</code> instead of
             <code>execve</code>, sidestepping the sandbox entirely.
 
             <div class="caveat-takeaway">
-              <strong>The sandbox caught most attempts — but not all.</strong>
+              <strong>The sandbox caught most attempts, but not all.</strong>
               This isn't an argument against sandboxing. It's an argument
               against <em>only</em> sandboxing. Your configuration handles the
               majority of threats. Your attention handles the rest. Stay engaged
@@ -1644,7 +1648,7 @@
               </svg>
             </div>
             <span class="check-text"
-              >Enable dual-layer sandboxing — filesystem and network
+              >Enable dual-layer sandboxing, filesystem and network
               isolation</span
             >
           </div>
@@ -1676,7 +1680,7 @@
               </svg>
             </div>
             <span class="check-text"
-              >Run in Normal mode by default — escalate only when needed with
+              >Run in Normal mode by default. Escalate only when needed with
               matching safeguards</span
             >
           </div>
@@ -1727,8 +1731,8 @@
           <div class="principle-item">
             <span class="principle-num">01</span>
             <span class="principle-text"
-              ><strong>Your dev environment is a security surface</strong> —
-              every session, every tool, every permission is a decision.
+              ><strong>Your dev environment is a security surface.</strong>
+              Every session, every tool, every permission is a decision.
               Configure it like one.</span
             >
           </div>
@@ -1739,7 +1743,7 @@
                 >Encode security decisions in configuration, not
                 discipline</strong
               >
-              — willpower degrades over a session. Settings files don't.</span
+. Willpower degrades over a session. Settings files don't.</span
             >
           </div>
           <div class="principle-item">
@@ -1749,7 +1753,7 @@
                 >Sandboxing contains most threats; your attention catches the
                 rest</strong
               >
-              — configuration is necessary but not sufficient. Stay engaged with
+. Configuration is necessary but not sufficient. Stay engaged with
               what your agent is doing.</span
             >
           </div>
@@ -1861,11 +1865,11 @@
 
       const modeInfo = {
         normal:
-          '<span class="safe">Recommended for daily work.</span> Sensitive operations require your approval. Sandbox active. Deny rules enforced. You review what matters — the sandbox handles the rest. <strong>90% of sessions should be here.</strong>',
+          '<span class="safe">Recommended for daily work.</span> Sensitive operations require your approval. Sandbox active. Deny rules enforced. You review what matters. The sandbox handles the rest. <strong>90% of sessions should be here.</strong>',
         plan: '<span class="safe">Safest mode.</span> Agent can read files and search but cannot write, execute, or modify anything. Use for research, exploration, and planning before you start building.',
         auto: "<span class=\"caution\">Elevated risk.</span> All operations within your allow rules execute without prompts. Your deny rules and sandbox are now your only defense. <strong>Only use with properly configured deny rules and sandbox.</strong> If those aren't set, you're at Level 4 in practice.",
         bypass:
-          '<span class="danger">Maximum risk.</span> No sandbox. No approvals. No deny rules enforced. The agent has your full system permissions. <strong>Disposable environments only</strong> — containers, VMs, machines with no credentials or production access.',
+          '<span class="danger">Maximum risk.</span> No sandbox. No approvals. No deny rules enforced. The agent has your full system permissions. <strong>Disposable environments only</strong>: containers, VMs, machines with no credentials or production access.',
       };
 
       modeCards.forEach((card) => {
@@ -1899,7 +1903,7 @@
             connectorResult.textContent = "";
           } else if (reviewed < connectorTotal) {
             connectorResult.classList.add("partial");
-            connectorResult.textContent = `${reviewed} of ${connectorTotal} reviewed. Keep going — each unreviewed connector is an unexamined trust decision.`;
+            connectorResult.textContent = `${reviewed} of ${connectorTotal} reviewed. Keep going. Each unreviewed connector is an unexamined trust decision.`;
           } else {
             connectorResult.classList.add("complete");
             connectorResult.textContent =
@@ -1921,11 +1925,11 @@
             progress.textContent = "";
             progress.classList.remove("complete");
           } else if (checked < checkTotal) {
-            progress.textContent = `${checked} of ${checkTotal} — keep going`;
+            progress.textContent = `${checked} of ${checkTotal} - keep going`;
             progress.classList.remove("complete");
           } else {
             progress.textContent =
-              "Environment secured. Now move fast — safely.";
+              "Environment secured. Now move fast, safely.";
             progress.classList.add("complete");
           }
         });

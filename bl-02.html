@@ -597,6 +597,10 @@
   @media (max-width: 520px) {
     .next-cta { flex-direction: column; text-align: center; }
     .env-card { flex-direction: column; text-align: center; align-items: center; }
+    .topnav { padding: 0.75rem 1rem; }
+    .breadcrumb > :nth-child(n+4) { display: none; }
+    section { padding: 2.5rem 1.25rem; }
+    .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
   }
 </style>
 </head>
@@ -671,15 +675,15 @@
       </div>
       <div class="scene-body">
         <div class="scene-panel active" data-scene="emp" id="emp-doing">
-          They paste client emails into AI tools to draft replies. They upload spreadsheets to get summaries. They share documents to brainstorm. <strong>They're discovering what AI can build — and they're not technical enough to know what they're exposing.</strong>
+          They paste client emails into AI tools to draft replies. They upload spreadsheets to get summaries. They share documents to brainstorm. <strong>They're discovering what AI can build, and they're not technical enough to know what they're exposing.</strong>
           <span class="scene-highlight warn">They don't understand how permissions, credentials, and data sharing work on their machines.</span>
         </div>
         <div class="scene-panel" data-scene="emp" id="emp-risk">
-          Every document they share with an AI tool could contain sensitive data that leaves your organization's control. <strong>Hidden instructions embedded in files they receive can manipulate the AI</strong> into disclosing confidential information — without the employee noticing anything unusual.
+          Every document they share with an AI tool could contain sensitive data that leaves your organization's control. <strong>Hidden instructions embedded in files they receive can manipulate the AI</strong> into disclosing confidential information, without the employee noticing anything unusual.
           <span class="scene-highlight warn">One manipulated document can turn an AI assistant into a data disclosure channel.</span>
         </div>
         <div class="scene-panel" data-scene="emp" id="emp-need">
-          <strong>Clear guidelines on what data is acceptable to share with AI tools.</strong> Training that explains the risk in terms they understand — not technical jargon, but real consequences. And a safe channel to ask questions without feeling judged for using the tools.
+          <strong>Clear guidelines on what data is acceptable to share with AI tools.</strong> Training that explains the risk in terms they understand, not technical jargon, but real consequences. And a safe channel to ask questions without feeling judged for using the tools.
           <span class="scene-highlight action">This is a training mandate and a policy decision. Both are in your lane.</span>
         </div>
       </div>
@@ -701,15 +705,15 @@
       </div>
       <div class="scene-body">
         <div class="scene-panel active" data-scene="dev" id="dev-doing">
-          They use AI coding assistants to write code, review pull requests, and debug problems. Many run these tools in permissive modes that auto-approve actions to stay productive. <strong>They're more productive than ever — while performing risky operations on critical systems.</strong>
+          They use AI coding assistants to write code, review pull requests, and debug problems. Many run these tools in permissive modes that auto-approve actions to stay productive. <strong>They're more productive than ever, while performing risky operations on critical systems.</strong>
           <span class="scene-highlight warn">They want to move fast. They're accepting permissions they haven't fully reviewed.</span>
         </div>
         <div class="scene-panel" data-scene="dev" id="dev-risk">
-          Research shows <strong>87% of AI-generated code changes contain security flaws</strong> — authentication bypasses, access control failures, session management gaps. These are decade-old vulnerability classes being generated at scale. Pattern-based scanning tools miss the majority because they're logic flaws, not known-bad code.
+          Research shows <strong>87% of AI-generated code changes contain security flaws</strong>: authentication bypasses, access control failures, session management gaps. These are decade-old vulnerability classes being generated at scale. Pattern-based scanning tools miss the majority because they're logic flaws, not known-bad code.
           <span class="scene-highlight warn">Your developers are shipping faster. The code quality isn't keeping up.</span>
         </div>
         <div class="scene-panel" data-scene="dev" id="dev-need">
-          <strong>Mandatory security review for every AI-generated code change.</strong> Engineering leadership that treats AI-assisted development as a new workflow requiring new safeguards — not the same process with a faster keyboard. And budget for contextual security tooling that catches logic flaws, not just known patterns.
+          <strong>Mandatory security review for every AI-generated code change.</strong> Engineering leadership that treats AI-assisted development as a new workflow requiring new safeguards, not the same process with a faster keyboard. And budget for contextual security tooling that catches logic flaws, not just known patterns.
           <span class="scene-highlight action">This is a process mandate and a budget decision. Both are in your lane.</span>
         </div>
       </div>
@@ -736,7 +740,7 @@
 <section>
   <div class="reveal">
     <h2>What "both speed and security" looks like</h2>
-    <p class="section-sub">Three organizational shifts that don't slow your teams down — they protect what your teams are building.</p>
+    <p class="section-sub">Three organizational shifts that don't slow your teams down. They protect what your teams are building.</p>
   </div>
 
   <div class="env-cards">
@@ -744,7 +748,7 @@
       <div class="env-icon green-bg">&#128220;</div>
       <div>
         <h3>Guidelines instead of guesswork</h3>
-        <p>Your employees are making security decisions every day — they just don't know it. A clear AI usage policy removes the guesswork: what data stays internal, what tools are approved, when to escalate. People move faster when the boundaries are visible.</p>
+        <p>Your employees are making security decisions every day, they just don't know it. A clear AI usage policy removes the guesswork: what data stays internal, what tools are approved, when to escalate. People move faster when the boundaries are visible.</p>
       </div>
     </div>
 
@@ -752,7 +756,7 @@
       <div class="env-icon accent-bg">&#128269;</div>
       <div>
         <h3>Review built into the workflow</h3>
-        <p>Security review shouldn't be a gate at the end — it should be woven into how your teams already work. For developers, that means scanning every AI-generated code change as part of the normal process, not as an extra step they'll skip under deadline pressure.</p>
+        <p>Security review shouldn't be a gate at the end. It should be woven into how your teams already work. For developers, that means scanning every AI-generated code change as part of the normal process, not as an extra step they'll skip under deadline pressure.</p>
       </div>
     </div>
 
@@ -760,7 +764,7 @@
       <div class="env-icon warm-bg">&#128172;</div>
       <div>
         <h3>A culture where everyone has a security mindset</h3>
-        <p>You can't be in every room where an AI decision is made. But you can build a culture where every employee asks themselves: what could go wrong, and how do we minimize the consequences? When that habit is embedded — in how people use tools, share data, and approve actions — you've turned every employee into a security sensor. That scales. Your availability doesn't.</p>
+        <p>You can't be in every room where an AI decision is made. But you can build a culture where every employee asks themselves: what could go wrong, and how do we minimize the consequences? When that habit is embedded, in how people use tools, share data, and approve actions, you've turned every employee into a security sensor. That scales. Your availability doesn't.</p>
       </div>
     </div>
   </div>
@@ -791,7 +795,7 @@
         <div class="check-box">
           <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <span class="check-text">Ask engineering leadership how AI-generated code is reviewed today — and what gaps exist</span>
+        <span class="check-text">Ask engineering leadership how AI-generated code is reviewed today, and what gaps exist</span>
       </div>
 
       <div class="check-item" data-check>
@@ -874,8 +878,8 @@
     { pct: 40, text: '<strong>Leaning toward speed.</strong> Some awareness, but no formal process. Gaps are growing.' },
     { pct: 50, text: '<strong>The false middle.</strong> Most leaders think they\'re here. In reality, without active governance, you\'re further left than you think.' },
     { pct: 60, text: '<strong>Starting to balance.</strong> You have some policies, some review. But consistency is the challenge.' },
-    { pct: 80, text: '<strong>Security-conscious.</strong> Clear policies, trained people, review processes. Your teams still move fast — with guardrails.' },
-    { pct: 100, text: '<strong>The goal isn\'t maximum security — it\'s informed speed.</strong> The best organizations move fast because they\'ve built security into the workflow, not bolted it on after.' }
+    { pct: 80, text: '<strong>Security-conscious.</strong> Clear policies, trained people, review processes. Your teams still move fast, with guardrails.' },
+    { pct: 100, text: '<strong>The goal isn\'t maximum security. It\'s informed speed.</strong> The best organizations move fast because they\'ve built security into the workflow, not bolted it on after.' }
   ];
 
   function updateSlider(pct) {
@@ -943,7 +947,7 @@
         progress.textContent = `${checked} of ${total} actions committed`;
         progress.classList.remove('complete');
       } else {
-        progress.textContent = 'Speed and security — you\'re building both into the environment.';
+        progress.textContent = 'Speed and security. You\'re building both into the environment.';
         progress.classList.add('complete');
       }
     });

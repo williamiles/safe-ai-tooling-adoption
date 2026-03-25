@@ -696,6 +696,10 @@
     .level-btn:last-child { border-bottom: none; }
     .level-row { grid-template-columns: 1fr; }
     .next-cta { flex-direction: column; text-align: center; }
+    .topnav { padding: 0.75rem 1rem; }
+    .breadcrumb > :nth-child(n+4) { display: none; }
+    section { padding: 2.5rem 1.25rem; }
+    .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
   }
 </style>
 </head>
@@ -717,7 +721,7 @@
 <div class="hero">
   <div class="hero-tag">Article 3</div>
   <h1>Governance questions every leader <em>needs to answer.</em></h1>
-  <p>Before you deploy AI further, you need a framework for how much autonomy to grant — and who is accountable at each level.</p>
+  <p>Before you deploy AI further, you need a framework for how much autonomy to grant, and who is accountable at each level.</p>
   <div class="scroll-hint">
     See the framework
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -738,7 +742,7 @@
 <section id="autonomy-levels">
   <div class="reveal">
     <h2>How much autonomy does your AI have?</h2>
-    <p class="section-sub">AI tools operate at different levels of autonomy. Each level carries different risks — and requires different governance. Tap a level to explore.</p>
+    <p class="section-sub">AI tools operate at different levels of autonomy. Each level carries different risks and requires different governance. Tap a level to explore.</p>
 
     <div class="level-selector">
       <button class="level-btn l1 active" data-level="1">
@@ -762,7 +766,7 @@
     <div class="level-detail">
       <div class="level-panel active" data-level-panel="1">
         <h3>Level 1 — Assistive AI</h3>
-        <div class="level-desc">The AI suggests, the human decides. Every action requires explicit approval. <strong>This is where most organizations start</strong> — employees using ChatGPT, Copilot, or Claude to draft emails, summarize documents, and brainstorm ideas.</div>
+        <div class="level-desc">The AI suggests, the human decides. Every action requires explicit approval. <strong>This is where most organizations start</strong>: employees using ChatGPT, Copilot, or Claude to draft emails, summarize documents, and brainstorm ideas.</div>
         <div class="level-row">
           <div class="level-box example">
             <div class="level-box-label">In your organization</div>
@@ -780,7 +784,7 @@
 
       <div class="level-panel" data-level-panel="2">
         <h3>Level 2 — Semi-Autonomous AI</h3>
-        <div class="level-desc">The AI takes some actions on its own but asks for approval on sensitive operations. <strong>This is where many development teams are today</strong> — AI coding assistants that write and modify code, with the developer reviewing changes before they ship.</div>
+        <div class="level-desc">The AI takes some actions on its own but asks for approval on sensitive operations. <strong>This is where many development teams are today</strong>: AI coding assistants that write and modify code, with the developer reviewing changes before they ship.</div>
         <div class="level-row">
           <div class="level-box example">
             <div class="level-box-label">In your organization</div>
@@ -798,11 +802,11 @@
 
       <div class="level-panel" data-level-panel="3">
         <h3>Level 3 — Autonomous AI Agents</h3>
-        <div class="level-desc">The AI plans and executes multi-step tasks with minimal supervision. It accesses internal systems, reads private data, and takes actions across tools. <strong>This is where the risk escalates sharply</strong> — the AI is making decisions with organizational consequences.</div>
+        <div class="level-desc">The AI plans and executes multi-step tasks with minimal supervision. It accesses internal systems, reads private data, and takes actions across tools. <strong>This is where the risk escalates sharply</strong>: the AI is making decisions with organizational consequences.</div>
         <div class="level-row">
           <div class="level-box example">
             <div class="level-box-label">In your organization</div>
-            <p>An AI agent monitors support tickets, reads customer data, drafts responses, and sends them — with only periodic human review.</p>
+            <p>An AI agent monitors support tickets, reads customer data, drafts responses, and sends them, with only periodic human review.</p>
           </div>
           <div class="level-box risk">
             <div class="level-box-label">Organizational risk</div>
@@ -820,7 +824,7 @@
         <div class="level-row">
           <div class="level-box example">
             <div class="level-box-label">In your organization</div>
-            <p>An AI system manages infrastructure, deploys code, and responds to incidents autonomously — making production decisions without human approval.</p>
+            <p>An AI system manages infrastructure, deploys code, and responds to incidents autonomously, making production decisions without human approval.</p>
           </div>
           <div class="level-box risk">
             <div class="level-box-label">Organizational risk</div>
@@ -851,7 +855,7 @@
       </div>
       <div class="question-answer">
         <div class="question-answer-inner">
-          You need a <strong>complete inventory</strong> — not just officially purchased tools, but anything employees have signed up for individually. Shadow AI is your biggest blind spot. If you don't know what tools are in use, you can't govern them.
+          You need a <strong>complete inventory</strong>, not just officially purchased tools, but anything employees have signed up for individually. Shadow AI is your biggest blind spot. If you don't know what tools are in use, you can't govern them.
           <br><span class="answer-owner">Owner: CISO</span>
         </div>
       </div>
@@ -865,7 +869,7 @@
       </div>
       <div class="question-answer">
         <div class="question-answer-inner">
-          Define <strong>data classification tiers</strong> for AI usage. Public data — fine. Internal documents — with approved tools only. Client data, credentials, financial records — never shared with AI tools unless the tool has been security-evaluated and the data flow is controlled.
+          Define <strong>data classification tiers</strong> for AI usage. Public data - fine. Internal documents - with approved tools only. Client data, credentials, financial records - never shared with AI tools unless the tool has been security-evaluated and the data flow is controlled.
           <br><span class="answer-owner">Owner: CISO + Legal</span>
         </div>
       </div>
@@ -893,7 +897,7 @@
       </div>
       <div class="question-answer">
         <div class="question-answer-inner">
-          For code: <strong>every AI-generated change scanned before merge</strong>. For content: human review before external publication. For automated actions: audit logs and periodic review. The review process must be mandatory, not optional — and it must match the autonomy level.
+          For code: <strong>every AI-generated change scanned before merge</strong>. For content: human review before external publication. For automated actions: audit logs and periodic review. The review process must be mandatory, not optional, and it must match the autonomy level.
           <br><span class="answer-owner">Owner: Engineering lead + CISO</span>
         </div>
       </div>
@@ -916,12 +920,12 @@
     <div class="question-card reveal" data-question>
       <div class="question-header">
         <div class="question-num">6</div>
-        <span class="question-text">What autonomy level have we approved — and who signed off?</span>
+        <span class="question-text">What autonomy level have we approved, and who signed off?</span>
         <span class="question-toggle">+</span>
       </div>
       <div class="question-answer">
         <div class="question-answer-inner">
-          <strong>Each autonomy level should be a deliberate decision with a documented sign-off</strong> — not a gradual drift. If your teams have moved from Level 1 to Level 3 without explicit governance review, you've accepted risk you haven't evaluated.
+          <strong>Each autonomy level should be a deliberate decision with a documented sign-off</strong>, not a gradual drift. If your teams have moved from Level 1 to Level 3 without explicit governance review, you've accepted risk you haven't evaluated.
           <br><span class="answer-owner">Owner: You + Board</span>
         </div>
       </div>
@@ -935,7 +939,7 @@
       </div>
       <div class="question-answer">
         <div class="question-answer-inner">
-          <strong>Monitoring and detection</strong> — not just for traditional threats, but for AI-specific risks: unusual data flows from AI tools, unexpected external communications, AI outputs that deviate from expected behavior. If you can't detect it, you can't respond to it.
+          <strong>Monitoring and detection</strong>: not just for traditional threats, but for AI-specific risks: unusual data flows from AI tools, unexpected external communications, AI outputs that deviate from expected behavior. If you can't detect it, you can't respond to it.
           <br><span class="answer-owner">Owner: CISO + Engineering</span>
         </div>
       </div>
@@ -1004,7 +1008,7 @@
         <div class="check-box">
           <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <span class="check-text">Determine which autonomy level your organization has approved — and document it</span>
+        <span class="check-text">Determine which autonomy level your organization has approved and document it</span>
       </div>
 
       <div class="check-item" data-check>
@@ -1047,7 +1051,7 @@
       <details class="sources-toggle">
         <summary>Sources</summary>
         <div class="source-item">NVIDIA Developer Blog, <a href="https://developer.nvidia.com/blog/agentic-autonomy-levels-and-security/" target="_blank" rel="noopener">"Agentic Autonomy Levels and Security"</a>, February 2025</div>
-        <div class="source-item">Accenture, <a href="https://www.securitymagazine.com/articles/101765-90-of-large-organizations-unprepared-for-ai-enabled-threats" target="_blank" rel="noopener">"2025 State of Cybersecurity Resilience"</a> — survey of 2,286 executives globally</div>
+        <div class="source-item">Accenture, <a href="https://www.securitymagazine.com/articles/101765-90-of-large-organizations-unprepared-for-ai-enabled-threats" target="_blank" rel="noopener">"2025 State of Cybersecurity Resilience"</a>, survey of 2,286 executives globally</div>
       </details>
     </div>
     <a class="next-cta" href="bl-04.html">
@@ -1149,7 +1153,7 @@
       irResult.textContent = `${missing} gap${missing > 1 ? 's' : ''} identified. Your incident response plan needs an AI-specific update before your next deployment.`;
     } else {
       irResult.classList.add('partial');
-      irResult.textContent = `Partially covered. ${missing} gap${missing > 1 ? 's' : ''} remaining — close them before increasing AI autonomy.`;
+      irResult.textContent = `Partially covered. ${missing} gap${missing > 1 ? 's' : ''} remaining. Close them before increasing AI autonomy.`;
     }
   }
 

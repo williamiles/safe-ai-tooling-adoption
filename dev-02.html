@@ -728,6 +728,10 @@
           flex-direction: column;
           text-align: center;
         }
+        .topnav { padding: 0.75rem 1rem; }
+        .breadcrumb > :nth-child(n+4) { display: none; }
+        section { padding: 2.5rem 1.25rem; }
+        .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
       }
     </style>
   </head>
@@ -949,10 +953,10 @@
                 channels</strong
               >. The attacker posts a message in a public channel containing
               hidden instructions. When a user queries Slack AI, it pulls
-              context from public channels, private channels, and DMs — treating
+              context from public channels, private channels, and DMs, treating
               all content with equal weight. The injected instructions cause
               Slack AI to render a fake error message with a "reauthentication
-              link" — embedding the stolen data as URL parameters. Slack's
+              link", embedding the stolen data as URL parameters. Slack's
               citation system failed to properly flag the attacker's content,
               making the source difficult to trace.
               <span class="incident-mechanism"
@@ -974,14 +978,14 @@
           <p>
             <strong
               >Prompt injection is an attacker embedding instructions in content
-              the AI reads — often without the user's knowledge or
+              the AI reads, often without the user's knowledge or
               consent.</strong
             >
             The user never types anything malicious. The attack lives in an
-            email, a shared document, a GitHub issue, a Slack message — content
+            email, a shared document, a GitHub issue, a Slack message. Content
             the AI ingests as context.<br /><br />
             This is not a guardrail problem. It's an
-            <strong>architectural problem</strong> — LLMs cannot reliably
+            <strong>architectural problem</strong>. LLMs cannot reliably
             distinguish between instructions and data in their context window.
             Every input is processed the same way.<br /><br />
             No amount of prompt engineering, instruction tuning, or guardrail
@@ -1000,7 +1004,7 @@
         <h2>Audit your systems for the trifecta</h2>
         <p class="section-sub">
           For each AI-integrated system you maintain, answer these three
-          questions. Tap "Yes" or "No" — two clicks to cycle. If all three are
+          questions. Tap "Yes" or "No", two clicks to cycle. If all three are
           "Yes," you have an exploitable system.
         </p>
 
@@ -1057,7 +1061,7 @@
                 target="_blank"
                 rel="noopener"
                 >"EchoLeak: Exploiting AI in Microsoft 365 Copilot"</a
-              >, June 2025 — CVE-2025-32711
+              >, June 2025 (CVE-2025-32711)
             </div>
             <div class="source-item">
               PromptArmor,
@@ -1078,7 +1082,7 @@
                 >"GitHub MCP Vulnerability: Prompt Injection via Poisoned
                 Issues"</a
               >
-              — Private repo exfiltration via MCP tool chain
+              - Private repo exfiltration via MCP tool chain
             </div>
             <div class="source-item">
               Simon Willison,
@@ -1250,7 +1254,7 @@
             "Trifecta confirmed. This system can be exploited via indirect prompt injection. Architecturally eliminate at least one leg.";
         } else if (yeses === 2) {
           auditResult.className = "audit-result partial";
-          auditResult.textContent = `2 of 3 legs present. One architectural boundary is holding — verify it can't be bypassed and monitor it.`;
+          auditResult.textContent = `2 of 3 legs present. One architectural boundary is holding. Verify it can't be bypassed and monitor it.`;
         } else if (yeses <= 1) {
           auditResult.className = "audit-result safe";
           auditResult.textContent = `${yeses === 0 ? "No" : "Only 1"} trifecta leg${yeses === 1 ? "" : "s"} present. Architecturally, this system resists prompt injection exfiltration. Maintain those boundaries.`;

@@ -755,6 +755,10 @@
           flex-direction: column;
           text-align: center;
         }
+        .topnav { padding: 0.75rem 1rem; }
+        .breadcrumb > :nth-child(n+4) { display: none; }
+        section { padding: 2.5rem 1.25rem; }
+        .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
       }
     </style>
   </head>
@@ -847,7 +851,7 @@
       <div class="reveal">
         <h2>See the difference</h2>
         <p class="section-sub">
-          Watch what happens when one thing goes wrong — with and without walls.
+          Watch what happens when one thing goes wrong, with and without walls.
         </p>
 
         <div class="blast-wrapper">
@@ -936,7 +940,7 @@
       <div class="reveal">
         <h2>What happens when...</h2>
         <p class="section-sub">
-          Tap each scenario to see the risk — and the safer alternative.
+          Tap each scenario to see the risk, and the safer alternative.
         </p>
       </div>
 
@@ -975,8 +979,8 @@
           <div class="scenario-answer">
             <div class="scenario-answer-inner">
               <div class="scenario-bad">
-                <strong>Risk:</strong> Tax returns, contracts, personal photos —
-                the AI can read all of it. A hidden instruction in one file
+                <strong>Risk:</strong> Tax returns, contracts, personal photos.
+                The AI can read all of it. A hidden instruction in one file
                 could expose everything else.
               </div>
               <div class="scenario-better">
@@ -1028,8 +1032,8 @@
               </div>
               <div class="scenario-better">
                 <strong>Better:</strong> Glance at what the AI did before you
-                send, save, or share. If something looks odd — a link you didn't
-                expect, a message you didn't write — pause and check.
+                send, save, or share. If something looks odd, like a link you didn't
+                expect or a message you didn't write, pause and check.
               </div>
             </div>
           </div>
@@ -1058,7 +1062,7 @@
               </svg>
             </div>
             <span class="check-text"
-              >Share the minimum — only the file or text the AI actually
+              >Share the minimum, only the file or text the AI actually
               needs</span
             >
           </div>
@@ -1089,7 +1093,7 @@
               </svg>
             </div>
             <span class="check-text"
-              >Keep sensitive stuff separate — don't mix personal files with
+              >Keep sensitive stuff separate. Don't mix personal files with
               work AI</span
             >
           </div>
@@ -1105,7 +1109,7 @@
               </svg>
             </div>
             <span class="check-text"
-              >Glance before you send — check the AI's output before sharing it
+              >Glance before you send. Check the AI's output before sharing it
               with others</span
             >
           </div>
@@ -1121,7 +1125,7 @@
               </svg>
             </div>
             <span class="check-text"
-              >Revoke access you no longer need — treat permissions like
+              >Revoke access you no longer need. Treat permissions like
               borrowed keys</span
             >
           </div>
@@ -1339,7 +1343,7 @@
             progress.textContent = "";
             progress.classList.remove("complete");
           } else if (checked < total) {
-            progress.textContent = `${checked} of ${total} — building your safety walls`;
+            progress.textContent = `${checked} of ${total} - building your safety walls`;
             progress.classList.remove("complete");
           } else {
             progress.textContent =

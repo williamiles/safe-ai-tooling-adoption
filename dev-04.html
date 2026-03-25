@@ -644,6 +644,10 @@
     .pattern-row { grid-template-columns: 1fr; }
     .trinity-grid { grid-template-columns: 1fr; }
     .back-cta { flex-direction: column; text-align: center; }
+    .topnav { padding: 0.75rem 1rem; }
+    .breadcrumb > :nth-child(n+4) { display: none; }
+    section { padding: 2.5rem 1.25rem; }
+    .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
   }
 </style>
 </head>
@@ -759,7 +763,7 @@
           <div class="pattern-source">Anthropic — Claude Code, October 2025</div>
         </div>
         <div class="pattern-body">
-          <div class="pattern-desc">Combine filesystem isolation and network isolation using OS-level primitives. <strong>Filesystem isolation restricts which files the agent can access. Network isolation routes all traffic through a proxy that validates domains.</strong> Both layers are essential — filesystem alone doesn't prevent network exfiltration, and network alone can be circumvented through filesystem manipulation. Article 3 covered this for your dev environment; here it applies to <strong>agent systems you deploy for users</strong>.</div>
+          <div class="pattern-desc">Combine filesystem isolation and network isolation using OS-level primitives. <strong>Filesystem isolation restricts which files the agent can access. Network isolation routes all traffic through a proxy that validates domains.</strong> Both layers are essential. Filesystem alone doesn't prevent network exfiltration, and network alone can be circumvented through filesystem manipulation. Article 3 covered this for your dev environment; here it applies to <strong>agent systems you deploy for users</strong>.</div>
           <div class="pattern-row">
             <div class="pattern-box how">
               <div class="pattern-box-label">How it works</div>
@@ -910,7 +914,7 @@
 
       <div class="trinity-panel" data-trinity-panel="observe">
         <h3>Observe — Detect after the fact</h3>
-        <div class="tri-desc"><strong>Log every action, monitor for anomalies, and maintain audit trails.</strong> Even with evaluation and enforcement, novel attacks will eventually succeed. Observation ensures you detect them, understand the blast radius, and can trace the full chain of actions. Every agent action must be attributable to a specific identity and context — no anonymous operations.</div>
+        <div class="tri-desc"><strong>Log every action, monitor for anomalies, and maintain audit trails.</strong> Even with evaluation and enforcement, novel attacks will eventually succeed. Observation ensures you detect them, understand the blast radius, and can trace the full chain of actions. Every agent action must be attributable to a specific identity and context. No anonymous operations.</div>
         <div class="tri-examples">
           <div class="tri-example">audit_log.append({ agent, action, target, timestamp, user_context })</div>
           <div class="tri-example">alert_if(network_requests.to_unknown_domains > 0)</div>
@@ -1165,14 +1169,14 @@
 
   const layerMessages = [
     '',
-    'One layer. A start — but single points of defense can be bypassed.',
+    'One layer. A start, but single points of defense can be bypassed.',
     'Two layers. Defense is building. Each layer catches what the other misses.',
     'Three layers. Solid defense-in-depth. The trifecta is constrained on multiple fronts.',
     'Four layers. Strong coverage. You\'re making injection exploitation significantly harder.',
     'Five layers. Deep defense. An attacker would need to bypass multiple independent controls.',
     'Six layers. Comprehensive. Your architecture addresses patterns, process, and observability.',
     'Seven layers. Near-complete coverage. Runtime and supply chain defenses both active.',
-    'Full stack. Every layer active. Defense-in-depth at the architectural level — patterns, trinity, boundaries, and provenance.'
+    'Full stack. Every layer active. Defense-in-depth at the architectural level: patterns, trinity, boundaries, and provenance.'
   ];
 
   layers.forEach(item => {

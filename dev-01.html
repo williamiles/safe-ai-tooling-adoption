@@ -747,6 +747,12 @@
           flex-direction: column;
           text-align: center;
         }
+        .topnav { padding: 0.75rem 1rem; }
+        .breadcrumb > :nth-child(n+4) { display: none; }
+        section { padding: 2.5rem 1.25rem; }
+        .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
+        .anchor-nav { padding: 0.75rem 1.25rem; }
+        .case-body { padding: 1rem 1.25rem 1.5rem; }
       }
     </style>
   </head>
@@ -1042,7 +1048,7 @@
               <div class="case-finding">
                 <span class="finding-label">RATIO</span>
                 <span class="finding-text"
-                  >88:1 agent-to-human ratio (1.5M agents, 17K human owners) —
+                  >88:1 agent-to-human ratio (1.5M agents, 17K human owners),
                   no verification mechanisms</span
                 >
               </div>
@@ -1279,7 +1285,7 @@
             progress.textContent = "";
             progress.classList.remove("complete");
           } else if (checked < total) {
-            progress.textContent = `${checked} of ${total} — keep going`;
+            progress.textContent = `${checked} of ${total} - keep going`;
             progress.classList.remove("complete");
           } else {
             progress.textContent =

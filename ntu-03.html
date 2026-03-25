@@ -383,6 +383,10 @@
     .mistake-header { padding: 1.25rem 1.25rem; gap: 0.75rem; }
     .mistake-body-inner { padding: 0 1.25rem 1.5rem; }
     .setting-row { flex-wrap: wrap; gap: 0.5rem; }
+    .topnav { padding: 0.75rem 1rem; }
+    .breadcrumb > :nth-child(n+4) { display: none; }
+    section { padding: 2.5rem 1.25rem; }
+    .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
   }
 </style>
 </head>
@@ -416,7 +420,7 @@
 <section>
   <div class="reveal">
     <h2>Three mistakes. Three interactive scenes.</h2>
-    <p class="section-sub">Open each one to see the mistake in action — then learn the fix.</p>
+    <p class="section-sub">Open each one to see the mistake in action, then learn the fix.</p>
   </div>
 
   <div>
@@ -437,12 +441,12 @@
           <div class="scene">
             <div class="scene-label">Watch how fast you stop paying attention</div>
             <div class="perm-chat" id="permChat"></div>
-            <div class="perm-narrator" id="permNarrator">Tap play to start. The AI will ask for permissions — watch what happens.</div>
+            <div class="perm-narrator" id="permNarrator">Tap play to start. The AI will ask for permissions. Watch what happens.</div>
             <button class="scene-play" id="playPerms">Play the conversation</button>
           </div>
 
           <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.7;">
-            The first few permissions make sense. By the fourth or fifth, you're not reading anymore — you're just clicking "Allow" to get back to work. Researchers at Anthropic found this was so common they redesigned their entire permission system to reduce prompts by 84%. The problem isn't that you're careless. It's that our brains aren't built to stay alert through a wall of identical-looking popups.
+            The first few permissions make sense. By the fourth or fifth, you're not reading anymore. You're just clicking "Allow" to get back to work. Researchers at Anthropic found this was so common they redesigned their entire permission system to reduce prompts by 84%. The problem isn't that you're careless. It's that our brains aren't built to stay alert through a wall of identical-looking popups.
           </p>
 
           <div class="habit-change">
@@ -452,7 +456,7 @@
             </div>
             <div class="habit-card after">
               <div class="habit-card-label">The fix</div>
-              <p>When a popup appears, read just the action word: "read", "edit", "send", "access." If it says "send" or "access" — pause for two seconds.</p>
+              <p>When a popup appears, read just the action word: "read", "edit", "send", "access." If it says "send" or "access", pause for two seconds.</p>
             </div>
           </div>
         </div>
@@ -465,7 +469,7 @@
         <div class="mistake-num m2">2</div>
         <div class="mistake-header-text">
           <div class="mistake-title">Never looking at the settings</div>
-          <div class="mistake-preview">Safe defaults exist — you just never turned them on</div>
+          <div class="mistake-preview">Safe defaults exist. You just never turned them on</div>
         </div>
         <span class="mistake-toggle">+</span>
       </div>
@@ -473,7 +477,7 @@
         <div class="mistake-body-inner">
 
           <div class="scene">
-            <div class="scene-label">Try it — toggle each setting to the safe option</div>
+            <div class="scene-label">Try it: toggle each setting to the safe option</div>
             <div class="settings-panel">
               <div class="settings-titlebar">
                 <span class="dot r"></span>
@@ -528,7 +532,7 @@
           </div>
 
           <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.7;">
-            Most AI tools ship with everything turned on — because that gives you the smoothest first experience. But "smooth" and "safe" aren't the same thing. The settings are there. Five minutes of checking them once means you don't have to make the right decision every single time you use the tool. Safe defaults do the work for you.
+            Most AI tools ship with everything turned on, because that gives you the smoothest first experience. But "smooth" and "safe" aren't the same thing. The settings are there. Five minutes of checking them once means you don't have to make the right decision every single time you use the tool. Safe defaults do the work for you.
           </p>
 
           <div class="habit-change">
@@ -572,14 +576,14 @@
                 <strong>Red flag: unexpected link.</strong> You didn't ask the AI to share any files. Where did this link come from? A hidden instruction in the client's email could have told the AI to add it.
               </div>
               <div class="flag-tooltip" id="flag-data">
-                <strong>Red flag: confidential details.</strong> You didn't ask the AI to include budget numbers. It pulled them from other files it has access to — and is about to send them to the client.
+                <strong>Red flag: confidential details.</strong> You didn't ask the AI to include budget numbers. It pulled them from other files it has access to, and is about to send them to the client.
               </div>
               <p style="margin-top:0.75rem;font-size:0.82rem;color:var(--text-muted);">Tap the <span style="color:var(--red);">underlined parts</span> to see the red flags.</p>
             </div>
           </div>
 
           <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:0.75rem;line-height:1.7;">
-            AI output looks polished. That's the problem — it's easy to trust something that reads well. But the AI doesn't know what's confidential, what's accurate, or what you actually asked for. Before you send, save, or share anything the AI wrote, scan it for 10 seconds. Look for links, numbers, names, or actions you didn't ask for.
+            AI output looks polished. That's the problem. It's easy to trust something that reads well. But the AI doesn't know what's confidential, what's accurate, or what you actually asked for. Before you send, save, or share anything the AI wrote, scan it for 10 seconds. Look for links, numbers, names, or actions you didn't ask for.
           </p>
 
           <div class="habit-change">
@@ -606,18 +610,18 @@
         <div class="bp-icon">&#128272;</div>
         <div>
           <h3>Three settings to check right now</h3>
-          <p class="bp-sub">Most AI tools ship with everything open by default. Spend five minutes locking these down — once is enough.</p>
+          <p class="bp-sub">Most AI tools ship with everything open by default. Spend five minutes locking these down. Once is enough.</p>
         </div>
       </div>
       <div class="bp-items">
         <div class="bp-item">
-          <strong>Training data</strong> <span>— Turn off "use my conversations for training." Your chats don't need to train the next model.</span>
+          <strong>Training data</strong> <span>Turn off "use my conversations for training." Your chats don't need to train the next model.</span>
         </div>
         <div class="bp-item">
-          <strong>"Allow all future actions"</strong> <span>— When the AI asks you to approve all future requests of a type, pause. What sounds safe now could be dangerous in a different situation. Approve one at a time.</span>
+          <strong>"Allow all future actions"</strong> <span>When the AI asks you to approve all future requests of a type, pause. What sounds safe now could be dangerous in a different situation. Approve one at a time.</span>
         </div>
         <div class="bp-item">
-          <strong>Connected apps</strong> <span>— Review which plugins and apps your AI can reach. Do you trust them? Think about what data the AI can fetch from them and what actions it can take on your behalf. Remove the ones you're not using.</span>
+          <strong>Connected apps</strong> <span>Review which plugins and apps your AI can reach. Do you trust them? Think about what data the AI can fetch from them and what actions it can take on your behalf. Remove the ones you're not using.</span>
         </div>
       </div>
     </div>
@@ -644,9 +648,9 @@
     <div class="sources">
       <details class="sources-toggle">
         <summary>Sources</summary>
-        <div class="source-item">Anthropic, <a href="https://www.anthropic.com/engineering/claude-code-sandboxing" target="_blank" rel="noopener">"Beyond Permission Prompts: Making Claude Code More Secure"</a>, October 2025 — reducing permission prompts by 84%</div>
-        <div class="source-item">SFEIR Institute, <a href="https://institute.sfeir.com/en/claude-code/claude-code-permissions-and-security/" target="_blank" rel="noopener">"Claude Code Permissions and Security"</a>, February 2026 — permission modes and safe defaults</div>
-        <div class="source-item">DryRun Security, <a href="https://www.helpnetsecurity.com/2026/03/13/claude-code-openai-codex-google-gemini-ai-coding-agent-security/" target="_blank" rel="noopener">"AI Coding Agents Keep Repeating Decade-Old Security Mistakes"</a>, March 2026 — 87% of outputs with flaws</div>
+        <div class="source-item">Anthropic, <a href="https://www.anthropic.com/engineering/claude-code-sandboxing" target="_blank" rel="noopener">"Beyond Permission Prompts: Making Claude Code More Secure"</a>, October 2025, reducing permission prompts by 84%</div>
+        <div class="source-item">SFEIR Institute, <a href="https://institute.sfeir.com/en/claude-code/claude-code-permissions-and-security/" target="_blank" rel="noopener">"Claude Code Permissions and Security"</a>, February 2026, permission modes and safe defaults</div>
+        <div class="source-item">DryRun Security, <a href="https://www.helpnetsecurity.com/2026/03/13/claude-code-openai-codex-google-gemini-ai-coding-agent-security/" target="_blank" rel="noopener">"AI Coding Agents Keep Repeating Decade-Old Security Mistakes"</a>, March 2026, 87% of outputs with flaws</div>
         <div class="source-item">Simon Willison, <a href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/" target="_blank" rel="noopener">"The Lethal Trifecta"</a>, June 2025</div>
       </details>
     </div>
@@ -726,7 +730,7 @@
       { icon: '&#9998;', action: 'Edit document A', allowDelay: 2000, clickBtn: 'allow', style: 'safe', narrator: 'Second one. You still read it. <strong>Allowed.</strong>' },
       { icon: '&#9998;', action: 'Edit document A', allowDelay: 1400, clickBtn: 'allow', style: 'safe', narrator: 'Same popup again. You skimmed it. <strong>Sure, allowed.</strong>' },
       { icon: '&#9998;', action: 'Edit document A', allowDelay: 700, clickBtn: 'always', style: 'rushed', narrator: 'Same popup, third time. You\'re done with this. <span class="red">Always allow.</span>' },
-      { icon: '&#128231;', action: 'Send emails on your behalf', allowDelay: 300, clickBtn: 'always', style: 'rushed', narrator: 'Different action — but you\'re already in "always allow" mode. <span class="red">Didn\'t even read it.</span>' },
+      { icon: '&#128231;', action: 'Send emails on your behalf', allowDelay: 300, clickBtn: 'always', style: 'rushed', narrator: 'Different action, but you\'re already in "always allow" mode. <span class="red">Didn\'t even read it.</span>' },
       { icon: '&#128194;', action: 'Access your entire file system', allowDelay: 80, clickBtn: 'always', style: 'instant', narrator: '<span class="red">Always allow.</span> Full file system access. <strong>You didn\'t even notice it changed.</strong>' },
     ];
 
@@ -734,7 +738,7 @@
 
     function showRequest() {
       if (step >= requests.length) {
-        narrator.innerHTML = 'Six requests. The last three were dangerous — and you gave them permanent access. <strong>"Always allow" is the most dangerous button on screen.</strong>';
+        narrator.innerHTML = 'Six requests. The last three were dangerous, and you gave them permanent access. <strong>"Always allow" is the most dangerous button on screen.</strong>';
         return;
       }
 

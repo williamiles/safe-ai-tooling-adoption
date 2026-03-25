@@ -604,6 +604,10 @@
         .back-cta {
           padding: 1rem;
         }
+        .topnav { padding: 0.75rem 1rem; }
+        .breadcrumb > :nth-child(n+4) { display: none; }
+        section { padding: 2.5rem 1.25rem; }
+        .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
       }
     </style>
   </head>
@@ -626,7 +630,7 @@
       <div class="hero-tag">Article 4 — the positive one</div>
       <h1>What <em>safe</em> AI use actually looks like</h1>
       <p>
-        It starts with you. Not with tools, not with settings — with how you
+        It starts with you. Not with tools, not with settings. With how you
         think.
       </p>
       <div class="scroll-hint">
@@ -651,11 +655,11 @@
 
           <div class="mindset-quote-block">
             <p>
-              Before settings, before tools, before any checklist — the most
+              Before settings, before tools, before any checklist, the most
               powerful thing you can build is
               <span class="highlight-phrase">a way of thinking</span>. Not
-              paranoia — <span class="highlight-green">curiosity</span>. Not
-              expertise — <span class="highlight-green">awareness</span>. These
+              paranoia, <span class="highlight-green">curiosity</span>. Not
+              expertise, <span class="highlight-green">awareness</span>. These
               three habits separate people who get caught off guard from people
               who don't.
             </p>
@@ -667,8 +671,8 @@
               <div class="pillar-text">
                 <div class="pillar-title">Question things</div>
                 <div class="pillar-desc">
-                  When something feels off — an unexpected link, a weird
-                  request, an action you didn't ask for — don't ignore that
+                  When something feels off, like an unexpected link, a weird
+                  request, or an action you didn't ask for, don't ignore that
                   feeling. Ask why. The AI won't be offended.
                 </div>
                 <div class="pillar-quote">
@@ -684,8 +688,8 @@
                 <div class="pillar-title">Explore what it does</div>
                 <div class="pillar-desc">
                   You don't need to understand how AI works. But paying
-                  attention to what it's doing — what it's reading, what it's
-                  sending, what permissions it has — keeps you ahead of
+                  attention to what it's doing, what it's reading, what it's
+                  sending, what permissions it has, keeps you ahead of
                   problems.
                 </div>
                 <div class="pillar-quote">
@@ -701,7 +705,7 @@
                 <div class="pillar-title">Prepare for when things go wrong</div>
                 <div class="pillar-desc">
                   Don't assume everything will work perfectly. Assume that at
-                  some point, something will fail — and set yourself up so that
+                  some point, something will fail. Set yourself up so that
                   when it does, the damage is small and fixable.
                 </div>
                 <div class="pillar-quote">
@@ -746,7 +750,7 @@
             <div class="rule-num">03</div>
             <div class="rule-title">Pause on "send" and "access"</div>
             <div class="rule-desc">
-              When the AI wants to do something — not just read — take two
+              When the AI wants to do something, not just read, take two
               seconds to decide if it should.
             </div>
           </div>
@@ -783,7 +787,7 @@
               >question things, explore what AI does, and prepare for when
               things go wrong.</strong
             >
-            Combine that with five simple habits — and you're safer than most.
+            Combine that with five simple habits, and you're safer than most.
           </p>
         </div>
 
@@ -802,7 +806,7 @@
                 target="_blank"
                 rel="noopener"
                 >"Beyond Permission Prompts: Making Claude Code More Secure"</a
-              >, October 2025 — dual-layer sandboxing and 84% prompt reduction
+              >, October 2025, dual-layer sandboxing and 84% prompt reduction
             </div>
             <div class="source-item">
               SFEIR Institute,
@@ -811,7 +815,7 @@
                 target="_blank"
                 rel="noopener"
                 >"Claude Code Permissions and Security"</a
-              >, February 2026 — graduated permission modes and safe defaults
+              >, February 2026, graduated permission modes and safe defaults
             </div>
             <div class="source-item">
               NVIDIA Developer Blog,
@@ -820,10 +824,10 @@
                 target="_blank"
                 rel="noopener"
                 >"Agentic Autonomy Levels and Security"</a
-              >, February 2025 — autonomy levels framework
+              >, February 2025, autonomy levels framework
             </div>
             <div class="source-item">
-              SANS Institute, "AI Security Made Easy", 2026 — zero-trust
+              SANS Institute, "AI Security Made Easy", 2026, zero-trust
               guardrails and layered defense principles
             </div>
             <div class="source-item">
@@ -833,7 +837,7 @@
                 target="_blank"
                 rel="noopener"
                 >"How to Stop AI's Lethal Trifecta"</a
-              >, September 2025 — architectural elimination of attack vectors
+              >, September 2025, architectural elimination of attack vectors
             </div>
           </details>
         </div>
@@ -883,7 +887,7 @@
             closer.classList.remove("done");
           } else if (pillarsLit < 3) {
             closer.textContent =
-              pillarsLit + " of 3 — keep building your mindset";
+              pillarsLit + " of 3 - keep building your mindset";
             closer.classList.remove("done");
           } else {
             closer.textContent =
@@ -911,7 +915,7 @@
             counter.textContent = rulesActivated + " of 5 rules activated";
             counter.classList.remove("done");
           } else {
-            counter.textContent = "All five. You're ready. Go use AI — safely.";
+            counter.textContent = "All five. You're ready. Go use AI safely.";
             counter.classList.add("done");
           }
         });

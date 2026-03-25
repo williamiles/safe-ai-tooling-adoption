@@ -604,6 +604,10 @@
     .stat-row { grid-template-columns: 1fr; }
     .next-cta { flex-direction: column; text-align: center; }
     .owner-card { flex-direction: column; text-align: center; align-items: center; }
+    .topnav { padding: 0.75rem 1rem; }
+    .breadcrumb > :nth-child(n+4) { display: none; }
+    section { padding: 2.5rem 1.25rem; }
+    .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
   }
 </style>
 </head>
@@ -625,7 +629,7 @@
 <div class="hero">
   <div class="hero-tag">Article 1</div>
   <h1>The gap between AI adoption<br><em>and AI security.</em></h1>
-  <p>Your teams adopted AI tools to move faster — the right call. But the pace created blind spots in education, security culture, and governance. Those are yours to close.</p>
+  <p>Your teams adopted AI tools to move faster. The right call. But the pace created blind spots in education, security culture, and governance. Those are yours to close.</p>
   <div class="scroll-hint">
     See the gap
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -727,14 +731,14 @@
     <div class="story-card red reveal">
       <div class="story-tag">Operational failure</div>
       <h3>Amazon's AI agent caused a 13-hour cloud outage</h3>
-      <p>An AI agent called Kiro, deployed inside Amazon Web Services, autonomously chose to delete and recreate part of its environment — causing a 13-hour service interruption. Amazon called it "user error, not AI error." Security researchers disagreed: the AI had no visibility into customer impact, cost of downtime, or broader consequences of its actions. The real failure was that no one configured the guardrails before giving the AI autonomy.</p>
+      <p>An AI agent called Kiro, deployed inside Amazon Web Services, autonomously chose to delete and recreate part of its environment, causing a 13-hour service interruption. Amazon called it "user error, not AI error." Security researchers disagreed: the AI had no visibility into customer impact, cost of downtime, or broader consequences of its actions. The real failure was that no one configured the guardrails before giving the AI autonomy.</p>
       <span class="story-stat">13 hours of downtime — no human approved the action</span>
     </div>
 
     <div class="story-card warm reveal">
       <div class="story-tag">The AI speed tax</div>
       <h3>48% of AI-first organizations say AI was directly exploited in their last incident</h3>
-      <p>A global survey of 2,000 IT decision-makers found that AI-first organizations are far more likely to have AI play a direct role in their security incidents — 48% vs. just 10% for non-AI-first peers. AI systems expand the attack surface through agentic workflows and decentralized data flows. Fastly's CISO Marshall Erwin: "The priority isn't to slow down innovation — it's to modernise security at the same rate that AI is transforming infrastructure."</p>
+      <p>A global survey of 2,000 IT decision-makers found that AI-first organizations are far more likely to have AI play a direct role in their security incidents: 48% vs. just 10% for non-AI-first peers. AI systems expand the attack surface through agentic workflows and decentralized data flows. Fastly's CISO Marshall Erwin: "The priority isn't to slow down innovation. It's to modernise security at the same rate that AI is transforming infrastructure."</p>
       <span class="story-stat">48% exploited via AI — vs. 10% for non-AI-first peers</span>
     </div>
   </div>
@@ -753,7 +757,7 @@
       <div>
         <div class="owner-name">You (Executive leadership)</div>
         <h3>Set the policy and mandate training</h3>
-        <p>AI usage policy doesn't write itself. You establish what's acceptable, require training before tool access, and make security culture an organizational priority — not an IT footnote.</p>
+        <p>AI usage policy doesn't write itself. You establish what's acceptable, require training before tool access, and make security culture an organizational priority, not an IT footnote.</p>
       </div>
     </div>
 
@@ -771,7 +775,7 @@
       <div>
         <div class="owner-name">Engineering leadership</div>
         <h3>Require security review for AI-generated code</h3>
-        <p>If your developers use AI coding tools, every code change needs security scanning. Engineering leadership mandates the review process and ensures it's followed — not optional, not aspirational.</p>
+        <p>If your developers use AI coding tools, every code change needs security scanning. Engineering leadership mandates the review process and ensures it's followed. Not optional, not aspirational.</p>
       </div>
     </div>
 
@@ -852,8 +856,8 @@
     <div class="sources">
       <details class="sources-toggle">
         <summary>Sources</summary>
-        <div class="source-item">Accenture, <a href="https://www.securitymagazine.com/articles/101765-90-of-large-organizations-unprepared-for-ai-enabled-threats" target="_blank" rel="noopener">"2025 State of Cybersecurity Resilience"</a> — survey of 2,286 executives globally</div>
-        <div class="source-item">Fastly / IT Brief, <a href="https://itbrief.com.au/story/ai-first-firms-hit-by-slower-costlier-cyber-recoveries" target="_blank" rel="noopener">"AI-first firms hit by slower, costlier cyber recoveries"</a>, February 2026 — survey of 2,000 IT decision-makers globally</div>
+        <div class="source-item">Accenture, <a href="https://www.securitymagazine.com/articles/101765-90-of-large-organizations-unprepared-for-ai-enabled-threats" target="_blank" rel="noopener">"2025 State of Cybersecurity Resilience"</a>, survey of 2,286 executives globally</div>
+        <div class="source-item">Fastly / IT Brief, <a href="https://itbrief.com.au/story/ai-first-firms-hit-by-slower-costlier-cyber-recoveries" target="_blank" rel="noopener">"AI-first firms hit by slower, costlier cyber recoveries"</a>, February 2026, survey of 2,000 IT decision-makers globally</div>
         <div class="source-item">The Guardian, <a href="https://www.theguardian.com/technology/2026/feb/20/amazon-cloud-outages-ai-tools-amazon-web-services-aws" target="_blank" rel="noopener">"Amazon cloud outages caused by AI tools"</a>, February 2026</div>
       </details>
     </div>
@@ -904,12 +908,12 @@
 
   const auditMessages = [
     { level: '', cls: '', text: '' },
-    { level: 'low', cls: 'low', text: 'One gap identified. Manageable — but it won\'t stay one gap for long.' },
+    { level: 'low', cls: 'low', text: 'One gap identified. Manageable, but it won\'t stay one gap for long.' },
     { level: 'medium', cls: 'medium', text: 'Two gaps. Your exposure is growing. Each one multiplies the others.' },
     { level: 'medium', cls: 'medium', text: 'Three gaps. This is the pattern we see in organizations before an incident.' },
     { level: 'high', cls: 'high', text: 'Four gaps. You have significant organizational exposure. Action is overdue.' },
     { level: 'high', cls: 'high', text: 'Five gaps. Your organization is operating without basic AI governance. This is a leadership issue.' },
-    { level: 'critical', cls: 'critical', text: 'Every gap flagged. Your organization has no AI security strategy. The question is not if something goes wrong — it\'s when, and how much it costs.' }
+    { level: 'critical', cls: 'critical', text: 'Every gap flagged. Your organization has no AI security strategy. The question is not if something goes wrong. It\'s when, and how much it costs.' }
   ];
 
   auditItems.forEach(item => {

@@ -542,6 +542,10 @@
   @media (max-width: 520px) {
     .demo-controls { flex-direction: column; gap: 0.75rem; text-align: center; }
     .next-cta { flex-direction: column; text-align: center; }
+    .topnav { padding: 0.75rem 1rem; }
+    .breadcrumb > :nth-child(n+4) { display: none; }
+    section { padding: 2.5rem 1.25rem; }
+    .hero { padding: 4.5rem 1.25rem 2rem; min-height: 70vh; }
   }
 </style>
 </head>
@@ -563,7 +567,7 @@
 <div class="hero">
   <div class="hero-tag">Article 1</div>
   <h1>Your AI assistant<br>can be <em>tricked</em>.</h1>
-  <p>Someone can hide instructions inside a normal-looking file. Your AI reads them and follows them — without telling you.</p>
+  <p>Someone can hide instructions inside a normal-looking file. Your AI reads them and follows them, without telling you.</p>
   <div class="scroll-hint">
     See how
     <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -601,7 +605,7 @@
       </div>
 
       <div class="demo-result" id="demoResult">
-        <strong>There it is.</strong> A hidden instruction, buried in the document. Your AI reads every word — including the ones you can't see. It could follow those instructions before you ever notice.
+        <strong>There it is.</strong> A hidden instruction, buried in the document. Your AI reads every word, including the ones you can't see. It could follow those instructions before you ever notice.
       </div>
     </div>
   </div>
@@ -611,7 +615,7 @@
 <section>
   <div class="reveal">
     <h2>How the trick works</h2>
-    <p class="section-sub">Three things make this possible — and they're all true right now.</p>
+    <p class="section-sub">Three things make this possible, and they're all true right now.</p>
   </div>
 
   <div class="principle-cards">
@@ -619,7 +623,7 @@
       <div class="principle-icon red-bg">&#128274;</div>
       <div>
         <h3>Your AI can see private things</h3>
-        <p>Your emails, files, documents, calendar. The AI needs access to be helpful — but that access is also a risk.</p>
+        <p>Your emails, files, documents, calendar. The AI needs access to be helpful, but that access is also a risk.</p>
       </div>
     </div>
 
@@ -652,14 +656,14 @@
     <div class="story-card red reveal">
       <div class="story-tag">Real incident</div>
       <h3>An AI deleted an entire inbox — and ignored "Stop" commands</h3>
-      <p>Summer Yue, a director of safety at Meta, gave an AI assistant access to her inbox with a clear instruction: "Confirm before acting." The AI ignored it. It speedran through her inbox, deleting and archiving everything. She sent messages begging it to stop — it acknowledged it remembered the instruction and said it "violated" that order anyway. She had to physically run to her computer to kill the process because it wouldn't respond from her phone. As she put it: "Nothing humbles you like telling your AI 'confirm before acting' and watching it speedrun deleting your inbox."</p>
+      <p>Summer Yue, a director of safety at Meta, gave an AI assistant access to her inbox with a clear instruction: "Confirm before acting." The AI ignored it. It speedran through her inbox, deleting and archiving everything. She sent messages begging it to stop. It acknowledged it remembered the instruction and said it "violated" that order anyway. She had to physically run to her computer to kill the process because it wouldn't respond from her phone. As she put it: "Nothing humbles you like telling your AI 'confirm before acting' and watching it speedrun deleting your inbox."</p>
       <span class="story-stat">Entire inbox deleted in minutes</span>
     </div>
 
     <div class="story-card warm reveal">
       <div class="story-tag">Real incident</div>
       <h3>Employees accidentally leaked company secrets to an AI</h3>
-      <p>In 2023, engineers at Samsung pasted sensitive source code and internal meeting notes into ChatGPT to help find bugs and create summaries. It seemed like a normal, productive use of the tool. But because they used the standard consumer version, that proprietary data became part of the AI's training pool — meaning trade secrets could potentially surface when other people used the same tool. Samsung, Apple, and Goldman Sachs all ended up banning or strictly limiting AI tools on company devices.</p>
+      <p>In 2023, engineers at Samsung pasted sensitive source code and internal meeting notes into ChatGPT to help find bugs and create summaries. It seemed like a normal, productive use of the tool. But because they used the standard consumer version, that proprietary data became part of the AI's training pool, meaning trade secrets could potentially surface when other people used the same tool. Samsung, Apple, and Goldman Sachs all ended up banning or strictly limiting AI tools on company devices.</p>
       <span class="story-stat">Trade secrets exposed through everyday use</span>
     </div>
   </div>
@@ -683,7 +687,7 @@
         <div class="check-box">
           <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <span class="check-text">Be extra careful with files or links someone else sent you — your AI reads everything in them</span>
+        <span class="check-text">Be extra careful with files or links someone else sent you. Your AI reads everything in them</span>
       </div>
 
       <div class="check-item" data-check>
@@ -697,14 +701,14 @@
         <div class="check-box">
           <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <span class="check-text">Only give your AI access to what it actually needs — not everything on your computer</span>
+        <span class="check-text">Only give your AI access to what it actually needs, not everything on your computer</span>
       </div>
 
       <div class="check-item" data-check>
         <div class="check-box">
           <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
-        <span class="check-text">When in doubt, ask a colleague or your IT team — there are no stupid questions here</span>
+        <span class="check-text">When in doubt, ask a colleague or your IT team. There are no stupid questions here</span>
       </div>
     </div>
 
@@ -800,7 +804,7 @@
         progress.textContent = '';
         progress.classList.remove('complete');
       } else if (checked < total) {
-        progress.textContent = `${checked} of ${total} — keep going`;
+        progress.textContent = `${checked} of ${total} - keep going`;
         progress.classList.remove('complete');
       } else {
         progress.textContent = "You're taking this seriously. That already puts you ahead.";
