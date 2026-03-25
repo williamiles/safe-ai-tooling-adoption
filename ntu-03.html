@@ -377,6 +377,38 @@
 
   footer { text-align: center; padding: 3rem 2rem; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border); max-width: 760px; margin: 0 auto; }
 
+  /* ── ANCHOR NAV ── */
+  .anchor-nav {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+  .anchor-nav-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .anchor-nav a {
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .anchor-nav a:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+  }
+
   @media (max-width: 520px) {
     .habit-change { flex-direction: column; }
     .next-cta { flex-direction: column; text-align: center; }
@@ -416,8 +448,14 @@
   </div>
 </div>
 
+<nav class="anchor-nav reveal">
+  <span class="anchor-nav-label">Jump to:</span>
+  <a href="#three-mistakes">Three Mistakes</a>
+  <a href="#best-practice">Three Settings</a>
+</nav>
+
 <!-- ── THREE MISTAKES ── -->
-<section>
+<section id="three-mistakes">
   <div class="reveal">
     <h2>Three mistakes. Three interactive scenes.</h2>
     <p class="section-sub">Open each one to see the mistake in action, then learn the fix.</p>
@@ -603,7 +641,7 @@
 </section>
 
 <!-- ── BEST PRACTICE CALLOUT ── -->
-<section>
+<section id="best-practice">
   <div class="reveal">
     <div class="best-practice">
       <div class="bp-header">

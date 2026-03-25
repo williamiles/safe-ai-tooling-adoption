@@ -594,6 +594,38 @@
     margin: 0 auto;
   }
 
+  /* ── ANCHOR NAV ── */
+  .anchor-nav {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+  }
+  .anchor-nav-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .anchor-nav a {
+    font-size: 0.78rem;
+    color: var(--accent);
+    text-decoration: none;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .anchor-nav a:hover {
+    background: var(--accent-glow);
+    border-color: var(--accent);
+  }
+
   @media (max-width: 520px) {
     .next-cta { flex-direction: column; text-align: center; }
     .env-card { flex-direction: column; text-align: center; align-items: center; }
@@ -631,8 +663,17 @@
   </div>
 </div>
 
+<nav class="anchor-nav reveal">
+  <span class="anchor-nav-label">Jump to:</span>
+  <a href="#tradeoff">The Tradeoff</a>
+  <a href="#your-people">Your People</a>
+  <a href="#your-role">Your Role</a>
+  <a href="#building-environment">Building Safety</a>
+  <a href="#action-items">Action Items</a>
+</nav>
+
 <!-- ── THE FALSE TRADEOFF ── -->
-<section>
+<section id="tradeoff">
   <div class="reveal">
     <h2>The tradeoff you think you're making</h2>
     <p class="section-sub">Most leaders see speed and security as a slider. Move it one way, lose the other. Tap the bar to explore.</p>
@@ -652,7 +693,7 @@
 </section>
 
 <!-- ── YOUR PEOPLE RIGHT NOW ── -->
-<section>
+<section id="your-people">
   <div class="reveal">
     <h2>Two groups in your organization right now</h2>
     <p class="section-sub">They're both moving fast with AI. Neither has what they need to do it safely. Tap the tabs to see their reality.</p>
@@ -722,7 +763,7 @@
 </section>
 
 <!-- ── YOUR ROLE ── -->
-<section>
+<section id="your-role">
   <div class="reveal">
     <div class="bridge-box">
       <h2>Your role is the environment.</h2>
@@ -737,7 +778,7 @@
 </section>
 
 <!-- ── BUILDING THE ENVIRONMENT ── -->
-<section>
+<section id="building-environment">
   <div class="reveal">
     <h2>What "both speed and security" looks like</h2>
     <p class="section-sub">Three organizational shifts that don't slow your teams down. They protect what your teams are building.</p>
@@ -771,7 +812,7 @@
 </section>
 
 <!-- ── CHECKLIST ── -->
-<section>
+<section id="action-items">
   <div class="reveal">
     <h2>Actions you can take this week</h2>
     <p class="section-sub">Each one creates a safer environment for one of the two groups. Tap to commit.</p>

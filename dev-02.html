@@ -723,6 +723,38 @@
         margin: 0 auto;
       }
 
+      /* ── ANCHOR NAV ── */
+      .anchor-nav {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem 1rem;
+      }
+      .anchor-nav-label {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+      }
+      .anchor-nav a {
+        font-size: 0.78rem;
+        color: var(--accent);
+        text-decoration: none;
+        padding: 0.25rem 0.6rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        transition: all 0.2s;
+        white-space: nowrap;
+      }
+      .anchor-nav a:hover {
+        background: var(--accent-glow);
+        border-color: var(--accent);
+      }
+
       @media (max-width: 520px) {
         .next-cta {
           flex-direction: column;
@@ -776,8 +808,15 @@
       </div>
     </div>
 
+    <nav class="anchor-nav reveal">
+      <span class="anchor-nav-label">Jump to:</span>
+      <a href="#lethal-trifecta">The Trifecta</a>
+      <a href="#incidents">Real Incidents</a>
+      <a href="#audit">Audit</a>
+    </nav>
+
     <!-- ── THE LETHAL TRIFECTA ── -->
-    <section>
+    <section id="lethal-trifecta">
       <div class="reveal">
         <h2>The lethal trifecta</h2>
         <p class="section-sub">
@@ -861,7 +900,7 @@
     </section>
 
     <!-- ── PRODUCTION INCIDENTS ── -->
-    <section>
+    <section id="incidents">
       <div class="reveal">
         <h2>Production incidents — not proofs of concept</h2>
         <p class="section-sub">
@@ -999,7 +1038,7 @@
     </section>
 
     <!-- ── AUDIT YOUR SYSTEMS ── -->
-    <section>
+    <section id="audit">
       <div class="reveal">
         <h2>Audit your systems for the trifecta</h2>
         <p class="section-sub">
