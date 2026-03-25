@@ -425,92 +425,6 @@
     line-height: 1.6;
   }
 
-  /* ── CHECKLIST ── */
-  .checklist {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .check-item {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    user-select: none;
-    -webkit-tap-highlight-color: transparent;
-  }
-
-  .check-item:hover { background: var(--surface-hover); }
-
-  .check-item.done {
-    border-color: var(--green);
-    background: var(--green-glow);
-  }
-
-  .check-box {
-    width: 26px;
-    height: 26px;
-    border-radius: 8px;
-    border: 2px solid var(--border);
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .check-item.done .check-box {
-    border-color: var(--green);
-    background: var(--green);
-  }
-
-  .check-box svg {
-    width: 14px;
-    height: 14px;
-    stroke: white;
-    stroke-width: 3;
-    opacity: 0;
-    transition: opacity 0.2s;
-  }
-
-  .check-item.done .check-box svg { opacity: 1; }
-
-  .check-text {
-    font-size: 0.92rem;
-    font-weight: 500;
-    transition: color 0.3s;
-  }
-
-  .check-item.done .check-text { color: var(--green); }
-
-  .check-owner {
-    font-size: 0.7rem;
-    color: var(--accent);
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    flex-shrink: 0;
-  }
-
-  .checklist-progress {
-    text-align: center;
-    margin-top: 1.5rem;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-    min-height: 1.5em;
-  }
-
-  .checklist-progress.complete {
-    color: var(--green);
-    font-weight: 600;
-  }
-
   /* ── SOURCES ── */
   .sources {
     border-top: 1px solid var(--border);
@@ -676,7 +590,6 @@
   <a href="#exposure-audit">Exposure Audit</a>
   <a href="#consequences">Consequences</a>
   <a href="#ownership">Who Owns What</a>
-  <a href="#checklist">Checklist</a>
 </nav>
 
 <!-- ── THE GAP IN NUMBERS ── -->
@@ -831,66 +744,6 @@
   </div>
 </section>
 
-<!-- ── ACTION CHECKLIST ── -->
-<section id="checklist">
-  <div class="reveal">
-    <h2>Your governance checklist</h2>
-    <p class="section-sub">Actions you can authorize or delegate this week. Tap each one as you commit to it.</p>
-
-    <div class="checklist">
-      <div class="check-item" data-check>
-        <div class="check-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="check-text">Commission an inventory of which AI tools your organization uses today</span>
-        <span class="check-owner">CISO</span>
-      </div>
-
-      <div class="check-item" data-check>
-        <div class="check-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="check-text">Establish an AI-specific acceptable use policy with clear boundaries</span>
-        <span class="check-owner">You</span>
-      </div>
-
-      <div class="check-item" data-check>
-        <div class="check-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="check-text">Mandate AI security training before employees get tool access</span>
-        <span class="check-owner">HR</span>
-      </div>
-
-      <div class="check-item" data-check>
-        <div class="check-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="check-text">Require security review for all AI-generated code before it ships</span>
-        <span class="check-owner">Eng lead</span>
-      </div>
-
-      <div class="check-item" data-check>
-        <div class="check-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="check-text">Add AI incidents to your existing incident response plan</span>
-        <span class="check-owner">CISO</span>
-      </div>
-
-      <div class="check-item" data-check>
-        <div class="check-box">
-          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-        </div>
-        <span class="check-text">Assign a named owner for AI risk on the org chart</span>
-        <span class="check-owner">You</span>
-      </div>
-    </div>
-
-    <div class="checklist-progress" id="checkProgress"></div>
-  </div>
-</section>
-
 <!-- ── SOURCES ── -->
 <section>
   <div class="reveal">
@@ -972,27 +825,6 @@
     });
   });
 
-  // ── Interactive checklist ──
-  const checks = document.querySelectorAll('[data-check]');
-  const progress = document.getElementById('checkProgress');
-  const total = checks.length;
-
-  checks.forEach(item => {
-    item.addEventListener('click', () => {
-      item.classList.toggle('done');
-      const checked = document.querySelectorAll('.check-item.done').length;
-      if (checked === 0) {
-        progress.textContent = '';
-        progress.classList.remove('complete');
-      } else if (checked < total) {
-        progress.textContent = `${checked} of ${total} actions committed`;
-        progress.classList.remove('complete');
-      } else {
-        progress.textContent = 'Full governance commitment. Now assign deadlines and follow up.';
-        progress.classList.add('complete');
-      }
-    });
-  });
 </script>
 </body>
 </html>
