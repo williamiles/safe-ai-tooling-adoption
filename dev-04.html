@@ -10,22 +10,22 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #0f0f13;
-    --surface: #1a1a24;
-    --surface-hover: #24243a;
-    --border: #2a2a3e;
-    --text: #e4e4ed;
-    --text-muted: #8888a4;
-    --accent: #7c6ff7;
-    --accent-glow: rgba(124, 111, 247, 0.15);
-    --red: #f76f6f;
-    --red-glow: rgba(247, 111, 111, 0.12);
-    --warm: #f39c6b;
-    --warm-glow: rgba(243, 156, 107, 0.12);
-    --green: #6bcf9f;
-    --green-glow: rgba(107, 207, 159, 0.15);
-    --yellow: #f7d76f;
-    --yellow-glow: rgba(247, 215, 111, 0.12);
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface-hover: #eeeae4;
+    --border: #ddd9d1;
+    --text: #2a2535;
+    --text-muted: #7d7589;
+    --accent: #5d56c9;
+    --accent-glow: rgba(93, 86, 201, 0.10);
+    --red: #c94f4f;
+    --red-glow: rgba(201, 79, 79, 0.10);
+    --warm: #c47848;
+    --warm-glow: rgba(196, 120, 72, 0.10);
+    --green: #3d9970;
+    --green-glow: rgba(61, 153, 112, 0.12);
+    --yellow: #a88a20;
+    --yellow-glow: rgba(168, 138, 32, 0.12);
   }
 
   html { scroll-behavior: smooth; }
@@ -38,8 +38,8 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
   }
-  *::selection { background: rgba(124, 111, 247, 0.3); }
-  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+  *::selection { background: rgba(93, 86, 201, 0.18); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(93, 86, 201, 0.10); }
 
   code {
     font-family: 'JetBrains Mono', monospace;
@@ -62,7 +62,7 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
-    background: rgba(15,15,19,0.85);
+    background: rgba(245,243,239,0.92);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     padding: 0.75rem 2rem;
@@ -201,12 +201,12 @@
 
   .pattern-box.how {
     background: var(--green-glow);
-    border: 1px solid rgba(107,207,159,0.15);
+    border: 1px solid rgba(61,153,112,0.15);
   }
 
   .pattern-box.limits {
     background: var(--yellow-glow);
-    border: 1px solid rgba(247,215,111,0.15);
+    border: 1px solid rgba(168,138,32,0.15);
   }
 
   .pattern-box-label {
@@ -345,17 +345,17 @@
 
   .boundary-zone.trusted {
     background: var(--green-glow);
-    border: 1px solid rgba(107,207,159,0.2);
+    border: 1px solid rgba(61,153,112,0.2);
   }
 
   .boundary-zone.semi {
     background: var(--yellow-glow);
-    border: 1px solid rgba(247,215,111,0.2);
+    border: 1px solid rgba(168,138,32,0.2);
   }
 
   .boundary-zone.untrusted {
     background: var(--red-glow);
-    border: 1px solid rgba(247,111,111,0.15);
+    border: 1px solid rgba(201,79,79,0.15);
   }
 
   .zone-label {
@@ -382,7 +382,7 @@
     font-weight: 500;
     padding: 0.25rem 0.6rem;
     border-radius: 6px;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.05);
   }
 
   .boundary-zone.trusted .zone-item { color: var(--green); }
@@ -403,7 +403,7 @@
     padding: 0.85rem 1rem;
     border-radius: 10px;
     background: var(--accent-glow);
-    border: 1px solid rgba(124,111,247,0.15);
+    border: 1px solid rgba(93,86,201,0.15);
     font-size: 0.85rem;
     color: var(--text-muted);
     line-height: 1.6;
@@ -476,7 +476,7 @@
     padding: 1rem;
     border-radius: 10px;
     background: var(--green-glow);
-    border: 1px solid rgba(107,207,159,0.15);
+    border: 1px solid rgba(61,153,112,0.15);
     font-size: 0.85rem;
     color: var(--text-muted);
     line-height: 1.7;
@@ -524,7 +524,7 @@
 
   .layer-item.on {
     background: var(--green-glow);
-    border-color: rgba(107,207,159,0.2);
+    border-color: rgba(61,153,112,0.2);
   }
 
   .layer-dot {
@@ -585,36 +585,6 @@
   .layer-result.partial { color: var(--yellow); }
   .layer-result.strong { color: var(--green); font-weight: 600; }
 
-  .anchor-nav {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1rem;
-  }
-  .anchor-nav-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .anchor-nav a {
-    font-size: 0.78rem;
-    color: var(--accent);
-    text-decoration: none;
-    padding: 0.25rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .anchor-nav a:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-  }
 
   /* ── SOURCES ── */
   .sources { border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 1rem; }
@@ -630,7 +600,7 @@
   .sources-toggle summary::-webkit-details-marker { display: none; }
 
   /* ── BACK CTA ── */
-  .back-cta { background: var(--green-glow); border: 1px solid rgba(107,207,159,0.2); border-radius: 18px; padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; text-decoration: none; color: inherit; transition: all 0.3s; margin-top: 2rem; }
+  .back-cta { background: var(--green-glow); border: 1px solid rgba(61,153,112,0.2); border-radius: 18px; padding: 2rem 2.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; text-decoration: none; color: inherit; transition: all 0.3s; margin-top: 2rem; }
   .back-cta:hover { border-color: var(--green); transform: translateY(-2px); }
   .back-label { font-size: 0.75rem; color: var(--green); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.3rem; }
   .back-title { font-size: 1.1rem; font-weight: 600; }
@@ -676,15 +646,6 @@
   </div>
 </div>
 
-<nav class="anchor-nav reveal">
-  <span class="anchor-nav-label">Jump to:</span>
-  <a href="#framing">The Shift</a>
-  <a href="#six-patterns">Six Patterns</a>
-  <a href="#security-trinity">Security Trinity</a>
-  <a href="#trust-boundaries">Trust Boundaries</a>
-  <a href="#data-poisoning">Data Poisoning</a>
-  <a href="#defense-stack">Defense Stack</a>
-</nav>
 
 <!-- ── FRAMING ── -->
 <section id="framing">

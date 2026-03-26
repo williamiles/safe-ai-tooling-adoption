@@ -16,22 +16,22 @@
       }
 
       :root {
-        --bg: #0f0f13;
-        --surface: #1a1a24;
-        --surface-hover: #24243a;
-        --border: #2a2a3e;
-        --text: #e4e4ed;
-        --text-muted: #8888a4;
-        --accent: #7c6ff7;
-        --accent-glow: rgba(124, 111, 247, 0.15);
-        --red: #f76f6f;
-        --red-glow: rgba(247, 111, 111, 0.12);
-        --warm: #f39c6b;
-        --warm-glow: rgba(243, 156, 107, 0.12);
-        --green: #6bcf9f;
-        --green-glow: rgba(107, 207, 159, 0.15);
-        --yellow: #f7d76f;
-        --yellow-glow: rgba(247, 215, 111, 0.12);
+        --bg: #f5f3ef;
+        --surface: #ffffff;
+        --surface-hover: #eeeae4;
+        --border: #ddd9d1;
+        --text: #2a2535;
+        --text-muted: #7d7589;
+        --accent: #5d56c9;
+        --accent-glow: rgba(93, 86, 201, 0.10);
+        --red: #c94f4f;
+        --red-glow: rgba(201, 79, 79, 0.10);
+        --warm: #c47848;
+        --warm-glow: rgba(196, 120, 72, 0.10);
+        --green: #3d9970;
+        --green-glow: rgba(61, 153, 112, 0.12);
+        --yellow: #a88a20;
+        --yellow-glow: rgba(168, 138, 32, 0.12);
       }
 
       html {
@@ -50,7 +50,7 @@
         -webkit-tap-highlight-color: transparent;
       }
       *::selection {
-        background: rgba(124, 111, 247, 0.3);
+        background: rgba(93, 86, 201, 0.18);
       }
       a,
       button,
@@ -59,7 +59,7 @@
       .tile,
       [data-tile],
       [data-spoke] {
-        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+        -webkit-tap-highlight-color: rgba(93, 86, 201, 0.10);
       }
 
       code {
@@ -90,7 +90,7 @@
         left: 0;
         right: 0;
         z-index: 100;
-        background: rgba(15, 15, 19, 0.85);
+        background: rgba(245, 243, 239, 0.92);
         backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--border);
         padding: 0.75rem 2rem;
@@ -244,7 +244,7 @@
         padding: 1.25rem 1.5rem;
         border-radius: 12px;
         background: var(--green-glow);
-        border: 1px solid rgba(107, 207, 159, 0.15);
+        border: 1px solid rgba(61, 153, 112, 0.15);
         font-size: 0.95rem;
         font-weight: 500;
         color: var(--green);
@@ -335,7 +335,6 @@
       }
 
       .level-controls {
-        max-height: 0;
         overflow: hidden;
         transition: max-height 0.4s ease;
       }
@@ -753,7 +752,7 @@
         padding: 1rem 1.25rem;
         border-radius: 10px;
         background: var(--accent-glow);
-        border: 1px solid rgba(124, 111, 247, 0.15);
+        border: 1px solid rgba(93, 86, 201, 0.15);
         font-size: 0.85rem;
         color: var(--text-muted);
         line-height: 1.65;
@@ -869,36 +868,6 @@
         color: var(--text);
       }
 
-      .anchor-nav {
-        max-width: 760px;
-        margin: 0 auto;
-        padding: 1rem 2rem;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.5rem 1rem;
-      }
-      .anchor-nav-label {
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-      }
-      .anchor-nav a {
-        font-size: 0.78rem;
-        color: var(--accent);
-        text-decoration: none;
-        padding: 0.25rem 0.6rem;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        transition: all 0.2s;
-        white-space: nowrap;
-      }
-      .anchor-nav a:hover {
-        background: var(--accent-glow);
-        border-color: var(--accent);
-      }
 
       /* ── SOURCES ── */
       .sources {
@@ -1059,15 +1028,6 @@
       </div>
     </div>
 
-    <nav class="anchor-nav reveal">
-      <span class="anchor-nav-label">Jump to:</span>
-      <a href="#mindset">Security Mindset</a>
-      <a href="#autonomy-levels">Autonomy Levels</a>
-      <a href="#sandboxing">Sandboxing</a>
-      <a href="#connectors">Connectors</a>
-      <a href="#caveat">Honest Caveat</a>
-      <a href="#checklist">Checklist</a>
-    </nav>
 
     <!-- ── SECURITY MINDSET ── -->
     <section id="mindset">
@@ -1848,14 +1808,12 @@
           (window.scrollY / h) * 100 + "%";
       });
 
-      // ── Autonomy levels ──
+      // ── Autonomy levels (all open by default) ──
+      document.querySelectorAll("[data-level]").forEach((row) => row.classList.add("active"));
+
       document.querySelectorAll("[data-level]").forEach((row) => {
         row.addEventListener("click", () => {
-          const wasActive = row.classList.contains("active");
-          document
-            .querySelectorAll("[data-level]")
-            .forEach((r) => r.classList.remove("active"));
-          if (!wasActive) row.classList.add("active");
+          row.classList.toggle("active");
         });
       });
 

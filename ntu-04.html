@@ -14,23 +14,23 @@
       }
 
       :root {
-        --bg: #0f0f13;
-        --surface: #1a1a24;
-        --surface-hover: #24243a;
-        --border: #2a2a3e;
-        --text: #e4e4ed;
-        --text-muted: #8888a4;
-        --accent: #7c6ff7;
-        --accent-glow: rgba(124, 111, 247, 0.15);
-        --red: #f76f6f;
-        --red-glow: rgba(247, 111, 111, 0.12);
-        --warm: #f39c6b;
-        --warm-glow: rgba(243, 156, 107, 0.12);
-        --green: #6bcf9f;
-        --green-glow: rgba(107, 207, 159, 0.15);
-        --green-solid: #4db88a;
-        --yellow: #f7d76f;
-        --yellow-glow: rgba(247, 215, 111, 0.12);
+        --bg: #f5f3ef;
+        --surface: #ffffff;
+        --surface-hover: #eeeae4;
+        --border: #ddd9d1;
+        --text: #2a2535;
+        --text-muted: #7d7589;
+        --accent: #5d56c9;
+        --accent-glow: rgba(93, 86, 201, 0.10);
+        --red: #c94f4f;
+        --red-glow: rgba(201, 79, 79, 0.10);
+        --warm: #c47848;
+        --warm-glow: rgba(196, 120, 72, 0.10);
+        --green: #3d9970;
+        --green-glow: rgba(61, 153, 112, 0.12);
+        --green-solid: #2d8a5e;
+        --yellow: #a88a20;
+        --yellow-glow: rgba(168, 138, 32, 0.12);
       }
 
       html {
@@ -49,7 +49,7 @@
         -webkit-tap-highlight-color: transparent;
       }
       *::selection {
-        background: rgba(124, 111, 247, 0.3);
+        background: rgba(93, 86, 201, 0.18);
       }
       a,
       button,
@@ -58,7 +58,7 @@
       .tile,
       [data-tile],
       [data-spoke] {
-        -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15);
+        -webkit-tap-highlight-color: rgba(93, 86, 201, 0.10);
       }
 
       .reveal {
@@ -80,7 +80,7 @@
         left: 0;
         right: 0;
         z-index: 100;
-        background: rgba(15, 15, 19, 0.85);
+        background: rgba(245, 243, 239, 0.92);
         backdrop-filter: blur(12px);
         border-bottom: 1px solid var(--border);
         padding: 0.75rem 2rem;
@@ -329,7 +329,7 @@
         background: linear-gradient(
           135deg,
           var(--accent-glow),
-          rgba(107, 207, 159, 0.08)
+          rgba(61, 153, 112, 0.08)
         );
         border-left: 4px solid var(--accent);
         border-radius: 0 16px 16px 0;
@@ -394,14 +394,7 @@
         background: var(--bg);
         border: 1px solid var(--border);
         border-radius: 14px;
-        cursor: pointer;
         transition: all 0.3s;
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-
-      .pillar:hover {
-        border-color: var(--accent);
       }
 
       .pillar.lit {
@@ -446,10 +439,10 @@
       }
 
       .pillar-quote {
-        display: none;
+        display: block;
         margin-top: 0.6rem;
         padding: 0.6rem 0.85rem;
-        background: rgba(124, 111, 247, 0.08);
+        background: rgba(93, 86, 201, 0.08);
         border-left: 3px solid var(--accent);
         border-radius: 0 8px 8px 0;
         font-size: 0.8rem;
@@ -458,9 +451,6 @@
         line-height: 1.6;
       }
 
-      .pillar.lit .pillar-quote {
-        display: block;
-      }
 
       .mindset-closer {
         text-align: center;
@@ -482,7 +472,7 @@
           var(--green-glow),
           var(--accent-glow)
         );
-        border: 1px solid rgba(107, 207, 159, 0.2);
+        border: 1px solid rgba(61, 153, 112, 0.2);
         border-radius: 20px;
         padding: 3rem 2.5rem;
         text-align: center;
@@ -594,37 +584,6 @@
         margin: 0 auto;
       }
 
-      /* ── ANCHOR NAV ── */
-      .anchor-nav {
-        max-width: 760px;
-        margin: 0 auto;
-        padding: 1rem 2rem;
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: 0.5rem 1rem;
-      }
-      .anchor-nav-label {
-        font-size: 0.75rem;
-        font-weight: 500;
-        color: var(--text-muted);
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-      }
-      .anchor-nav a {
-        font-size: 0.78rem;
-        color: var(--accent);
-        text-decoration: none;
-        padding: 0.25rem 0.6rem;
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        transition: all 0.2s;
-        white-space: nowrap;
-      }
-      .anchor-nav a:hover {
-        background: var(--accent-glow);
-        border-color: var(--accent);
-      }
 
       @media (max-width: 520px) {
         .rules-grid {
@@ -679,12 +638,6 @@
       </div>
     </div>
 
-    <nav class="anchor-nav reveal">
-      <span class="anchor-nav-label">Jump to:</span>
-      <a href="#mindset">Security Mindset</a>
-      <a href="#safety-rules">Safety Rules</a>
-      <a href="#wrap-up">Wrap Up</a>
-    </nav>
 
     <!-- ── SECURITY MINDSET (MOVED TO TOP) ── -->
     <section id="mindset">
@@ -912,29 +865,10 @@
           (window.scrollY / h) * 100 + "%";
       });
 
-      // ── Mindset pillars ──
-      let pillarsLit = 0;
-
-      document.querySelectorAll("[data-pillar]").forEach((pillar) => {
-        pillar.addEventListener("click", () => {
-          pillar.classList.toggle("lit");
-          pillarsLit = document.querySelectorAll(".pillar.lit").length;
-
-          const closer = document.getElementById("mindsetCloser");
-          if (pillarsLit === 0) {
-            closer.textContent = "";
-            closer.classList.remove("done");
-          } else if (pillarsLit < 3) {
-            closer.textContent =
-              pillarsLit + " of 3 - keep building your mindset";
-            closer.classList.remove("done");
-          } else {
-            closer.textContent =
-              "Question it. Explore it. Prepare for it. That's the security mindset.";
-            closer.classList.add("done");
-          }
-        });
-      });
+      // ── Mindset pillars (shown by default) ──
+      document.querySelectorAll('[data-pillar]').forEach(p => p.classList.add('lit'));
+      document.getElementById('mindsetCloser').textContent = "Question it. Explore it. Prepare for it. That\u2019s the security mindset.";
+      document.getElementById('mindsetCloser').classList.add('done');
 
       // ── Five rules ──
       let rulesActivated = 0;

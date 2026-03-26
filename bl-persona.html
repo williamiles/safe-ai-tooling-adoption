@@ -10,23 +10,23 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #0f0f13;
-    --surface: #1a1a24;
-    --surface-hover: #24243a;
-    --border: #2a2a3e;
-    --text: #e4e4ed;
-    --text-muted: #8888a4;
-    --accent: #7c6ff7;
-    --accent-glow: rgba(124, 111, 247, 0.15);
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface-hover: #eeeae4;
+    --border: #ddd9d1;
+    --text: #2a2535;
+    --text-muted: #7d7589;
+    --accent: #5d56c9;
+    --accent-glow: rgba(93, 86, 201, 0.10);
     --accent-soft: #6c5ce7;
-    --warm: #f39c6b;
-    --green: #6bcf9f;
-    --green-glow: rgba(107, 207, 159, 0.15);
-    --red: #f76f6f;
-    --red-glow: rgba(247, 111, 111, 0.12);
-    --yellow: #f7d76f;
-    --yellow-glow: rgba(247, 215, 111, 0.12);
-    --warm-glow: rgba(243, 156, 107, 0.12);
+    --warm: #c47848;
+    --green: #3d9970;
+    --green-glow: rgba(61, 153, 112, 0.12);
+    --red: #c94f4f;
+    --red-glow: rgba(201, 79, 79, 0.10);
+    --yellow: #a88a20;
+    --yellow-glow: rgba(168, 138, 32, 0.12);
+    --warm-glow: rgba(196, 120, 72, 0.10);
   }
 
   html { scroll-behavior: smooth; }
@@ -39,8 +39,8 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
   }
-  *::selection { background: rgba(124, 111, 247, 0.3); }
-  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+  *::selection { background: rgba(93, 86, 201, 0.18); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(93, 86, 201, 0.10); }
 
   /* ── Scroll-triggered fade-in ── */
   .reveal {
@@ -325,37 +325,6 @@
     margin: 0 auto;
   }
 
-  /* ── ANCHOR NAV ── */
-  .anchor-nav {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1rem;
-  }
-  .anchor-nav-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .anchor-nav a {
-    font-size: 0.78rem;
-    color: var(--accent);
-    text-decoration: none;
-    padding: 0.25rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .anchor-nav a:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-  }
 
   /* ── RESPONSIVE ── */
   @media (max-width: 520px) {
@@ -373,7 +342,7 @@
     left: 0;
     right: 0;
     z-index: 100;
-    background: rgba(15,15,19,0.85);
+    background: rgba(245,243,239,0.92);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     padding: 0.75rem 2rem;
@@ -402,19 +371,8 @@
   <h1>AI adoption was the right call.<br>The pace created blind spots.</h1>
   <p>Your team is already using AI tools. The question isn't whether to adopt. It's whether you've closed the gaps in education, security culture, and governance.</p>
   <a href="#articles" style="display:inline-block;margin-top:1.5rem;color:var(--accent);text-decoration:none;font-size:0.85rem;font-weight:500;letter-spacing:0.05em;transition:opacity 0.2s;opacity:0.8;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">&darr; Jump to articles</a>
-  <div class="scroll-hint">
-    Scroll
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 5v14M19 12l-7 7-7-7"/>
-    </svg>
-  </div>
 </div>
 
-<nav class="anchor-nav reveal">
-  <span class="anchor-nav-label">Jump to:</span>
-  <a href="#your-situation">Your Situation</a>
-  <a href="#articles">Articles</a>
-</nav>
 
 <!-- ════════════════════ THIS IS YOU ════════════════════ -->
 <section id="your-situation">

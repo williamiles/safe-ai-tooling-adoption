@@ -10,22 +10,22 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #0f0f13;
-    --surface: #1a1a24;
-    --surface-hover: #24243a;
-    --border: #2a2a3e;
-    --text: #e4e4ed;
-    --text-muted: #8888a4;
-    --accent: #7c6ff7;
-    --accent-glow: rgba(124, 111, 247, 0.15);
-    --red: #f76f6f;
-    --red-glow: rgba(247, 111, 111, 0.12);
-    --warm: #f39c6b;
-    --warm-glow: rgba(243, 156, 107, 0.12);
-    --green: #6bcf9f;
-    --green-glow: rgba(107, 207, 159, 0.15);
-    --yellow: #f7d76f;
-    --yellow-glow: rgba(247, 215, 111, 0.12);
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface-hover: #eeeae4;
+    --border: #ddd9d1;
+    --text: #2a2535;
+    --text-muted: #7d7589;
+    --accent: #5d56c9;
+    --accent-glow: rgba(93, 86, 201, 0.10);
+    --red: #c94f4f;
+    --red-glow: rgba(201, 79, 79, 0.10);
+    --warm: #c47848;
+    --warm-glow: rgba(196, 120, 72, 0.10);
+    --green: #3d9970;
+    --green-glow: rgba(61, 153, 112, 0.12);
+    --yellow: #a88a20;
+    --yellow-glow: rgba(168, 138, 32, 0.12);
   }
 
   html { scroll-behavior: smooth; }
@@ -38,8 +38,8 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
   }
-  *::selection { background: rgba(124, 111, 247, 0.3); }
-  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+  *::selection { background: rgba(93, 86, 201, 0.18); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(93, 86, 201, 0.10); }
 
   .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.7s ease, transform 0.7s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
@@ -47,7 +47,7 @@
   /* ── NAV ── */
   .topnav {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    background: rgba(15, 15, 19, 0.85); backdrop-filter: blur(12px);
+    background: rgba(245, 243, 239, 0.92); backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border); padding: 0.75rem 2rem;
     display: flex; align-items: center; justify-content: space-between;
   }
@@ -101,9 +101,9 @@
     display: flex; align-items: center; justify-content: center;
     font-weight: 700; font-size: 1.1rem; flex-shrink: 0;
   }
-  .mistake-num.m1 { background: var(--red-glow); color: var(--red); border: 1px solid rgba(247,111,111,0.2); }
-  .mistake-num.m2 { background: var(--warm-glow); color: var(--warm); border: 1px solid rgba(243,156,107,0.2); }
-  .mistake-num.m3 { background: var(--yellow-glow); color: var(--yellow); border: 1px solid rgba(247,215,111,0.2); }
+  .mistake-num.m1 { background: var(--red-glow); color: var(--red); border: 1px solid rgba(201,79,79,0.2); }
+  .mistake-num.m2 { background: var(--warm-glow); color: var(--warm); border: 1px solid rgba(196,120,72,0.2); }
+  .mistake-num.m3 { background: var(--yellow-glow); color: var(--yellow); border: 1px solid rgba(168,138,32,0.2); }
 
   .mistake-header-text { flex: 1; }
   .mistake-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.15rem; }
@@ -116,7 +116,7 @@
   }
   .mistake-block.open .mistake-toggle { transform: rotate(45deg); background: var(--accent-glow); color: var(--accent); }
 
-  .mistake-body { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; }
+  .mistake-body { overflow: hidden; transition: max-height 0.5s ease; }
   .mistake-block.open .mistake-body { max-height: 1200px; }
   .mistake-body-inner { padding: 0 2rem 2rem; }
 
@@ -161,13 +161,13 @@
     font-weight: 600; font-size: 0.82rem; transition: background 0.3s, border-color 0.3s;
   }
   .perm-msg.user.safe {
-    background: var(--green-glow); border: 1px solid rgba(107,207,159,0.3); color: var(--green);
+    background: var(--green-glow); border: 1px solid rgba(61,153,112,0.3); color: var(--green);
   }
   .perm-msg.user.rushed {
-    background: var(--red-glow); border: 1px solid rgba(247,111,111,0.3); color: var(--red);
+    background: var(--red-glow); border: 1px solid rgba(201,79,79,0.3); color: var(--red);
   }
   .perm-msg.user.instant {
-    background: var(--red-glow); border: 1px solid rgba(247,111,111,0.5); color: var(--red);
+    background: var(--red-glow); border: 1px solid rgba(201,79,79,0.5); color: var(--red);
   }
 
   .perm-btn-group {
@@ -177,7 +177,7 @@
   .perm-btn-group.visible { opacity: 1; transform: translateY(0); }
 
   .perm-allow-btn {
-    background: var(--green); color: #0f0f13; border: none;
+    background: var(--green); color: #ffffff; border: none;
     border-radius: 10px; padding: 0.55rem 1.25rem; font-family: inherit;
     font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
   }
@@ -284,7 +284,7 @@
   .output-sim .suspicious:hover { background: var(--red-glow); border-radius: 4px; }
 
   .flag-tooltip {
-    display: none; background: var(--red-glow); border: 1px solid rgba(247,111,111,0.3);
+    display: none; background: var(--red-glow); border: 1px solid rgba(201,79,79,0.3);
     border-radius: 10px; padding: 0.75rem 1rem; font-size: 0.82rem;
     color: var(--text); margin-top: 0.5rem; line-height: 1.6;
   }
@@ -298,8 +298,8 @@
     flex: 1; border-radius: 12px; padding: 1rem 1.1rem;
     font-size: 0.85rem; line-height: 1.6;
   }
-  .habit-card.before { background: var(--red-glow); border: 1px solid rgba(247,111,111,0.15); }
-  .habit-card.after { background: var(--green-glow); border: 1px solid rgba(107,207,159,0.15); }
+  .habit-card.before { background: var(--red-glow); border: 1px solid rgba(201,79,79,0.15); }
+  .habit-card.after { background: var(--green-glow); border: 1px solid rgba(61,153,112,0.15); }
 
   .habit-card-label { font-size: 0.65rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 0.4rem; }
   .habit-card.before .habit-card-label { color: var(--red); }
@@ -319,7 +319,7 @@
     width: 42px; height: 42px; border-radius: 12px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.2rem; flex-shrink: 0;
-    background: var(--accent-glow); border: 1px solid rgba(124,111,247,0.2);
+    background: var(--accent-glow); border: 1px solid rgba(93,86,201,0.2);
   }
 
   .best-practice h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.25rem; }
@@ -334,21 +334,6 @@
   .bp-item strong { color: var(--green); }
   .bp-item span { color: var(--text-muted); }
 
-  /* ── SCORE TRACKER ── */
-  .score-bar-wrap {
-    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-    padding: 2rem; text-align: center;
-  }
-  .score-bar-wrap h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
-  .score-bar-wrap .score-sub { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-
-  .score-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; margin-bottom: 1rem; }
-  .score-fill { height: 100%; width: 0%; border-radius: 4px; transition: width 0.6s ease, background 0.6s ease; background: var(--accent); }
-  .score-fill.half { background: var(--warm); }
-  .score-fill.full { background: var(--green); }
-
-  .score-text { font-size: 0.85rem; color: var(--text-muted); min-height: 1.4em; transition: color 0.3s; }
-  .score-text.complete { color: var(--green); font-weight: 600; }
 
   /* ── SOURCES ── */
   .sources { border-top: 1px solid var(--border); padding-top: 2rem; margin-top: 1rem; }
@@ -377,37 +362,6 @@
 
   footer { text-align: center; padding: 3rem 2rem; font-size: 0.75rem; color: var(--text-muted); border-top: 1px solid var(--border); max-width: 760px; margin: 0 auto; }
 
-  /* ── ANCHOR NAV ── */
-  .anchor-nav {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1rem;
-  }
-  .anchor-nav-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .anchor-nav a {
-    font-size: 0.78rem;
-    color: var(--accent);
-    text-decoration: none;
-    padding: 0.25rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .anchor-nav a:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-  }
 
   @media (max-width: 520px) {
     .habit-change { flex-direction: column; }
@@ -448,11 +402,6 @@
   </div>
 </div>
 
-<nav class="anchor-nav reveal">
-  <span class="anchor-nav-label">Jump to:</span>
-  <a href="#three-mistakes">Three Mistakes</a>
-  <a href="#best-practice">Three Settings</a>
-</nav>
 
 <!-- ── THREE MISTAKES ── -->
 <section id="three-mistakes">
@@ -666,19 +615,6 @@
   </div>
 </section>
 
-<!-- ── SCORE ── -->
-<section>
-  <div class="reveal">
-    <div class="score-bar-wrap">
-      <h3>Your awareness score</h3>
-      <p class="score-sub">Explore all three mistakes to fill the bar.</p>
-      <div class="score-track">
-        <div class="score-fill" id="scoreFill"></div>
-      </div>
-      <div class="score-text" id="scoreText"></div>
-    </div>
-  </div>
-</section>
 
 <!-- ── SOURCES ── -->
 <section>
@@ -720,41 +656,16 @@
     document.getElementById('progressBar').style.width = (window.scrollY / h * 100) + '%';
   });
 
-  // ── Mistake accordion ──
-  const explored = new Set();
+  // ── Mistake blocks (open by default) ──
+  document.querySelectorAll('.mistake-block').forEach(b => b.classList.add('open'));
 
   document.querySelectorAll('.mistake-header').forEach(header => {
     header.addEventListener('click', (e) => {
       e.stopPropagation();
       const block = header.closest('.mistake-block');
-      const wasOpen = block.classList.contains('open');
-      document.querySelectorAll('.mistake-block').forEach(b => b.classList.remove('open'));
-      if (!wasOpen) {
-        block.classList.add('open');
-        explored.add(block.dataset.mistake);
-        updateScore();
-      }
+      block.classList.toggle('open');
     });
   });
-
-  function updateScore() {
-    const pct = (explored.size / 3) * 100;
-    const fill = document.getElementById('scoreFill');
-    const text = document.getElementById('scoreText');
-    fill.style.width = pct + '%';
-    fill.classList.remove('half', 'full');
-    if (explored.size === 0) {
-      text.textContent = ''; text.classList.remove('complete');
-    } else if (explored.size < 3) {
-      fill.classList.add('half');
-      text.textContent = explored.size + ' of 3 mistakes explored';
-      text.classList.remove('complete');
-    } else {
-      fill.classList.add('full');
-      text.textContent = "You can see all three now. That's your superpower.";
-      text.classList.add('complete');
-    }
-  }
 
   // ── Permission fatigue chat (Mistake 1) ──
   document.getElementById('playPerms').addEventListener('click', function() {

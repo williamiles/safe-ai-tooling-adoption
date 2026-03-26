@@ -10,22 +10,22 @@
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --bg: #0f0f13;
-    --surface: #1a1a24;
-    --surface-hover: #24243a;
-    --border: #2a2a3e;
-    --text: #e4e4ed;
-    --text-muted: #8888a4;
-    --accent: #7c6ff7;
-    --accent-glow: rgba(124, 111, 247, 0.15);
-    --red: #f76f6f;
-    --red-glow: rgba(247, 111, 111, 0.12);
-    --warm: #f39c6b;
-    --warm-glow: rgba(243, 156, 107, 0.12);
-    --green: #6bcf9f;
-    --green-glow: rgba(107, 207, 159, 0.15);
-    --yellow: #f7d76f;
-    --yellow-glow: rgba(247, 215, 111, 0.12);
+    --bg: #f5f3ef;
+    --surface: #ffffff;
+    --surface-hover: #eeeae4;
+    --border: #ddd9d1;
+    --text: #2a2535;
+    --text-muted: #7d7589;
+    --accent: #5d56c9;
+    --accent-glow: rgba(93, 86, 201, 0.10);
+    --red: #c94f4f;
+    --red-glow: rgba(201, 79, 79, 0.10);
+    --warm: #c47848;
+    --warm-glow: rgba(196, 120, 72, 0.10);
+    --green: #3d9970;
+    --green-glow: rgba(61, 153, 112, 0.12);
+    --yellow: #a88a20;
+    --yellow-glow: rgba(168, 138, 32, 0.12);
   }
 
   html { scroll-behavior: smooth; }
@@ -38,8 +38,8 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
   }
-  *::selection { background: rgba(124, 111, 247, 0.3); }
-  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(124, 111, 247, 0.15); }
+  *::selection { background: rgba(93, 86, 201, 0.18); }
+  a, button, [role="button"], .spoke, .tile, [data-tile], [data-spoke] { -webkit-tap-highlight-color: rgba(93, 86, 201, 0.10); }
 
   .reveal {
     opacity: 0;
@@ -53,7 +53,7 @@
     position: fixed;
     top: 0; left: 0; right: 0;
     z-index: 100;
-    background: rgba(15,15,19,0.85);
+    background: rgba(245,243,239,0.92);
     backdrop-filter: blur(12px);
     border-bottom: 1px solid var(--border);
     padding: 0.75rem 2rem;
@@ -267,8 +267,8 @@
     flex-shrink: 0;
   }
 
-  .scene-avatar.warm { background: var(--warm-glow); border: 1px solid rgba(243,156,107,0.2); }
-  .scene-avatar.accent { background: var(--accent-glow); border: 1px solid rgba(124,111,247,0.2); }
+  .scene-avatar.warm { background: var(--warm-glow); border: 1px solid rgba(196,120,72,0.2); }
+  .scene-avatar.accent { background: var(--accent-glow); border: 1px solid rgba(93,86,201,0.2); }
 
   .scene-role {
     font-size: 0.7rem;
@@ -337,13 +337,13 @@
 
   .scene-highlight.warn {
     background: var(--red-glow);
-    border: 1px solid rgba(247,111,111,0.15);
+    border: 1px solid rgba(201,79,79,0.15);
     color: var(--red);
   }
 
   .scene-highlight.action {
     background: var(--green-glow);
-    border: 1px solid rgba(107,207,159,0.15);
+    border: 1px solid rgba(61,153,112,0.15);
     color: var(--green);
   }
 
@@ -387,12 +387,7 @@
     display: flex;
     align-items: flex-start;
     gap: 1.25rem;
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.5s ease;
   }
-
-  .env-card.visible { opacity: 1; transform: translateY(0); }
 
   .env-icon {
     width: 48px;
@@ -405,9 +400,9 @@
     flex-shrink: 0;
   }
 
-  .env-icon.green-bg { background: var(--green-glow); border: 1px solid rgba(107,207,159,0.2); }
-  .env-icon.accent-bg { background: var(--accent-glow); border: 1px solid rgba(124,111,247,0.2); }
-  .env-icon.warm-bg { background: var(--warm-glow); border: 1px solid rgba(243,156,107,0.2); }
+  .env-icon.green-bg { background: var(--green-glow); border: 1px solid rgba(61,153,112,0.2); }
+  .env-icon.accent-bg { background: var(--accent-glow); border: 1px solid rgba(93,86,201,0.2); }
+  .env-icon.warm-bg { background: var(--warm-glow); border: 1px solid rgba(196,120,72,0.2); }
 
   .env-card h3 {
     font-size: 1rem;
@@ -594,37 +589,6 @@
     margin: 0 auto;
   }
 
-  /* ── ANCHOR NAV ── */
-  .anchor-nav {
-    max-width: 760px;
-    margin: 0 auto;
-    padding: 1rem 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem 1rem;
-  }
-  .anchor-nav-label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-  }
-  .anchor-nav a {
-    font-size: 0.78rem;
-    color: var(--accent);
-    text-decoration: none;
-    padding: 0.25rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .anchor-nav a:hover {
-    background: var(--accent-glow);
-    border-color: var(--accent);
-  }
 
   @media (max-width: 520px) {
     .next-cta { flex-direction: column; text-align: center; }
@@ -663,14 +627,6 @@
   </div>
 </div>
 
-<nav class="anchor-nav reveal">
-  <span class="anchor-nav-label">Jump to:</span>
-  <a href="#tradeoff">The Tradeoff</a>
-  <a href="#your-people">Your People</a>
-  <a href="#your-role">Your Role</a>
-  <a href="#building-environment">Building Safety</a>
-  <a href="#action-items">Action Items</a>
-</nav>
 
 <!-- ── THE FALSE TRADEOFF ── -->
 <section id="tradeoff">
@@ -886,19 +842,13 @@
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
       if (entry.isIntersecting) {
-        if (entry.target.classList.contains('env-card')) {
-          const cards = document.querySelectorAll('.env-card');
-          const idx = Array.from(cards).indexOf(entry.target);
-          setTimeout(() => entry.target.classList.add('visible'), idx * 150);
-        } else {
-          entry.target.classList.add('visible');
-        }
+        entry.target.classList.add('visible');
         observer.unobserve(entry.target);
       }
     });
   }, { threshold: 0.12 });
 
-  document.querySelectorAll('.reveal, .env-card').forEach(el => observer.observe(el));
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
   // ── Reading progress bar ──
   window.addEventListener('scroll', () => {
